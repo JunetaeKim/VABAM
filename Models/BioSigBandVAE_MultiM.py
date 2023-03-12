@@ -48,7 +48,7 @@ def GenHighFilter (HF, N = 401):
     HPF /= tf.reduce_sum(HPF, axis=-1, keepdims=True)
     HPF = -HPF
 
-    ## HPF[(N - 1) // 2] += 1
+    ## To make HPF[(N - 1) // 2] += 1
     Mask = np.zeros(HPF.shape[1])
     Mask[(N - 1) // 2] += 1
     Mask = tf.constant(Mask, dtype=tf.float32)
