@@ -28,7 +28,7 @@ def GenLowFilter (LF, N = 401):
 
     # A low-pass filter
     X = 2 * LF * (nVec - (N - 1) / 2)
-    X = tf.maximum(X , 1e-7)
+    X = tf.where(X == 0, 1e-7, X)
     LPF = tf.sin(np.pi*X)/(np.pi*X)
     LPF *= Window
     LPF /= tf.reduce_sum(LPF, axis=-1, keepdims=True)
@@ -42,13 +42,13 @@ def GenHighFilter (HF, N = 401):
 
     # A high-pass filter
     Y = 2 * HF * (nVec - (N - 1) / 2)
-    Y = tf.maximum(Y , 1e-7)
+    Y = tf.where(Y == 0, 1e-7, Y)
     HPF = tf.sin(np.pi*Y)/(np.pi*Y)
     HPF *= Window
     HPF /= tf.reduce_sum(HPF, axis=-1, keepdims=True)
     HPF = -HPF
 
-    ## HPF[(N - 1) // 2] += 1
+    ## To make HPF[(N - 1) // 2] += 1
     Mask = np.zeros(HPF.shape[1])
     Mask[(N - 1) // 2] += 1
     Mask = tf.constant(Mask, dtype=tf.float32)
