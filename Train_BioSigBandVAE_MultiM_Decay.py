@@ -42,8 +42,8 @@ if __name__ == "__main__":
     Capacity_Z = 0.1
     Capacity_Fc = 0.1
     FcLimit = 0.05
-    DecayH = 0. 
-    DecayL = 0.
+    DecayH = 0.1 
+    DecayL = 0.05
     
     ### Other parameters
     Patience = 300
