@@ -36,7 +36,7 @@ def GenLowFilter (LF, N = 401, Decay=0):
     # Freq cutoff Decay effect
     if Decay != 0:
         #LPF *= np.exp(-Decay * nVec) 
-        LPF *= np.exp(-LF * Decay * nVec) 
+        LPF *= tf.exp(-LF * Decay * nVec) 
     
     return LPF[:,None] 
 
@@ -62,7 +62,7 @@ def GenHighFilter (HF, N = 401, Decay=0):
     # Freq cutoff Decay effect
     if Decay != 0:
         #HPF *= np.exp(-Decay * nVec) 
-        HPF *= np.exp(-HF * Decay * nVec) 
+        HPF *= tf.exp(-HF * Decay * nVec) 
     
     return HPF[:,None] 
 
