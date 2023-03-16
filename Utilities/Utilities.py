@@ -75,7 +75,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.SaveWay = SaveWay
         self.SavePath = SavePath
         self.Logs = []
-
+        self.LogsPath = "./Logs_" + SavePath.split('/')[-1].split('.')[0] + '.txt'
+        
         
     def on_epoch_end(self, epoch, logs={}):
         
@@ -95,7 +96,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             else:
                 CurrentLoss = np.max(SubLosses)
             
-            if CurrentLoss <= self.CheckLoss:
+            if CurrentLoss <= self.CheckLoss and epoch > 0:
                 self.model.save(self.SavePath)
                 print()
                 print('The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
@@ -103,18 +104,18 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 
                 self.Logs.append(str(epoch)+': The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
                 
-                with open("./LossLogs.txt", "w") as file:
+                with open(self.LogsPath, "w") as file:
                     file.write('\n'.join(self.Logs))
                 
                 self.CheckLoss = CurrentLoss
-            else:
+            elif epoch > 0:
                 print()
                 print('The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
                 print()
                 
                 self.Logs.append(str(epoch)+': The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
                 
-                with open("./LossLogs.txt", "w") as file:
+                with open(self.LogsPath, "w") as file:
                     file.write('\n'.join(self.Logs))
                 
                 
