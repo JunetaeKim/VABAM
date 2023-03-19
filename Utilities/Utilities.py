@@ -24,22 +24,26 @@ class Lossweight(tf.keras.layers.Layer):
     
 
 
-class KLAnneal(tf.keras.callbacks.Callback):
+class Anneal(tf.keras.callbacks.Callback):
     def __init__(self, TargetLossName, Threshold,  BetaName, MaxBeta=0.1, MinBeta=1e-5, AnnealEpoch=100, UnderLimit=0., verbose=1):
         
+        '''
         if type(TargetLossName) != list:
             TargetLossName = [TargetLossName]
+        '''
         
         self.TargetLossName = TargetLossName
         self.Threshold = Threshold
         self.BetaName = BetaName
         self.AnnealIdx = 0
         self.verbose = verbose 
-        self.Beta =  np.concatenate([np.array([UnderLimit]), np.linspace(start=MinBeta, stop=MaxBeta, num=AnnealEpoch )])
+        self.Beta =  np.concatenate([np.array([UnderLimit]), np.linspace(start=MinBeta, stop=MaxBeta, num=AnnealEpoch+1 )])
 
     def on_epoch_end(self, epoch, logs={}):
         
-        TargetLoss = max([logs[i] for i in self.TargetLossName]) 
+        #TargetLoss = max([logs[i] for i in self.TargetLossName.keys()]) 
+        TargetLoss = max([logs[LossName] / np.maximum(1e-7,self.model.get_layer(BetaName).variables[0].numpy())  for LossName, BetaName in self.TargetLossName.items()]) 
+        
         
         if TargetLoss > self.Threshold:
             
@@ -49,6 +53,7 @@ class KLAnneal(tf.keras.callbacks.Callback):
         else: 
             self.AnnealIdx += 1
             self.AnnealIdx = np.minimum(self.AnnealIdx, len(self.Beta)-1)
+
             K.set_value(self.model.get_layer(self.BetaName).variables[0], self.Beta[self.AnnealIdx])
         
         if self.verbose==1:
@@ -81,6 +86,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
         
         Losses = {key:logs[key]/np.maximum(1e-7,self.model.get_layer(beta).variables[0].numpy()) for key, beta in self.BetaList.items()}
+        rounded_losses = {key: round(value, 5) for key, value in Losses.items()}
+
 
         if self.ToSaveLoss is not None:
             
@@ -102,7 +109,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 print('The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
                 print()
                 
-                self.Logs.append(str(epoch)+': The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
+                #self.Logs.append(str(epoch)+': The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
+                self.Logs.append(str(epoch)+' saved '+ str(rounded_losses))
                 
                 with open(self.LogsPath, "w") as file:
                     file.write('\n'.join(self.Logs))
@@ -110,7 +118,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 self.CheckLoss = CurrentLoss
             elif epoch > 0:
                 print()
-                print('The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
+                #print('The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
+                self.Logs.append(str(epoch)+' not saved '+ str(rounded_losses))
                 print()
                 
                 self.Logs.append(str(epoch)+': The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
