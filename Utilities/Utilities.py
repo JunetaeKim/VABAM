@@ -65,7 +65,7 @@ class Anneal(tf.keras.callbacks.Callback):
           
 
 class RelLossWeight(tf.keras.callbacks.Callback):
-    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , verbose=1, ToSaveLoss=None, SaveWay=None, SavePath=None):
+    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True, SavePath=None):
             
         if type(ToSaveLoss) != list and ToSaveLoss is not None:
             ToSaveLoss = [ToSaveLoss]
@@ -80,6 +80,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.SaveWay = SaveWay
         self.SavePath = SavePath
         self.Logs = []
+        self.SaveLogOnly = SaveLogOnly
         self.LogsPath = "./Logs_" + SavePath.split('/')[-1].split('.')[0] + '.txt'
         
         
@@ -88,6 +89,12 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         Losses = {key:logs[key]/np.maximum(1e-7,self.model.get_layer(beta).variables[0].numpy()) for key, beta in self.BetaList.items()}
         rounded_losses = {key: round(value, 5) for key, value in Losses.items()}
 
+        if self.SaveLogOnly and self.ToSaveLoss == None:
+            self.Logs.append(str(epoch)+' '+ str(rounded_losses))
+            
+            with open(self.LogsPath, "w") as file:
+                file.write('\n'.join(self.Logs))
+        
 
         if self.ToSaveLoss is not None:
             
@@ -118,11 +125,11 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 self.CheckLoss = CurrentLoss
             elif epoch > 0:
                 print()
-                #print('The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
-                self.Logs.append(str(epoch)+' not saved '+ str(rounded_losses))
+                print('The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
                 print()
                 
-                self.Logs.append(str(epoch)+': The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
+                #self.Logs.append(str(epoch)+': The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
+                self.Logs.append(str(epoch)+' not saved '+ str(rounded_losses))
                 
                 with open(self.LogsPath, "w") as file:
                     file.write('\n'.join(self.Logs))
