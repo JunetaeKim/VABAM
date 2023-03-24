@@ -135,7 +135,7 @@ def Encoder(SigDim, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002,
     FCs = tf.clip_by_value(FCs, 1e-7, FcLimit-1e-7)
     FCs = ReName(FCs, 'FCs')
     
-    return Model(InpL, [Flatten(name='SigOut')(EncOut), FCs, Zs]) 
+    return Model(InpL, [Flatten(name='SigOut')(EncOut), FCs, Zs], name='EncModel') 
 
 
     
@@ -195,7 +195,7 @@ def FeatExtractor(SigDim, LatDim= 2, FiltLenList = [301, 301, 301, 301, 301, 301
     Sig_LL = Flatten(name='Sig_LL_Ext')(Sig_LL)
 
     
-    return Model([EncReInp, FCs], [Sig_HH, Sig_HL, Sig_LH, Sig_LL])
+    return Model([EncReInp, FCs], [Sig_HH, Sig_HL, Sig_LH, Sig_LL], name='FeatExtModel')
 
 
 
@@ -210,9 +210,9 @@ def FeatGenerator (LatDim= 2):
     HH_F, HL_F, LH_F, LL_F = tf.split(FCEach, 4, axis=1)
     
    
-    Dec_Sig_HH = Dense(10, activation='relu')(tf.concat([InpZ, FCCommon, HH_F], axis=-1))
-    Dec_Sig_HH = Dense(20, activation='relu')(Dec_Sig_HH)
+    Dec_Sig_HH = Dense(20, activation='relu')(tf.concat([InpZ, FCCommon, HH_F], axis=-1))
     Dec_Sig_HH = Dense(30, activation='relu')(Dec_Sig_HH)
+    Dec_Sig_HH = Dense(40, activation='relu')(Dec_Sig_HH)
     Dec_Sig_HH = Dense(50, activation='relu')(Dec_Sig_HH)
 
     Dec_Sig_HH = RepeatVector(10 )(Dec_Sig_HH)
@@ -223,9 +223,9 @@ def FeatGenerator (LatDim= 2):
     
     # ---------------------------------------------------------------------- #
     
-    Dec_Sig_HL = Dense(10, activation='relu')(tf.concat([InpZ, FCCommon, HL_F], axis=-1))
-    Dec_Sig_HL = Dense(20, activation='relu')(Dec_Sig_HL)
+    Dec_Sig_HL = Dense(20, activation='relu')(tf.concat([InpZ, FCCommon, HL_F], axis=-1))
     Dec_Sig_HL = Dense(30, activation='relu')(Dec_Sig_HL)
+    Dec_Sig_HL = Dense(40, activation='relu')(Dec_Sig_HL)
     Dec_Sig_HL = Dense(50, activation='relu')(Dec_Sig_HL)
 
     Dec_Sig_HL = RepeatVector(10 )(Dec_Sig_HL)
@@ -236,9 +236,9 @@ def FeatGenerator (LatDim= 2):
     
     # ---------------------------------------------------------------------- #
     
-    Dec_Sig_LH = Dense(10, activation='relu')(tf.concat([InpZ, FCCommon, LH_F], axis=-1))
-    Dec_Sig_LH = Dense(20, activation='relu')(Dec_Sig_LH)
+    Dec_Sig_LH = Dense(20, activation='relu')(tf.concat([InpZ, FCCommon, LH_F], axis=-1))
     Dec_Sig_LH = Dense(30, activation='relu')(Dec_Sig_LH)
+    Dec_Sig_LH = Dense(40, activation='relu')(Dec_Sig_LH)
     Dec_Sig_LH = Dense(50, activation='relu')(Dec_Sig_LH)
 
     Dec_Sig_LH = RepeatVector(10 )(Dec_Sig_LH)
@@ -249,9 +249,9 @@ def FeatGenerator (LatDim= 2):
     
     # ---------------------------------------------------------------------- #
     
-    Dec_Sig_LL = Dense(10, activation='relu')(tf.concat([InpZ, FCCommon, LL_F], axis=-1))
-    Dec_Sig_LL = Dense(20, activation='relu')(Dec_Sig_LL)
+    Dec_Sig_LL = Dense(20, activation='relu')(tf.concat([InpZ, FCCommon, LL_F], axis=-1))
     Dec_Sig_LL = Dense(30, activation='relu')(Dec_Sig_LL)
+    Dec_Sig_LL = Dense(40, activation='relu')(Dec_Sig_LL)
     Dec_Sig_LL = Dense(50, activation='relu')(Dec_Sig_LL)
 
     Dec_Sig_LL = RepeatVector(10 )(Dec_Sig_LL)
@@ -260,7 +260,7 @@ def FeatGenerator (LatDim= 2):
     Dec_Sig_LL = Dense(40,'tanh')(Dec_Sig_LL)
     Sig_LL= Flatten(name='Sig_LL_Gen')(Dec_Sig_LL)
     
-    return  Model([FCCommon, FCEach, InpZ], [Sig_HH, Sig_HL, Sig_LH, Sig_LL])
+    return  Model([FCCommon, FCEach, InpZ], [Sig_HH, Sig_HL, Sig_LH, Sig_LL], name='FeatGenModel')
 
 
 
@@ -271,7 +271,7 @@ def Reconstructor(SigDim , FeatDim=400 ):
     Sig_HL = Input(shape=(FeatDim,), name='Inp_Sig_HL')
     Sig_LH = Input(shape=(FeatDim,), name='Inp_Sig_LH')
     Sig_LL = Input(shape=(FeatDim,), name='Inp_Sig_LL')
-    FCs = Input(shape=(6,), name='Inp_FCs')
+    
 
     ## GRU NET -------------------------------------------------------------------
     Dec_Sig_HH = Reshape((-1, 100))(Sig_HH)
@@ -284,11 +284,15 @@ def Reconstructor(SigDim , FeatDim=400 ):
     Dec_Sig_LH = Bidirectional(GRU(5), name='Dec_Sig_LH')(Dec_Sig_LH)
     Dec_Sig_LL = Bidirectional(GRU(5), name='Dec_Sig_LL')(Dec_Sig_LL)
 
-    Decoder = tf.concat([ Dec_Sig_HH, Dec_Sig_HL, Dec_Sig_LH, Dec_Sig_LL, FCs], axis=1)
+    Decoder = tf.concat([ Dec_Sig_HH, Dec_Sig_HL, Dec_Sig_LH, Dec_Sig_LL], axis=1)
+    Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
+    Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
+    Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
+    Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = RepeatVector((SigDim//100) )(Decoder)
+    Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
     Decoder = Bidirectional(GRU(50, return_sequences=True))(Decoder)
-    Decoder = Dense(100, activation='relu')(Decoder)
     DecOut = Dense(100, activation='sigmoid')(Decoder)
     DecOut = Reshape((SigDim,),name='Out')(DecOut)
 
-    return Model([Sig_HH, Sig_HL, Sig_LH, Sig_LL, FCs], DecOut)
+    return Model([Sig_HH, Sig_HL, Sig_LH, Sig_LL], DecOut, name='ReconModel')

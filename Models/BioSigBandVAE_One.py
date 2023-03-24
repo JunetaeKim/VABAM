@@ -22,8 +22,8 @@ def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
     NoisVec = tf.reshape(NoisVec, (NBatch, -1))[:,:,None]
     return MaskVec, NoisVec
 
-def GenLowFilter (LF, N = 401):
-    nVec = np.arange(N)
+def GenLowFilter (LF, N = 401, Decay=0):
+    nVec = np.arange(N, dtype=np.float32)
     Window = tf.signal.hamming_window(N)
 
     # A low-pass filter
@@ -33,11 +33,17 @@ def GenLowFilter (LF, N = 401):
     LPF *= Window
     LPF /= tf.reduce_sum(LPF, axis=-1, keepdims=True)
     
+    # Freq cutoff Decay effect
+    if Decay != 0:
+        LPF *= tf.exp(-Decay * nVec) 
+        #LPF *= tf.exp(-LF * Decay * nVec) 
+        
+    
     return LPF[:,None] 
 
 
-def GenHighFilter (HF, N = 401):
-    nVec = np.arange(N)
+def GenHighFilter (HF, N = 401, Decay=0):
+    nVec = np.arange(N, dtype=np.float32)
     Window = tf.signal.hamming_window(N)
 
     # A high-pass filter
@@ -54,7 +60,14 @@ def GenHighFilter (HF, N = 401):
     Mask = tf.constant(Mask, dtype=tf.float32)
     HPF = HPF + Mask
     
+    # Freq cutoff Decay effect
+    if Decay != 0:
+        HPF *= tf.exp(-Decay * nVec) 
+        #HPF *= tf.exp(-HF * Decay * nVec) 
+        
+    
     return HPF[:,None] 
+
 
 
 def ReName (layer, name):
@@ -63,10 +76,9 @@ def ReName (layer, name):
 
 
 
-
 ## --------------------------------------------------    Models   ------------------------------------------------------------
 ## --------------------------------------------------   Encoder  -------------------------------------------------------------
-def Encoder(SigDim, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002, MaskStd = 0.1, ReparaStd = 0.1 , Reparam = False):
+def Encoder(SigDim, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002, MaskStd = 0.1, ReparaStd = 0.1 , Reparam = False, FcLimit=0.1):
 
     InpL = Input(shape=(SigDim,))
     InpFrame = tf.signal.frame(InpL, 100, 100)
@@ -86,48 +98,51 @@ def Encoder(SigDim, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002,
     Encoder = Dense(30, activation='relu')(Encoder)
     Encoder = Dense(15, activation='relu')(Encoder)
 
-    Z_Mean = Dense(LatDim, activation='linear')(Encoder)
-    Z_Log_Sigma = Dense(LatDim, activation='relu')(Encoder)
+    Z_Mu = Dense(LatDim, activation='linear', name='Z_Mu')(Encoder)
+    Z_Log_Sigma = Dense(LatDim, activation='softplus')(Encoder)
     Z_Log_Sigma = ReName(Z_Log_Sigma,'Z_Log_Sigma'+Type)
 
     
     # Reparameterization Trick for sampling from Guassian distribution
-    Epsilon = tf.random.normal(shape=(tf.shape(Z_Mean)[0], Z_Mean.shape[1]), mean=0., stddev=ReparaStd)
+    Epsilon = tf.random.normal(shape=(tf.shape(Z_Mu)[0], Z_Mu.shape[1]), mean=0., stddev=ReparaStd)
 
     if Reparam==False:
         Epsilon = Epsilon * 0
 
-    Z_Mean = Z_Mean + tf.exp(0.5 * Z_Log_Sigma) * Epsilon
-    Z_Mean = ReName(Z_Mean,'Z_Mean'+Type)
+    Zs = Z_Mu + tf.exp(0.5 * Z_Log_Sigma) * Epsilon
+    Zs = ReName(Zs,'Zs'+Type)
     
-    FCs =   Dense(6, activation='relu')(Encoder)
-    FCs =   Dense(6, activation='sigmoid')(FCs)
-    
+    FC_Mu =   Dense(6, activation='relu')(Encoder)
+    FC_Mu =   Dense(6, activation='sigmoid')(FC_Mu)
+    FC_Mu = tf.clip_by_value(FC_Mu, 1e-7, 1-1e-7)
+    FC_Mu = ReName(FC_Mu,'FC_Mu')
     
     # Reparameterization Trick for sampling from Uniformly distribution; ϵ∼U(0,1) 
-    FCs = tf.clip_by_value(FCs, 1e-7, 1-1e-7)
-    Epsilon = tf.random.uniform(shape=(tf.shape(FCs)[0], FCs.shape[1]))
+    Epsilon = tf.random.uniform(shape=(tf.shape(FC_Mu)[0], FC_Mu.shape[1]))
     Epsilon = tf.clip_by_value(Epsilon, 1e-7, 1-1e-7)
     
     LogEps = tf.math.log(Epsilon)
     LogNegEps = tf.math.log(1 - Epsilon)
     
-    LogTheta = tf.math.log(FCs)
-    LogNegTheta = tf.math.log(1-FCs)
+    LogTheta = tf.math.log(FC_Mu)
+    LogNegTheta = tf.math.log(1-FC_Mu)
     
     if Reparam==True:
-        FCs = tf.math.sigmoid(LogEps - LogNegEps + LogTheta - LogNegTheta)
+        FCs = tf.math.sigmoid(LogEps - LogNegEps + LogTheta - LogNegTheta) * 1. + FC_Mu * 0.
+    else:
+        FCs = tf.math.sigmoid(LogEps - LogNegEps + LogTheta - LogNegTheta) * 0. + FC_Mu * 1.
     
-    FCs = tf.clip_by_value(FCs, 1e-7, 1-1e-7)
+    FCs = FCs * FcLimit
+    FCs = tf.clip_by_value(FCs, 1e-7, FcLimit-1e-7)
     FCs = ReName(FCs, 'FCs')
     
-    return [InpL], [Flatten(name='SigOut')(EncOut), Z_Mean, FCs]
+    return [InpL], [Flatten(name='SigOut')(EncOut), Zs, FCs]
 
 
 
 
 ## --------------------------------------------------   FeatExtractor  -------------------------------------------------------------
-def FeatExtractor(Inps, LatDim= 2, FiltLenList = [301, 301, 301, 301, 301, 301] ):
+def FeatExtractor(Inps, LatDim= 2, FiltLenList = [301, 301, 301, 301, 301, 301], DecayH = 0. , DecayL = 0.  ):
     
     EncReInp, InpZ, FCs = Inps
     
@@ -136,8 +151,8 @@ def FeatExtractor(Inps, LatDim= 2, FiltLenList = [301, 301, 301, 301, 301, 301] 
 
     ### Filtering level 1 -------------------------------------------------------------------
     ## Filter generation
-    To_H = GenHighFilter(H_F,  N=FiltLenList[0])
-    To_L = GenLowFilter(L_F, N=FiltLenList[1])
+    To_H = GenHighFilter(H_F,  N=FiltLenList[0], Decay=DecayH)
+    To_L = GenLowFilter(L_F, N=FiltLenList[1], Decay=DecayL)
 
     ## Perform signal filtering level 1
     InpFrame =  tf.signal.frame(EncReInp, To_H.shape[-1], 1)
@@ -152,32 +167,32 @@ def FeatExtractor(Inps, LatDim= 2, FiltLenList = [301, 301, 301, 301, 301, 301] 
 
     ### Filtering level HH and HL (from Sig_H) -------------------------------------------------------------------
     ## Filter generation
-    To_HH = GenHighFilter(HH_F, N=FiltLenList[2])
-    To_HL = GenLowFilter(HL_F, N=FiltLenList[3])
+    To_HH = GenHighFilter(HH_F, N=FiltLenList[2], Decay=DecayH)
+    To_HL = GenLowFilter(HL_F, N=FiltLenList[3], Decay=DecayL)
 
     ## Perform signal filtering level 2
     Frame_H =  tf.signal.frame(Sig_H[:,:,0], To_HH.shape[-1], 1)
     Sig_HH = tf.reduce_sum(Frame_H*To_HH[:,:,::-1], axis=-1, keepdims=True)
-    #Sig_HH = ReName(Sig_HH, 'Sig_HH_Ext')
+    #Sig_HH = Flatten(name='Sig_HH_Ext')(Sig_HH)
 
     Frame_H =  tf.signal.frame(Sig_H[:,:,0], To_HL.shape[-1], 1)
     Sig_HL = tf.reduce_sum(Frame_H*To_HL[:,:,::-1], axis=-1, keepdims=True)
-    #Sig_HL = ReName(Sig_HL, 'Sig_HL_Ext')
+    #Sig_HL = Flatten(name='Sig_HL_Ext')(Sig_HL)
 
 
     ### Filtering level LH and LL (from Sig_L) -------------------------------------------------------------------
     ## Filter generation
-    To_LH = GenHighFilter(LH_F,  N=FiltLenList[4])
-    To_LL = GenLowFilter(LL_F,  N=FiltLenList[5])
+    To_LH = GenHighFilter(LH_F,  N=FiltLenList[4], Decay=DecayH)
+    To_LL = GenLowFilter(LL_F,  N=FiltLenList[5], Decay=DecayL)
 
     ## Perform signal filtering level 2
     Frame_L =  tf.signal.frame(Sig_L[:,:,0], To_LH.shape[-1], 1)
     Sig_LH = tf.reduce_sum(Frame_L*To_LH[:,:,::-1], axis=-1, keepdims=True)
-    #Sig_LH = ReName(Sig_LH, 'Sig_LH_Ext')
+    #Sig_LH = Flatten(name='Sig_LH_Ext')(Sig_LH)
 
     Frame_L =  tf.signal.frame(Sig_L[:,:,0], To_LL.shape[-1], 1)
     Sig_LL = tf.reduce_sum(Frame_L*To_LL[:,:,::-1], axis=-1, keepdims=True)
-    #Sig_LL = ReName(Sig_LL, 'Sig_LL_Ext')
+    #Sig_LL = Flatten(name='Sig_LL_Ext')(Sig_LL)
 
     
     return [Flatten(name='Sig_HH_Ext')(Sig_HH), Flatten(name='Sig_HL_Ext')(Sig_HL), Flatten(name='Sig_LH_Ext')(Sig_LH), Flatten(name='Sig_LL_Ext')(Sig_LL)]
