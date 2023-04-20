@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.stats import spearmanr
 
-def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200):
+def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200, MinZval = -3., MaxZval = 3.,):
     LatDim= FeatGenModel.input[-1].shape[-1]
-    Z_pred = np.linspace(-1.5, 1.5, N_Gen*LatDim).reshape(N_Gen, -1)
+    Z_pred = np.linspace(MinZval, MaxZval, N_Gen*LatDim).reshape(N_Gen, -1)
     FC_Comm = np.tile(np.ones(2) * FC, (N_Gen,1))
     FC_Each = np.tile(np.ones(4) * FC, (N_Gen,1))
     FeatGen = FeatGenModel([FC_Comm,FC_Each, Z_pred])
@@ -17,18 +17,18 @@ def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200):
     return SigGen, Amplitude
 
 
-def GenSig_FcVar (FeatGenModel, ReconModel, zValue, N_Gen=200, zType='Fixed'):
+def GenSig_FcVar (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZval = -3., MaxZval = 3., zType='Fixed'):
     LatDim= FeatGenModel.input[-1].shape[-1]
     if zType=='Random':
         Z_pred=np.random.normal(0, 1, ( N_Gen, LatDim))
     elif zType=='Line' :
-        Z_pred = np.linspace(-1.5, 1.5, N_Gen*LatDim).reshape(N_Gen, -1)
+        Z_pred = np.linspace(MinZval, MaxZval, N_Gen*LatDim).reshape(N_Gen, -1)
     elif zType=='Fixed':
         Z_pred = zValue
         
         
-    FC_Comm = np.tile(np.linspace(1e-7, 0.05, N_Gen )[:, None], (1,2))
-    FC_Each = np.tile(np.linspace(1e-7, 0.05, N_Gen )[:, None], (1,4))
+    FC_Comm = np.tile(np.linspace(1e-7, MaxFreq, N_Gen )[:, None], (1,2))
+    FC_Each = np.tile(np.linspace(1e-7, MaxFreq, N_Gen )[:, None], (1,4))
 
     FeatGen = FeatGenModel([FC_Comm,FC_Each, Z_pred])
     PredFCs = np.concatenate([FC_Comm,FC_Each], axis=-1)
