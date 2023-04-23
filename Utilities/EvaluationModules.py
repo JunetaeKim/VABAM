@@ -56,6 +56,8 @@ def GenSig_ZFcVar (FeatGenModel, ReconModel, Z_pred, FC_Comm, FC_Each, FreqRange
 
 
 
+
+
 def KernelGen (SortedWindow, MinIdx, WindowSize):
     
     TotalSpace = WindowSize-1
@@ -85,7 +87,8 @@ def KernelGen (SortedWindow, MinIdx, WindowSize):
     return Kernel
 
 
-def MonotonDegree (Vec, WindowSize):
+
+def MonotonDegree (Vec, WindowSize, Weight):
     
     AbsRhoList = []
     Global_Variability = np.std(Vec)
@@ -94,7 +97,7 @@ def MonotonDegree (Vec, WindowSize):
         Window = Vec[i:i + WindowSize]
 
         # Create an ideal monotonic list based on the sorted vector
-        SortedWindow = sorted(Window)
+        SortedWindow = sorted(Window).copy()
 
         SubRhos=[]
         # Compute Spearman's rho between Kernel and window
@@ -107,7 +110,13 @@ def MonotonDegree (Vec, WindowSize):
             # Compute Spearman's rho
             SubRho = spearmanr(Window, Kernel)[0]
             # Appeding sub-Rho values
-            SubRhos.append(abs(SubRho) * np.log(WindowSize)) # log(WindowSize) : Weighting by increasing window size
+                       
+            if Weight == 'WindowSize':
+                WeightVal = WindowSize
+            elif Weight == 'Continuity':
+                WeightVal = np.maximum(WindowSize - np.argmin(Kernel), np.argmin(Kernel)+1)
+                
+            SubRhos.append(abs(SubRho) * np.log(WeightVal)) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
 
         AbsRhoList.append(max(SubRhos))
 
@@ -116,7 +125,8 @@ def MonotonDegree (Vec, WindowSize):
 
 
 ## Permutation Local Correlation Monotonicity Index (PLCMI)
-def PLCMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., MinFreq=1, MaxFreq=51):
+def PLCMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., MinFreq=1, MaxFreq=51, Weight='Continuity'):
+    assert Weight in ['WindowSize','Continuity'], '''either 'WindowSize' or 'Continuity' is allowed for the weight argument'''
     
     zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
     zValues = np.linspace(MinZval , MaxZval , N_Interval)
@@ -132,8 +142,9 @@ def PLCMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinS
             MaxIDX = np.argmax(np.mean(Heatmap, axis=0))
             Vec =  Heatmap[:, MaxIDX]
 
-            print(zIdx, np.round(zVal,2),  np.round(MonotonDegree(Vec, MonoWinSize), 4))
+            Res = [zIdx, np.round(zVal,2),  np.round(MonotonDegree(Vec, MonoWinSize, Weight), 4)]
+            print(Res)
             
-            ResList.append([zIdx, zVal, MonotonDegree(Vec, MonoWinSize)])
+            ResList.append(Res)
             
     return ResList
