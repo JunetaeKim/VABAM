@@ -1,6 +1,9 @@
 import numpy as np
 from scipy.stats import spearmanr
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
 def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200, MinZval = -3., MaxZval = 3.,):
     LatDim= FeatGenModel.input[-1].shape[-1]
@@ -213,7 +216,7 @@ def VisReconGivenZ (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Ge
     # Create a colormap and normalize it based on the number of experiments
     cmap = cm.get_cmap('viridis')
     norm = plt.Normalize(0, N_Gen-1)
-    norm2 = plt.Normalize(0, 0.05)
+    norm2 = plt.Normalize(MinFreqR, MaxFreqR)
 
     if Mode == 'Origin':
         VisSet = SigGen
@@ -241,3 +244,60 @@ def VisReconGivenZ (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Ge
     cbar.set_label('Frequency ranges', size=14)
 
     plt.show()
+    
+    return SigGen, FeatGen[0], FeatGen[1], FeatGen[2], FeatGen[3]
+
+    
+    
+def VisReconGivenFreq (FeatGenModel,  ReconModel, LatDim, FcCommFix, FcEachFix,  Mode='Origin', N_Gen=300, MinZval = -3., MaxZval = 3., CutLower=-0.1, CutUpper = 0.1):
+    
+    zVal = np.linspace(MinZval, MaxZval, N_Gen*LatDim).reshape(N_Gen, -1)
+
+    FC_Comm = np.tile(np.zeros(2) , (N_Gen,1))
+    FC_Each = np.tile(np.zeros(4) , (N_Gen,1))
+
+    for KeyVal in FcCommFix.items():
+        FC_Comm[:,KeyVal[0]] = KeyVal[1]
+
+    for KeyVal in FcEachFix.items():
+        FC_Each[:,KeyVal[0]] = KeyVal[1]
+        
+        
+    FeatGen = FeatGenModel([FC_Comm,FC_Each, zVal])
+    PredFCs = np.concatenate([FC_Comm,FC_Each], axis=-1)
+    SigGen = ReconModel([FeatGen])
+    
+    # Create a colormap and normalize it based on the number of experiments
+    cmap = cm.get_cmap('viridis')
+    norm = plt.Normalize(0, N_Gen-1)
+    norm2 = plt.Normalize(MinZval, MaxZval)
+
+    if Mode == 'Origin':
+        VisSet = SigGen
+    elif Mode == 'HH':
+        VisSet = FeatGen[0]
+    elif Mode == 'HL':
+        VisSet = FeatGen[1]
+    elif Mode == 'LH':
+        VisSet = FeatGen[2]
+    elif Mode == 'LL':
+        VisSet = FeatGen[3]    
+
+    fig, ax = plt.subplots(figsize=(15, 7))
+    for i in range(0, N_Gen):
+        color = cmap(norm(i))
+        if np.min(zVal[i]) < CutLower or np.max(zVal[i]) > CutUpper:
+            ax.plot(VisSet[i], color=color)
+
+
+    # Create color bar
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.1)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label('z-value ranges')
+
+    plt.show()
+    
+    return SigGen, FeatGen[0], FeatGen[1], FeatGen[2], FeatGen[3]
