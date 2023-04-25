@@ -117,7 +117,7 @@ def MonotonDegree (Vec, WindowSize, Weight):
             elif Weight == 'Continuity':
                 WeightVal = np.maximum(WindowSize - np.argmin(Kernel), np.argmin(Kernel)+1)
                 
-            SubRhos.append(abs(SubRho) * np.log(WeightVal)) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
+            SubRhos.append(abs(SubRho) * WeightVal) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
 
         AbsRhoList.append(max(SubRhos))
 
@@ -127,7 +127,7 @@ def MonotonDegree (Vec, WindowSize, Weight):
 
 ## Permutation Local Correlation Monotonicity Index (PLCMI)
 def PLCMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., MinFreq=1, MaxFreq=51, Weight='Continuity'):
-    assert Weight in ['WindowSize','Continuity'], '''either 'WindowSize' or 'Continuity' is allowed for the weight argument'''
+    assert Weight in ['WindowSize','Continuity'], '''either 'WindowSize' or 'Continuity' is allowed for 'weight' '''
     
     zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
     zValues = np.linspace(MinZval , MaxZval , N_Interval)
@@ -155,7 +155,7 @@ def PLCMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinS
 
 
 ### Qualitative and Visual Evaluation
-def HeatMapFrequency (FeatGenModel,  ReconModel, LatDim, N_Gen, ZFix, MinFreq=1, MaxFreq=51):
+def HeatMapFrequency (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
     zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
     for KeyVal in ZFix.items():
@@ -190,3 +190,54 @@ def VisReconExtract (ValData, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, N
         plt.plot(RecPred[i])
     plt.plot(ValData[idx],linestyle='--', color='black', label='True signal')
     plt.legend()
+    
+    return RecPred, HH,HL,LH, LL
+
+
+def VisReconGivenZ (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
+    
+    assert Mode in ['Origin','HH','HL','LH','LL'], '''either 'Origin', 'HH', 'HL', 'LH', and 'LL' is allowed for 'Mode' '''
+
+    zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
+    for KeyVal in ZFix.items():
+        zVal[:,KeyVal[0]] = KeyVal[1]
+        
+    FC_Comm = np.tile(np.linspace(MinFreqR, MaxFreqR, N_Gen )[:, None], (1,2))
+    FC_Each = np.tile(np.linspace(MinFreqR, MaxFreqR, N_Gen )[:, None], (1,4))
+
+    FeatGen = FeatGenModel([FC_Comm,FC_Each, zVal])
+    PredFCs = np.concatenate([FC_Comm,FC_Each], axis=-1)
+    SigGen = ReconModel([FeatGen])
+    
+    
+    # Create a colormap and normalize it based on the number of experiments
+    cmap = cm.get_cmap('viridis')
+    norm = plt.Normalize(0, N_Gen-1)
+    norm2 = plt.Normalize(0, 0.05)
+
+    if Mode == 'Origin':
+        VisSet = SigGen
+    elif Mode == 'HH':
+        VisSet = FeatGen[0]
+    elif Mode == 'HL':
+        VisSet = FeatGen[1]
+    elif Mode == 'LH':
+        VisSet = FeatGen[2]
+    elif Mode == 'LL':
+        VisSet = FeatGen[3]    
+
+    fig, ax = plt.subplots(figsize=(15, 7))
+    for i in range(0, N_Gen):
+        color = cmap(norm(i))
+        ax.plot(VisSet[i], color=color)
+
+
+    # Create color bar
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.1)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label('Frequency ranges', size=14)
+
+    plt.show()
