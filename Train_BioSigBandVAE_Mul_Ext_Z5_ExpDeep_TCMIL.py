@@ -108,13 +108,13 @@ if __name__ == "__main__":
     ### Adding the RecLoss; 
     MSE = tf.keras.losses.MeanSquaredError()
     
-    ReconOut_ext = Beta_Rec_ext * MSE(ReconOut_ext, EncInp)
-    SigBandRepModel.add_loss(ReconOut_ext)
-    SigBandRepModel.add_metric(ReconOut_ext, 'ReconOut_ext')
+    ReconOutExt = Beta_Rec_ext * MSE(ReconOut_ext, EncInp)
+    SigBandRepModel.add_loss(ReconOutExt)
+    SigBandRepModel.add_metric(ReconOutExt, 'ReconOutExt')
     
-    #ReconOut_gen = Beta_Rec_gen * MSE(ReconOut_gen, EncInp)
-    #SigBandRepModel.add_loss(ReconOut_gen)
-    #SigBandRepModel.add_metric(ReconOut_gen, 'ReconOut_gen')
+    #ReconOutGen = Beta_Rec_gen * MSE(ReconOut_gen, EncInp)
+    #SigBandRepModel.add_loss(ReconOutGen)
+    #SigBandRepModel.add_metric(ReconOutGen, 'ReconOutGen')
     
 
     ### Adding the FeatRecLoss; It allows connection between the extractor and generator
@@ -171,17 +171,17 @@ if __name__ == "__main__":
     #KLD_Beta_Z = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Z',  MaxBeta=0.1 , MinBeta=0.1, AnnealEpoch=1, UnderLimit=1e-7, verbose=2)
     #KLD_Beta_Fc = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Fc',  MaxBeta=0.005 , MinBeta=0.005, AnnealEpoch=1, UnderLimit=1e-7, verbose=1)
 
-    RelLossDic = { 'val_ReconOut_ext':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc', 'val_kl_Loss_TC':'Beta_TC', 'val_kl_Loss_MI':'Beta_MI'}
-    ScalingDic = { 'val_ReconOut_ext':100., 'val_FeatRecLoss':200., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1, 'val_kl_Loss_TC':0.1, 'val_kl_Loss_MI':0.1}
-    MinLimit = {'Beta_Rec_ext':1., 'Beta_Feat':1., 'Beta_Z':0.01, 'Beta_Fc':0.01, 'Beta_TC':0.01, 'Beta_MI':0.01}
-    MaxLimit = {'Beta_Rec_ext':500., 'Beta_Feat':500., 'Beta_Z':0.25, 'Beta_Fc':0.25, 'Beta_TC':0.25, 'Beta_MI':0.25}
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName, CheckPoint=200)
+    RelLossDic = { 'val_ReconOutExt':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc', 'val_kl_Loss_TC':'Beta_TC', 'val_kl_Loss_MI':'Beta_MI'}
+    ScalingDic = { 'val_ReconOutExt':100., 'val_FeatRecLoss':200., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1, 'val_kl_Loss_TC':0.1, 'val_kl_Loss_MI':0.1}
+    MinLimit = {'Beta_Rec_ext':1., 'Beta_Feat':1., 'Beta_Z':0.1, 'Beta_Fc':0.1, 'Beta_TC':0.01, 'Beta_MI':0.01}
+    MaxLimit = {'Beta_Rec_ext':500., 'Beta_Feat':500., 'Beta_Z':0.5, 'Beta_Fc':0.4, 'Beta_TC':0.25, 'Beta_MI':0.25}
+    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOutExt'] , SaveWay='max' , SavePath = ModelSaveName, CheckPoint=200)
     
     
        
     
     # Model Training
-    #SigBandRepModel.load_weights(ModelSaveName)
+    SigBandRepModel.load_weights(ModelSaveName)
     SigBandRepModel.fit(TrData, batch_size=3000, epochs=2000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
