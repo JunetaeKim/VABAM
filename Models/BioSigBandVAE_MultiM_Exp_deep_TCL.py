@@ -1,10 +1,12 @@
+'''tobe'''
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda
 from tensorflow.keras import Model
 
-
+SlidingSize = 100
 
 def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
     ## Masking vector generation 1 vs 0
@@ -80,7 +82,7 @@ def ReName (layer, name):
 def Encoder(SigDim, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002, MaskStd = 0.1, ReparaStd = 0.1 , Reparam = False, FcLimit=0.1):
 
     InpL = Input(shape=(SigDim,), name='Inp_Enc')
-    InpFrame = tf.signal.frame(InpL, 100, 100)
+    InpFrame = tf.signal.frame(InpL, SlidingSize, SlidingSize)
 
     if Reparam:
         InpRegul = GaussianNoise(stddev=NoiseStd)(InpFrame, training=Reparam)
@@ -274,10 +276,10 @@ def Reconstructor(SigDim , FeatDim=400 ):
     
 
     ## GRU NET -------------------------------------------------------------------
-    Dec_Sig_HH = Reshape((-1, 100))(Sig_HH)
-    Dec_Sig_HL = Reshape((-1, 100))(Sig_HL)
-    Dec_Sig_LH = Reshape((-1, 100))(Sig_LH)
-    Dec_Sig_LL = Reshape((-1, 100))(Sig_LL)
+    Dec_Sig_HH = Reshape((-1, SlidingSize))(Sig_HH)
+    Dec_Sig_HL = Reshape((-1, SlidingSize))(Sig_HL)
+    Dec_Sig_LH = Reshape((-1, SlidingSize))(Sig_LH)
+    Dec_Sig_LL = Reshape((-1, SlidingSize))(Sig_LL)
 
     Dec_Sig_HH = Bidirectional(GRU(5), name='Dec_Sig_HH')(Dec_Sig_HH)
     Dec_Sig_HL = Bidirectional(GRU(5), name='Dec_Sig_HL')(Dec_Sig_HL)
@@ -289,10 +291,10 @@ def Reconstructor(SigDim , FeatDim=400 ):
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
-    Decoder = RepeatVector((SigDim//100) )(Decoder)
+    Decoder = RepeatVector((SigDim//SlidingSize) )(Decoder)
     Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
     Decoder = Bidirectional(GRU(50, return_sequences=True))(Decoder)
-    DecOut = Dense(100, activation='sigmoid')(Decoder)
+    DecOut = Dense(SlidingSize, activation='sigmoid')(Decoder)
     DecOut = Reshape((SigDim,),name='Out')(DecOut)
 
     return Model([Sig_HH, Sig_HL, Sig_LH, Sig_LL], DecOut, name='ReconModel')
