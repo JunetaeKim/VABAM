@@ -215,7 +215,7 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_HH = Dense(40, activation='relu')(Dec_Sig_HH)
     Dec_Sig_HH = Dense(50, activation='relu')(Dec_Sig_HH)
 
-    Dec_Sig_HH = RepeatVector(10 )(Dec_Sig_HH)
+    Dec_Sig_HH = RepeatVector(SigDim//SlidingSize )(Dec_Sig_HH)
     Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
     Dec_Sig_HH = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_HH)
     Dec_Sig_HH = Dense(40,'tanh')(Dec_Sig_HH)
@@ -228,7 +228,7 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_HL = Dense(40, activation='relu')(Dec_Sig_HL)
     Dec_Sig_HL = Dense(50, activation='relu')(Dec_Sig_HL)
 
-    Dec_Sig_HL = RepeatVector(10 )(Dec_Sig_HL)
+    Dec_Sig_HL = RepeatVector(SigDim//SlidingSize )(Dec_Sig_HL)
     Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
     Dec_Sig_HL = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_HL)
     Dec_Sig_HL = Dense(40,'tanh')(Dec_Sig_HL)
@@ -241,7 +241,7 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_LH = Dense(40, activation='relu')(Dec_Sig_LH)
     Dec_Sig_LH = Dense(50, activation='relu')(Dec_Sig_LH)
 
-    Dec_Sig_LH = RepeatVector(10 )(Dec_Sig_LH)
+    Dec_Sig_LH = RepeatVector(SigDim//SlidingSize )(Dec_Sig_LH)
     Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
     Dec_Sig_LH = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_LH)
     Dec_Sig_LH = Dense(40,'tanh')(Dec_Sig_LH)
@@ -254,7 +254,7 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_LL = Dense(40, activation='relu')(Dec_Sig_LL)
     Dec_Sig_LL = Dense(50, activation='relu')(Dec_Sig_LL)
 
-    Dec_Sig_LL = RepeatVector(10 )(Dec_Sig_LL)
+    Dec_Sig_LL = RepeatVector(SigDim//SlidingSize )(Dec_Sig_LL)
     Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
     Dec_Sig_LL = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_LL)
     Dec_Sig_LL = Dense(40,'tanh')(Dec_Sig_LL)

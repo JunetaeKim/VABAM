@@ -9,7 +9,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
 from tensorflow.keras import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from Models.BioSigBandVAE_MultiM_Exp_deep_xfreq import *
+from Models.BioSigBandVAE_MultiM_Exp_deep_T10 import *
 from Utilities.Utilities import *
 
 
@@ -65,11 +65,11 @@ if __name__ == "__main__":
         
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
+    EncModel = Encoder(SigDim=SigDim, SlidingSize=SlidingSize, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
     FeatExtModel = FeatExtractor(SigDim=SigDim, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, FeatDim=400)
-
+    FeatGenModel = FeatGenerator(SigDim=SigDim, SlidingSize=SlidingSize, LatDim= LatDim)
+    ReconModel = Reconstructor(SigDim=SigDim, SlidingSize=SlidingSize, FeatDim=400)
+    
     ## Model core parts
     EncInp =EncModel.input
     InpZ = EncModel.output[2]
@@ -79,11 +79,11 @@ if __name__ == "__main__":
     ## Each output of each model
     FeatExtOut = FeatExtModel(EncModel.output[:2])
     FeatGenOut = FeatGenModel([InpFCCommon, InpFCEach, InpZ])
-    ReconOut_ext = ReconModel(FeatExtOut)
-    ReconOut_gen = ReconModel(FeatGenOut)
+    ReconExtOut = ReconModel(FeatExtOut)
+    ReconGenOut = ReconModel(FeatGenOut)
 
     ### Define the total model
-    SigBandRepModel = Model(EncInp, [FeatGenOut, ReconOut_ext, ReconOut_gen])
+    SigBandRepModel = Model(EncInp, [FeatGenOut, ReconExtOut, ReconGenOut])
 
     ### Weight controller; Apply beta and capacity 
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.05)(FeatGenOut)
@@ -95,11 +95,11 @@ if __name__ == "__main__":
     ### Adding the RecLoss; 
     MSE = tf.keras.losses.MeanSquaredError()
     
-    ReconOut_ext = Beta_Rec_ext * MSE(ReconOut_ext, EncInp)
+    ReconOut_ext = Beta_Rec_ext * MSE(ReconExtOut, EncInp)
     SigBandRepModel.add_loss(ReconOut_ext)
     SigBandRepModel.add_metric(ReconOut_ext, 'ReconOut_ext')
     
-    #ReconOut_gen = Beta_Rec_gen * MSE(ReconOut_gen, EncInp)
+    #ReconOut_gen = Beta_Rec_gen * MSE(ReconGenOut, EncInp)
     #SigBandRepModel.add_loss(ReconOut_gen)
     #SigBandRepModel.add_metric(ReconOut_gen, 'ReconOut_gen')
     
@@ -146,7 +146,7 @@ if __name__ == "__main__":
        
     
     # Model Training
-    #SigBandRepModel.load_weights(ModelSaveName)
+    SigBandRepModel.load_weights(ModelSaveName)
     SigBandRepModel.fit(TrData, batch_size=3000, epochs=2000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
