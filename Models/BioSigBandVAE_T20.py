@@ -92,11 +92,12 @@ def Encoder(SigDim, SlidingSize = 100, LatDim= 2, Type = '', MaskingRate = 0.025
         EncInp, EncOut = InpFrame, InpFrame
 
     Encoder = Dense(50, activation='relu')(InpFrame)
-    Encoder = Bidirectional(GRU(30, return_sequences=True))(Encoder)
-    Encoder = Bidirectional(GRU(30, return_sequences=False))(Encoder)
+    Encoder = Bidirectional(GRU(25, return_sequences=True))(Encoder)
+    Encoder = Bidirectional(GRU(25, return_sequences=True))(Encoder)
+    Encoder = Bidirectional(GRU(50, return_sequences=False))(Encoder)
     Encoder = Dense(50, activation='relu')(Encoder)
     Encoder = Dense(30, activation='relu')(Encoder)
-    Encoder = Dense(15, activation='relu')(Encoder)
+    Encoder = Dense(20, activation='relu')(Encoder)
 
     Z_Mu = Dense(LatDim, activation='linear', name='Z_Mu')(Encoder)
     Z_Log_Sigma = Dense(LatDim, activation='softplus')(Encoder)
@@ -218,8 +219,9 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
 
     Dec_Sig_HH = RepeatVector(SigDim//SlidingSize )(Dec_Sig_HH)
     Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
-    Dec_Sig_HH = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_HH)
-    Dec_Sig_HH = Dense(40,'tanh')(Dec_Sig_HH)
+    Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
+    Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
+    Dec_Sig_HH = Dense(20,'tanh')(Dec_Sig_HH)
     Sig_HH= Flatten(name='Sig_HH_Gen')(Dec_Sig_HH)
     
     # ---------------------------------------------------------------------- #
@@ -231,8 +233,9 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
 
     Dec_Sig_HL = RepeatVector(SigDim//SlidingSize )(Dec_Sig_HL)
     Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
-    Dec_Sig_HL = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_HL)
-    Dec_Sig_HL = Dense(40,'tanh')(Dec_Sig_HL)
+    Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
+    Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
+    Dec_Sig_HL = Dense(20,'tanh')(Dec_Sig_HL)
     Sig_HL= Flatten(name='Sig_HL_Gen')(Dec_Sig_HL)
     
     # ---------------------------------------------------------------------- #
@@ -244,8 +247,9 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
 
     Dec_Sig_LH = RepeatVector(SigDim//SlidingSize )(Dec_Sig_LH)
     Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
-    Dec_Sig_LH = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_LH)
-    Dec_Sig_LH = Dense(40,'tanh')(Dec_Sig_LH)
+    Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
+    Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
+    Dec_Sig_LH = Dense(20,'tanh')(Dec_Sig_LH)
     Sig_LH= Flatten(name='Sig_LH_Gen')(Dec_Sig_LH)
     
     # ---------------------------------------------------------------------- #
@@ -257,8 +261,9 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
 
     Dec_Sig_LL = RepeatVector(SigDim//SlidingSize )(Dec_Sig_LL)
     Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
-    Dec_Sig_LL = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_LL)
-    Dec_Sig_LL = Dense(40,'tanh')(Dec_Sig_LL)
+    Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
+    Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
+    Dec_Sig_LL = Dense(20,'tanh')(Dec_Sig_LL)
     Sig_LL= Flatten(name='Sig_LL_Gen')(Dec_Sig_LL)
     
     return  Model([FCCommon, FCEach, InpZ], [Sig_HH, Sig_HL, Sig_LH, Sig_LL], name='FeatGenModel')
@@ -280,10 +285,10 @@ def Reconstructor(SigDim , SlidingSize = 100, FeatDim=400 ):
     Dec_Sig_LH = Reshape((-1, SlidingSize))(Sig_LH)
     Dec_Sig_LL = Reshape((-1, SlidingSize))(Sig_LL)
 
-    Dec_Sig_HH = Bidirectional(GRU(5), name='Dec_Sig_HH')(Dec_Sig_HH)
-    Dec_Sig_HL = Bidirectional(GRU(5), name='Dec_Sig_HL')(Dec_Sig_HL)
-    Dec_Sig_LH = Bidirectional(GRU(5), name='Dec_Sig_LH')(Dec_Sig_LH)
-    Dec_Sig_LL = Bidirectional(GRU(5), name='Dec_Sig_LL')(Dec_Sig_LL)
+    Dec_Sig_HH = Bidirectional(GRU(10), name='Dec_Sig_HH')(Dec_Sig_HH)
+    Dec_Sig_HL = Bidirectional(GRU(10), name='Dec_Sig_HL')(Dec_Sig_HL)
+    Dec_Sig_LH = Bidirectional(GRU(10), name='Dec_Sig_LH')(Dec_Sig_LH)
+    Dec_Sig_LL = Bidirectional(GRU(10), name='Dec_Sig_LL')(Dec_Sig_LL)
 
     Decoder = tf.concat([ Dec_Sig_HH, Dec_Sig_HL, Dec_Sig_LH, Dec_Sig_LL], axis=1)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
@@ -292,7 +297,8 @@ def Reconstructor(SigDim , SlidingSize = 100, FeatDim=400 ):
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = RepeatVector((SigDim//SlidingSize) )(Decoder)
     Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
-    Decoder = Bidirectional(GRU(50, return_sequences=True))(Decoder)
+    Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
+    Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
     DecOut = Dense(SlidingSize, activation='sigmoid')(Decoder)
     DecOut = Reshape((SigDim,),name='Out')(DecOut)
 

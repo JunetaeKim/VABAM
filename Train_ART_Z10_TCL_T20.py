@@ -9,7 +9,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
 from tensorflow.keras import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from Models.BioSigBandVAE_MultiM_Exp_deep_TCL_T20 import *
+from Models.BioSigBandVAE_T20 import *
 from Utilities.Utilities import *
 
 
