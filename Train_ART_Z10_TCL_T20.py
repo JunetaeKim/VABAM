@@ -48,7 +48,7 @@ if __name__ == "__main__":
     TrRate = 0.8
     
     SavePath = './Results/'
-    ModelName = 'ART_Z'+str(LatDim)+'_TCL_T10.hdf5'
+    ModelName = 'ART_Z'+str(LatDim)+'_TCL_T20.hdf5'
     
     if not os.path.exists(SavePath):
         os.mkdir(SavePath)
