@@ -1,10 +1,9 @@
-'''tobe'''
-
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda
 from tensorflow.keras import Model
+
 
 
 def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
@@ -78,10 +77,10 @@ def ReName (layer, name):
 
 ## --------------------------------------------------    Models   ------------------------------------------------------------
 ## --------------------------------------------------   Encoder  -------------------------------------------------------------
-def Encoder(SigDim, SlidingSize = 100, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002, MaskStd = 0.1, ReparaStd = 0.1 , Reparam = False, FcLimit=0.1):
+def Encoder(SigDim, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002, MaskStd = 0.1, ReparaStd = 0.1 , Reparam = False, FcLimit=0.1):
 
     InpL = Input(shape=(SigDim,), name='Inp_Enc')
-    InpFrame = tf.signal.frame(InpL, SlidingSize, SlidingSize)
+    InpFrame = tf.signal.frame(InpL, 100, 100)
 
     if Reparam:
         InpRegul = GaussianNoise(stddev=NoiseStd)(InpFrame, training=Reparam)
@@ -92,12 +91,11 @@ def Encoder(SigDim, SlidingSize = 100, LatDim= 2, Type = '', MaskingRate = 0.025
         EncInp, EncOut = InpFrame, InpFrame
 
     Encoder = Dense(50, activation='relu')(InpFrame)
-    Encoder = Bidirectional(GRU(25, return_sequences=True))(Encoder)
-    Encoder = Bidirectional(GRU(25, return_sequences=True))(Encoder)
-    Encoder = Bidirectional(GRU(50, return_sequences=False))(Encoder)
+    Encoder = Bidirectional(GRU(30, return_sequences=True))(Encoder)
+    Encoder = Bidirectional(GRU(30, return_sequences=False))(Encoder)
     Encoder = Dense(50, activation='relu')(Encoder)
     Encoder = Dense(30, activation='relu')(Encoder)
-    Encoder = Dense(20, activation='relu')(Encoder)
+    Encoder = Dense(15, activation='relu')(Encoder)
 
     Z_Mu = Dense(LatDim, activation='linear', name='Z_Mu')(Encoder)
     Z_Log_Sigma = Dense(LatDim, activation='softplus')(Encoder)
@@ -203,7 +201,7 @@ def FeatExtractor(SigDim, LatDim= 2, FiltLenList = [301, 301, 301, 301, 301, 301
 
 
 ## --------------------------------------------------   FeatGenerator  -------------------------------------------------------------
-def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
+def FeatGenerator (LatDim= 2):
     
     InpZ = Input(shape=(LatDim,), name='Inp_Z')
     FCCommon = Input(shape=(2,), name='Inp_FCCommon')
@@ -217,11 +215,10 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_HH = Dense(40, activation='relu')(Dec_Sig_HH)
     Dec_Sig_HH = Dense(50, activation='relu')(Dec_Sig_HH)
 
-    Dec_Sig_HH = RepeatVector(SigDim//SlidingSize )(Dec_Sig_HH)
+    Dec_Sig_HH = RepeatVector(10 )(Dec_Sig_HH)
     Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
-    Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
-    Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
-    Dec_Sig_HH = Dense(20,'tanh')(Dec_Sig_HH)
+    Dec_Sig_HH = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_HH)
+    Dec_Sig_HH = Dense(40,'tanh')(Dec_Sig_HH)
     Sig_HH= Flatten(name='Sig_HH_Gen')(Dec_Sig_HH)
     
     # ---------------------------------------------------------------------- #
@@ -231,11 +228,10 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_HL = Dense(40, activation='relu')(Dec_Sig_HL)
     Dec_Sig_HL = Dense(50, activation='relu')(Dec_Sig_HL)
 
-    Dec_Sig_HL = RepeatVector(SigDim//SlidingSize )(Dec_Sig_HL)
+    Dec_Sig_HL = RepeatVector(10 )(Dec_Sig_HL)
     Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
-    Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
-    Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
-    Dec_Sig_HL = Dense(20,'tanh')(Dec_Sig_HL)
+    Dec_Sig_HL = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_HL)
+    Dec_Sig_HL = Dense(40,'tanh')(Dec_Sig_HL)
     Sig_HL= Flatten(name='Sig_HL_Gen')(Dec_Sig_HL)
     
     # ---------------------------------------------------------------------- #
@@ -245,11 +241,10 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_LH = Dense(40, activation='relu')(Dec_Sig_LH)
     Dec_Sig_LH = Dense(50, activation='relu')(Dec_Sig_LH)
 
-    Dec_Sig_LH = RepeatVector(SigDim//SlidingSize )(Dec_Sig_LH)
+    Dec_Sig_LH = RepeatVector(10 )(Dec_Sig_LH)
     Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
-    Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
-    Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
-    Dec_Sig_LH = Dense(20,'tanh')(Dec_Sig_LH)
+    Dec_Sig_LH = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_LH)
+    Dec_Sig_LH = Dense(40,'tanh')(Dec_Sig_LH)
     Sig_LH= Flatten(name='Sig_LH_Gen')(Dec_Sig_LH)
     
     # ---------------------------------------------------------------------- #
@@ -259,11 +254,10 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
     Dec_Sig_LL = Dense(40, activation='relu')(Dec_Sig_LL)
     Dec_Sig_LL = Dense(50, activation='relu')(Dec_Sig_LL)
 
-    Dec_Sig_LL = RepeatVector(SigDim//SlidingSize )(Dec_Sig_LL)
+    Dec_Sig_LL = RepeatVector(10 )(Dec_Sig_LL)
     Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
-    Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
-    Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
-    Dec_Sig_LL = Dense(20,'tanh')(Dec_Sig_LL)
+    Dec_Sig_LL = Bidirectional(GRU(20, return_sequences=True))(Dec_Sig_LL)
+    Dec_Sig_LL = Dense(40,'tanh')(Dec_Sig_LL)
     Sig_LL= Flatten(name='Sig_LL_Gen')(Dec_Sig_LL)
     
     return  Model([FCCommon, FCEach, InpZ], [Sig_HH, Sig_HL, Sig_LH, Sig_LL], name='FeatGenModel')
@@ -271,7 +265,7 @@ def FeatGenerator (SigDim, LatDim= 2, SlidingSize= 100):
 
 
 ## --------------------------------------------------   Reconstructor  -------------------------------------------------------------
-def Reconstructor(SigDim , SlidingSize = 100, FeatDim=400 ):
+def Reconstructor(SigDim , FeatDim=400 ):
     
     Sig_HH = Input(shape=(FeatDim,), name='Inp_Sig_HH')
     Sig_HL = Input(shape=(FeatDim,), name='Inp_Sig_HL')
@@ -280,34 +274,25 @@ def Reconstructor(SigDim , SlidingSize = 100, FeatDim=400 ):
     
 
     ## GRU NET -------------------------------------------------------------------
-    Dec_Sig_HH = Reshape((-1, SlidingSize))(Sig_HH)
-    Dec_Sig_HL = Reshape((-1, SlidingSize))(Sig_HL)
-    Dec_Sig_LH = Reshape((-1, SlidingSize))(Sig_LH)
-    Dec_Sig_LL = Reshape((-1, SlidingSize))(Sig_LL)
+    Dec_Sig_HH = Reshape((-1, 100))(Sig_HH)
+    Dec_Sig_HL = Reshape((-1, 100))(Sig_HL)
+    Dec_Sig_LH = Reshape((-1, 100))(Sig_LH)
+    Dec_Sig_LL = Reshape((-1, 100))(Sig_LL)
 
-    Dec_Sig_HH = Bidirectional(GRU(10), name='Dec_Sig_HH')(Dec_Sig_HH)
-    Dec_Sig_HL = Bidirectional(GRU(10), name='Dec_Sig_HL')(Dec_Sig_HL)
-    Dec_Sig_LH = Bidirectional(GRU(10), name='Dec_Sig_LH')(Dec_Sig_LH)
-    Dec_Sig_LL = Bidirectional(GRU(10), name='Dec_Sig_LL')(Dec_Sig_LL)
+    Dec_Sig_HH = Bidirectional(GRU(5), name='Dec_Sig_HH')(Dec_Sig_HH)
+    Dec_Sig_HL = Bidirectional(GRU(5), name='Dec_Sig_HL')(Dec_Sig_HL)
+    Dec_Sig_LH = Bidirectional(GRU(5), name='Dec_Sig_LH')(Dec_Sig_LH)
+    Dec_Sig_LL = Bidirectional(GRU(5), name='Dec_Sig_LL')(Dec_Sig_LL)
 
     Decoder = tf.concat([ Dec_Sig_HH, Dec_Sig_HL, Dec_Sig_LH, Dec_Sig_LL], axis=1)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
     Decoder = Dense(Decoder.shape[-1], activation='relu')(Decoder)
-    Decoder = RepeatVector((SigDim//SlidingSize) )(Decoder)
+    Decoder = RepeatVector((SigDim//100) )(Decoder)
     Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
-    Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
-    Decoder = Bidirectional(GRU(25, return_sequences=True))(Decoder)
-    DecOut = Dense(SlidingSize, activation='sigmoid')(Decoder)
+    Decoder = Bidirectional(GRU(50, return_sequences=True))(Decoder)
+    DecOut = Dense(100, activation='sigmoid')(Decoder)
     DecOut = Reshape((SigDim,),name='Out')(DecOut)
 
     return Model([Sig_HH, Sig_HL, Sig_LH, Sig_LL], DecOut, name='ReconModel')
-
-
-
-def LogNormalDensity(LatSamp, LatMean, LogSquaScale):
-    Norm = tf.math.log(2. * tf.constant(np.pi))
-    InvSigma = tf.math.exp(-LogSquaScale)
-    MeanSampDiff = (LatSamp - LatMean)
-    return -0.5 * (MeanSampDiff * MeanSampDiff * InvSigma + LogSquaScale + Norm)
