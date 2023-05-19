@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.stats import spearmanr
-from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -93,9 +92,9 @@ def KernelGen (SortedWindow, MinIdx, WindowSize):
 
 
 
-def MonotonDegree (Vec, WindowSize, Weight, Type):
+def MonotonDegree (Vec, WindowSize, Weight):
     
-    MDList = []
+    AbsRhoList = []
     Global_Variability = np.std(Vec)
     
     for i in range(len(Vec) - WindowSize+1):
@@ -104,46 +103,34 @@ def MonotonDegree (Vec, WindowSize, Weight, Type):
         # Create an ideal monotonic list based on the sorted vector
         SortedWindow = sorted(Window).copy()
 
-        SubMDs=[]
-        # Compute MD values between Kernel and window
+        SubRhos=[]
+        # Compute Spearman's rho between Kernel and window
         for MinIdx in range(WindowSize):
             LeftSpaceSize = MinIdx - 0 
 
             Kernel = KernelGen(SortedWindow, MinIdx, WindowSize)
             #Kernel = sorted(Window)
-            
-            if Type == 'Cor':
-                # Compute Spearman's rho
-                SubMD = spearmanr(Window, Kernel)[0]
-            elif Type == 'L2':               
-                SubMD = np.sum((Window- Kernel)**2)
-                SubMD = np.log(1/SubMD)
-            elif Type == 'R2':       
-                SubMD = np.maximum(r2_score(Window, Kernel), 0) 
-                
-            # Appeding sub-MD values
+
+            # Compute Spearman's rho
+            SubRho = spearmanr(Window, Kernel)[0]
+            # Appeding sub-Rho values
+                       
             if Weight == 'WindowSize':
                 WeightVal = WindowSize
             elif Weight == 'Continuity':
                 WeightVal = np.maximum(WindowSize - np.argmin(Kernel), np.argmin(Kernel)+1)
-            elif Weight == 'Amplitude':
-                WeightVal = np.log(np.sum(Kernel))
-            elif Weight == 'RevHHI':
-                KernelRate = Kernel / np.sum(Kernel)
-                WeightVal = np.exp(1-np.sum(KernelRate**2))
                 
+            SubRhos.append(abs(SubRho) * WeightVal) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
 
-            SubMDs.append(abs(SubMD) * WeightVal) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
-
-        MDList.append(max(SubMDs))
-
-
-    return np.mean(MDList) #* Global_Variability # Global_Variability : Weighting by increasing total std.
+        AbsRhoList.append(max(SubRhos))
 
 
-## Permutation Local Monotonicity Index (PLMI)
-def PLMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight='Continuity', Type='Cor'):
-    assert Weight in ['WindowSize','Continuity', 'Amplitude', 'RevHHI'], '''either 'WindowSize', 'Continuity','Amplitude' or 'RevHHI' is allowed for 'weight' '''
+    return np.mean(AbsRhoList) #* Global_Variability # Global_Variability : Weighting by increasing total std.
+
+
+## Permutation Local Correlation Monotonicity Index (PLCMI)
+def PLCMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., MinFreq=1, MaxFreq=51, Weight='Continuity'):
+    assert Weight in ['WindowSize','Continuity'], '''either 'WindowSize' or 'Continuity' is allowed for 'weight' '''
     
     zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
     zValues = np.linspace(MinZval , MaxZval , N_Interval)
@@ -156,15 +143,10 @@ def PLMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSi
 
             Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
             Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
-            MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
-            
-            MonoRes = []
-            for IDX in MaxIDX:
-                Vec =  Heatmap[:, IDX]
-                MonoRes.append(np.round(MonotonDegree(Vec, MonoWinSize, Weight, Type), 4)) 
-            
-            Res = [zIdx, np.round(zVal,2), np.max(MonoRes)]
-                
+            MaxIDX = np.argmax(np.mean(Heatmap, axis=0))
+            Vec =  Heatmap[:, MaxIDX]
+
+            Res = [zIdx, np.round(zVal,2),  np.round(MonotonDegree(Vec, MonoWinSize, Weight), 4)]
             print(Res)
             
             ResList.append(Res)

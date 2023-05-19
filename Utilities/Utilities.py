@@ -65,7 +65,7 @@ class Anneal(tf.keras.callbacks.Callback):
           
 
 class RelLossWeight(tf.keras.callbacks.Callback):
-    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True, SavePath=None):
+    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True, SavePath=None, CheckPoint=False):
             
         if type(ToSaveLoss) != list and ToSaveLoss is not None:
             ToSaveLoss = [ToSaveLoss]
@@ -82,6 +82,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.Logs = []
         self.SaveLogOnly = SaveLogOnly
         self.LogsPath = "./Logs_" + SavePath.split('/')[-1].split('.')[0] + '.txt'
+        self.CheckPoint = CheckPoint
         
         
     def on_epoch_end(self, epoch, logs={}):
@@ -95,7 +96,14 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             with open(self.LogsPath, "w") as file:
                 file.write('\n'.join(self.Logs))
         
-
+        if self.CheckPoint:
+            if epoch % self.CheckPoint==0:
+                CharIDX = self.SavePath.rfind('/')
+                Path = self.SavePath[:CharIDX+1] +'Epoch' + str(epoch)+'_' + self.SavePath[CharIDX+1:]
+                print(Path)
+                self.model.save(Path)
+        
+        
         if self.ToSaveLoss is not None:
             
             SubLosses = []

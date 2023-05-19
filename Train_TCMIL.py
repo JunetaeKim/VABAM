@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+from argparse import ArgumentParser
 
 
 import tensorflow as tf
@@ -9,13 +10,13 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
 from tensorflow.keras import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from Models.BioSigBandVAE_T20 import *
+from Models.FPVAE_T20 import *
 from Utilities.Utilities import *
 
 
 ## GPU selection
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 # TensorFlow wizardry
 config = tf.compat.v1.ConfigProto()
@@ -29,26 +30,51 @@ tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))
 
 if __name__ == "__main__":
 
+    
+    # Create the parser
+    parser = ArgumentParser()
+    
+    # Add Model related parameters
+    parser.add_argument('--LatDim', type=int, required=True, help='The dimensionality of the latent variable z.')
+    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II')
+    
+    parser.add_argument('--MaskingRate', type=float, required=False, default=0.00, help='The sequence masking ratio refers to the proportion of the sequence that will be masked during training.')
+    parser.add_argument('--NoiseStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation across the entire signal.')
+    parser.add_argument('--MaskStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation applied to the masked signal.')
+    parser.add_argument('--ReparaStd', type=float, required=False, default=0.1, help='The standard deviation value for Gaussian noise generation used in the reparametrization trick.')
+    parser.add_argument('--Capacity_Z', type=float, required=False, default=0.1, help='The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.')
+    parser.add_argument('--Capacity_Fc', type=float, required=False, default=0.1, help='The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.')
+    parser.add_argument('--FcLimit', type=float, required=False, default=0.05, help='The upper threshold value for frequency.')
+    parser.add_argument('--DecayH', type=float, required=False, default=0.00, help='The decay effect on the cutoff frequency when creating a high-pass filter.')
+    parser.add_argument('--DecayL', type=float, required=False, default=0.00, help='The decay effect on the cutoff frequency when creating a low-pass filter.')
+    
+    # Other parameters
+    parser.add_argument('--Patience', type=int, required=False, default=300, help='The patience value for early stopping during model training.')
+    
+    
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
-    LatDim = 10
-    MaskingRate = 0.0
-    NoiseStd = 0.002
-    MaskStd = 0.1
-    ReparaStd = 0.1
-    Capacity_Z = 0.1
-    Capacity_Fc = 0.1
-    FcLimit = 0.05
-    DecayH = 0. 
-    DecayL = 0.
-    SlidingSize = 50
+    args = parser.parse_args() # Parse the arguments
     
-    ### Other parameters
-    Patience = 300
-    TrRate = 0.8
+    LatDim = args.LatDim
+    SigType = args.SigType
     
+    assert SigType in ['ART', 'PLETH', 'II'], "Value should be either ART, PLETH, II."
+
+    MaskingRate = args.MaskingRate
+    NoiseStd = args.NoiseStd
+    MaskStd = args.MaskStd
+    ReparaStd = args.ReparaStd
+    Capacity_Z = args.Capacity_Z
+    Capacity_Fc = args.Capacity_Fc
+    FcLimit = args.FcLimit
+    DecayH = args.DecayH
+    DecayL = args.DecayL
+    Patience = args.Patience
+    
+
     SavePath = './Results/'
-    ModelName = 'ART_Z'+str(LatDim)+'_TCL_T20.hdf5'
+    ModelName = 'TCMIL_'+str(SigType)+'_Z'+str(LatDim)+'.hdf5'
     
     if not os.path.exists(SavePath):
         os.mkdir(SavePath)
@@ -59,16 +85,16 @@ if __name__ == "__main__":
 
     
     #### -----------------------------------------------------   Data load and processing   -------------------------------------------------------------------------    
-    TrData = np.load('./Data/ProcessedData/TrART.npy')
-    ValData = np.load('./Data/ProcessedData/ValART.npy')
+    TrData = np.load('./Data/ProcessedData/Tr'+str(SigType)+'.npy')
+    ValData = np.load('./Data/ProcessedData/Val'+str(SigType)+'.npy')
     SigDim = TrData.shape[1]
-    
+        
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, SlidingSize=SlidingSize, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
+    EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
     FeatExtModel = FeatExtractor(SigDim=SigDim, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(SigDim=SigDim, SlidingSize=SlidingSize, LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, SlidingSize=SlidingSize, FeatDim=400)
+    FeatGenModel = FeatGenerator(SigDim=SigDim, LatDim= LatDim)
+    ReconModel = Reconstructor(SigDim=SigDim, FeatDim=400)
 
     ## Model core parts
     EncInp =EncModel.input
@@ -89,6 +115,7 @@ if __name__ == "__main__":
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.05)(FeatGenOut)
     Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.05)(FeatGenOut)
     Beta_TC = Lossweight(name='Beta_TC', InitVal=0.05)(FeatGenOut)
+    Beta_MI = Lossweight(name='Beta_MI', InitVal=0.05)(FeatGenOut)
     Beta_Rec_ext = Lossweight(name='Beta_Rec_ext', InitVal=500.)(FeatGenOut)
     Beta_Rec_gen = Lossweight(name='Beta_Rec_gen', InitVal=500.)(FeatGenOut)
     Beta_Feat = Lossweight(name='Beta_Feat', InitVal=500.)(FeatGenOut)
@@ -130,6 +157,12 @@ if __name__ == "__main__":
     Log_QZ = tf.reduce_logsumexp(tf.reduce_sum(LogProb_QZ, axis=2, keepdims=False),   axis=1,   keepdims=False)
     kl_Loss_TC = -tf.reduce_mean(Log_QZ - Log_QZ_Prod)
     kl_Loss_TC = Beta_TC * kl_Loss_TC
+
+    ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
+    Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
+    kl_Loss_MI = -tf.reduce_mean((Log_QZX - Log_QZ))
+    kl_Loss_MI = Beta_MI * kl_Loss_MI
+
     
     
     SigBandRepModel.add_loss(kl_Loss_Z )
@@ -140,6 +173,9 @@ if __name__ == "__main__":
 
     SigBandRepModel.add_loss(kl_Loss_TC )
     SigBandRepModel.add_metric(kl_Loss_TC , 'kl_Loss_TC')
+    
+    SigBandRepModel.add_loss(kl_Loss_MI )
+    SigBandRepModel.add_metric(kl_Loss_MI , 'kl_Loss_MI')
 
     
     ## Model Compile
@@ -150,17 +186,17 @@ if __name__ == "__main__":
     #KLD_Beta_Z = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Z',  MaxBeta=0.1 , MinBeta=0.1, AnnealEpoch=1, UnderLimit=1e-7, verbose=2)
     #KLD_Beta_Fc = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Fc',  MaxBeta=0.005 , MinBeta=0.005, AnnealEpoch=1, UnderLimit=1e-7, verbose=1)
 
-    RelLossDic = { 'val_ReconOut_ext':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc', 'val_kl_Loss_TC':'Beta_TC'}
-    ScalingDic = { 'val_ReconOut_ext':100., 'val_FeatRecLoss':200., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1, 'val_kl_Loss_TC':0.1}
-    MinLimit = {'Beta_Rec_ext':1., 'Beta_Feat':1., 'Beta_Z':0.01, 'Beta_Fc':0.01, 'Beta_TC':0.01}
-    MaxLimit = {'Beta_Rec_ext':500., 'Beta_Feat':500., 'Beta_Z':0.25, 'Beta_Fc':0.25, 'Beta_TC':0.25}
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName, CheckPoint=200)
+    RelLossDic = { 'val_ReconOut_ext':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc', 'val_kl_Loss_TC':'Beta_TC', 'val_kl_Loss_MI':'Beta_MI'}
+    ScalingDic = { 'val_ReconOut_ext':100., 'val_FeatRecLoss':200., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1, 'val_kl_Loss_TC':0.1, 'val_kl_Loss_MI':0.1}
+    MinLimit = {'Beta_Rec_ext':1., 'Beta_Feat':1., 'Beta_Z':0.1, 'Beta_Fc':0.1, 'Beta_TC':0.01, 'Beta_MI':0.01}
+    MaxLimit = {'Beta_Rec_ext':500., 'Beta_Feat':500., 'Beta_Z':0.5, 'Beta_Fc':0.4, 'Beta_TC':0.25, 'Beta_MI':0.25}
+    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName)
     
     
        
     
     # Model Training
     #SigBandRepModel.load_weights(ModelSaveName)
-    SigBandRepModel.fit(TrData, batch_size=3000, epochs=2000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
+    SigBandRepModel.fit(TrData, batch_size=3000, epochs=1200, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 

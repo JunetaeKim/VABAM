@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+from argparse import ArgumentParser
 
 
 import tensorflow as tf
@@ -9,13 +10,13 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
 from tensorflow.keras import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from Models.BioSigBandVAE_T10 import *
+from Models.FPVAE_T20 import *
 from Utilities.Utilities import *
 
 
 ## GPU selection
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
 # TensorFlow wizardry
 config = tf.compat.v1.ConfigProto()
@@ -29,26 +30,51 @@ tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))
 
 if __name__ == "__main__":
 
+    
+    # Create the parser
+    parser = ArgumentParser()
+    
+    # Add Model related parameters
+    parser.add_argument('--LatDim', type=int, required=True, help='The dimensionality of the latent variable z.')
+    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II')
+    
+    parser.add_argument('--MaskingRate', type=float, required=False, default=0.00, help='The sequence masking ratio refers to the proportion of the sequence that will be masked during training.')
+    parser.add_argument('--NoiseStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation across the entire signal.')
+    parser.add_argument('--MaskStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation applied to the masked signal.')
+    parser.add_argument('--ReparaStd', type=float, required=False, default=0.1, help='The standard deviation value for Gaussian noise generation used in the reparametrization trick.')
+    parser.add_argument('--Capacity_Z', type=float, required=False, default=0.1, help='The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.')
+    parser.add_argument('--Capacity_Fc', type=float, required=False, default=0.1, help='The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.')
+    parser.add_argument('--FcLimit', type=float, required=False, default=0.05, help='The upper threshold value for frequency.')
+    parser.add_argument('--DecayH', type=float, required=False, default=0.00, help='The decay effect on the cutoff frequency when creating a high-pass filter.')
+    parser.add_argument('--DecayL', type=float, required=False, default=0.00, help='The decay effect on the cutoff frequency when creating a low-pass filter.')
+    
+    # Other parameters
+    parser.add_argument('--Patience', type=int, required=False, default=300, help='The patience value for early stopping during model training.')
+    
+    
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
-    LatDim = 10
-    MaskingRate = 0.00
-    NoiseStd = 0.002
-    MaskStd = 0.1
-    ReparaStd = 0.1
-    Capacity_Z = 0.1
-    Capacity_Fc = 0.1
-    FcLimit = 0.05
-    DecayH = 0. 
-    DecayL = 0.
-    SlidingSize = 100
-
-    ### Other parameters
-    Patience = 300
-    TrRate = 0.8
+    args = parser.parse_args() # Parse the arguments
     
+    LatDim = args.LatDim
+    SigType = args.SigType
+    
+    assert SigType in ['ART', 'PLETH', 'II'], "Value should be either ART, PLETH, II."
+
+    MaskingRate = args.MaskingRate
+    NoiseStd = args.NoiseStd
+    MaskStd = args.MaskStd
+    ReparaStd = args.ReparaStd
+    Capacity_Z = args.Capacity_Z
+    Capacity_Fc = args.Capacity_Fc
+    FcLimit = args.FcLimit
+    DecayH = args.DecayH
+    DecayL = args.DecayL
+    Patience = args.Patience
+    
+
     SavePath = './Results/'
-    ModelName = 'ART_Z'+str(LatDim)+'_T10.hdf5'
+    ModelName = 'Base_'+str(SigType)+'_Z'+str(LatDim)+'.hdf5'
     
     if not os.path.exists(SavePath):
         os.mkdir(SavePath)
@@ -59,16 +85,16 @@ if __name__ == "__main__":
 
     
     #### -----------------------------------------------------   Data load and processing   -------------------------------------------------------------------------    
-    TrData = np.load('./Data/ProcessedData/TrART.npy')
-    ValData = np.load('./Data/ProcessedData/ValART.npy')
+    TrData = np.load('./Data/ProcessedData/Tr'+str(SigType)+'.npy')
+    ValData = np.load('./Data/ProcessedData/Val'+str(SigType)+'.npy')
     SigDim = TrData.shape[1]
         
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, SlidingSize=SlidingSize, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
+    EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
     FeatExtModel = FeatExtractor(SigDim=SigDim, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(SigDim=SigDim, SlidingSize=SlidingSize, LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, SlidingSize=SlidingSize, FeatDim=400)
+    FeatGenModel = FeatGenerator(SigDim=SigDim, LatDim= LatDim)
+    ReconModel = Reconstructor(SigDim=SigDim, FeatDim=400)
     
     ## Model core parts
     EncInp =EncModel.input
@@ -140,13 +166,13 @@ if __name__ == "__main__":
     ScalingDic = { 'val_ReconOut_ext':100., 'val_FeatRecLoss':200., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1}
     MinLimit = {'Beta_Rec_ext':1., 'Beta_Feat':1., 'Beta_Z':0.01, 'Beta_Fc':0.01}
     MaxLimit = {'Beta_Rec_ext':500., 'Beta_Feat':500., 'Beta_Z':0.25, 'Beta_Fc':0.25}
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName, CheckPoint=200)
+    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName)
     
     
        
     
     # Model Training
-    SigBandRepModel.load_weights(ModelSaveName)
-    SigBandRepModel.fit(TrData, batch_size=3000, epochs=2000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
+    #SigBandRepModel.load_weights(ModelSaveName)
+    SigBandRepModel.fit(TrData, batch_size=3000, epochs=1200, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
