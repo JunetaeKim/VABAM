@@ -16,7 +16,7 @@ from Utilities.Utilities import *
 
 ## GPU selection
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 # TensorFlow wizardry
 config = tf.compat.v1.ConfigProto()
@@ -36,8 +36,9 @@ if __name__ == "__main__":
     
     # Add Model related parameters
     parser.add_argument('--LatDim', type=int, required=True, help='The dimensionality of the latent variable z.')
-    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II')
+    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II, filtII')
     
+    parser.add_argument('--CompSize', type=int, required=False,default=500, help='Signal compression length (unit 0.01 second)')
     parser.add_argument('--MaskingRate', type=float, required=False, default=0.00, help='The sequence masking ratio refers to the proportion of the sequence that will be masked during training.')
     parser.add_argument('--NoiseStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation across the entire signal.')
     parser.add_argument('--MaskStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation applied to the masked signal.')
@@ -58,9 +59,10 @@ if __name__ == "__main__":
     
     LatDim = args.LatDim
     SigType = args.SigType
+    CompSize = args.CompSize
     
-    assert SigType in ['ART', 'PLETH', 'II'], "Value should be either ART, PLETH, II."
-
+    assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
+    
     MaskingRate = args.MaskingRate
     NoiseStd = args.NoiseStd
     MaskStd = args.MaskStd
@@ -74,7 +76,7 @@ if __name__ == "__main__":
     
 
     SavePath = './Results/'
-    ModelName = 'Base_'+str(SigType)+'_Z'+str(LatDim)+'.hdf5'
+    ModelName = 'Base_'+str(SigType)+'_Z'+str(LatDim)+'_Comp'+str(CompSize)+'.hdf5'
     
     if not os.path.exists(SavePath):
         os.mkdir(SavePath)
@@ -92,10 +94,10 @@ if __name__ == "__main__":
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
-    FeatExtModel = FeatExtractor(SigDim=SigDim, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(SigDim=SigDim, LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, FeatDim=400)
-    
+    FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, DecayH=DecayH, DecayL=DecayL)
+    FeatGenModel = FeatGenerator(SigDim=SigDim,FeatDim=FeatExtModel.output[1].shape[-1], LatDim= LatDim)
+    ReconModel = Reconstructor(SigDim=SigDim, FeatDim=FeatExtModel.output[1].shape[-1])
+
     ## Model core parts
     EncInp =EncModel.input
     InpZ = EncModel.output[2]
@@ -114,6 +116,8 @@ if __name__ == "__main__":
     ### Weight controller; Apply beta and capacity 
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.05)(FeatGenOut)
     Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.05)(FeatGenOut)
+    Beta_TC = Lossweight(name='Beta_TC', InitVal=0.05)(FeatGenOut)
+    Beta_MI = Lossweight(name='Beta_MI', InitVal=0.05)(FeatGenOut)
     Beta_Rec_ext = Lossweight(name='Beta_Rec_ext', InitVal=500.)(FeatGenOut)
     Beta_Rec_gen = Lossweight(name='Beta_Rec_gen', InitVal=500.)(FeatGenOut)
     Beta_Feat = Lossweight(name='Beta_Feat', InitVal=500.)(FeatGenOut)
@@ -163,7 +167,7 @@ if __name__ == "__main__":
     #KLD_Beta_Fc = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Fc',  MaxBeta=0.005 , MinBeta=0.005, AnnealEpoch=1, UnderLimit=1e-7, verbose=1)
     
     RelLossDic = { 'val_ReconOut_ext':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc'}
-    ScalingDic = { 'val_ReconOut_ext':100., 'val_FeatRecLoss':200., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1}
+    ScalingDic = { 'val_ReconOut_ext':200., 'val_FeatRecLoss':300., 'val_kl_Loss_Z':0.1, 'val_kl_Loss_FC':0.1}
     MinLimit = {'Beta_Rec_ext':1., 'Beta_Feat':1., 'Beta_Z':0.01, 'Beta_Fc':0.01}
     MaxLimit = {'Beta_Rec_ext':500., 'Beta_Feat':500., 'Beta_Z':0.25, 'Beta_Fc':0.25}
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName)
@@ -173,6 +177,6 @@ if __name__ == "__main__":
     
     # Model Training
     #SigBandRepModel.load_weights(ModelSaveName)
-    SigBandRepModel.fit(TrData, batch_size=3000, epochs=1200, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
+    SigBandRepModel.fit(TrData, batch_size=3000, epochs=2000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
