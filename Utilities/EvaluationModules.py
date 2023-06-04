@@ -4,6 +4,7 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+import EntropyHub as EH
 
 
 def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200, MinZval = -3., MaxZval = 3.,):
