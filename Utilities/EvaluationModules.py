@@ -131,6 +131,8 @@ def MonotonDegree (Vec, WindowSize, Weight, Type):
             elif Weight == 'RevHHI':
                 KernelRate = Kernel / np.sum(Kernel)
                 WeightVal = np.exp(1-np.sum(KernelRate**2))
+            elif Weight == None:
+                WeightVal = 1.
                 
 
             SubMDs.append(abs(SubMD) * WeightVal) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
@@ -142,15 +144,14 @@ def MonotonDegree (Vec, WindowSize, Weight, Type):
 
 
 ## Permutation Local Monotonicity Index (PLMI)
-def PLMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight='Continuity', Type='Cor'):
-    assert Weight in ['WindowSize','Continuity', 'Amplitude', 'RevHHI'], '''either 'WindowSize', 'Continuity','Amplitude' or 'RevHHI' is allowed for 'weight' '''
+def PLMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None, Type='Cor'):
+    assert Weight in ['WindowSize','Continuity', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Continuity','Amplitude' or 'RevHHI' is allowed for 'weight' '''
     
-    zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
     zValues = np.linspace(MinZval , MaxZval , N_Interval)
     
     ResList = []
-    
-    for zIdx in range(zZeros.shape[1]):
+    for zIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
         for zVal in zValues:
             zZeros[:, zIdx] = zVal
 
