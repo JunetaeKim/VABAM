@@ -320,3 +320,48 @@ def VisReconGivenFreq (FeatGenModel,  ReconModel, LatDim, FcCommFix, FcEachFix, 
     plt.show()
     
     return SigGen, FeatGen[0], FeatGen[1], FeatGen[2], FeatGen[3]
+
+
+
+## Local Permutation Entropy Index (LPEI)
+def LPEI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None):
+    assert Weight in ['WindowSize', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Amplitude' or 'RevHHI' is allowed for 'weight' '''
+    
+    
+    zValues = np.linspace(MinZval , MaxZval , N_Interval)
+    
+    ResList = []
+    for zIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
+        for zVal in zValues:
+            zZeros[:, zIdx] = zVal
+
+            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
+            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
+            MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+            
+            MonoRes = []
+            for IDX in MaxIDX:
+                             
+                Kernel = Heatmap[:, IDX]
+                
+                # Appeding sub-MD values
+                if Weight == 'WindowSize':
+                    WeightVal = MonoWinSize
+                elif Weight == 'Amplitude':
+                    WeightVal = np.log(np.sum(Kernel))
+                elif Weight == 'RevHHI':
+                    KernelRate = Kernel / np.sum(Kernel)
+                    WeightVal = np.exp(1-np.sum(KernelRate**2))
+                elif Weight == None:
+                    WeightVal = 1.
+
+                MonoRes.append( (1/EH.PermEn(Kernel)[0][1]) * WeightVal ) 
+                
+            Res = [zIdx, np.round(zVal,2), np.min(MonoRes), MaxIDX.tolist()]
+                
+            print(Res)
+            
+            ResList.append(Res)
+            
+    return ResList
