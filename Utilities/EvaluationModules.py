@@ -63,120 +63,6 @@ def GenSig_ZFcVar (FeatGenModel, ReconModel, Z_pred, FC_Comm, FC_Each, FreqRange
 
 
 
-
-def KernelGen (SortedWindow, MinIdx, WindowSize):
-    
-    TotalSpace = WindowSize-1
-    LeftSpaceSize = MinIdx - 0 
-    RightSpaceSize = WindowSize-LeftSpaceSize-1
-    InterIDX = 1
-
-
-    LeftSide = []
-    RightSide = []
-
-    # Kernel generation
-    while LeftSpaceSize>0 or RightSpaceSize>0:
-
-        if LeftSpaceSize>0:
-            LeftSide.append(SortedWindow[InterIDX])
-            InterIDX += 1
-            LeftSpaceSize -= 1
-
-        if RightSpaceSize>0:
-            RightSide.append(SortedWindow[InterIDX])
-            InterIDX += 1
-            RightSpaceSize -= 1
-
-    Kernel = np.concatenate([LeftSide[::-1], [SortedWindow[0]], RightSide])    
-    
-    return Kernel
-
-
-
-def MonotonDegree (Vec, WindowSize, Weight, Type):
-    
-    MDList = []
-    Global_Variability = np.std(Vec)
-    
-    for i in range(len(Vec) - WindowSize+1):
-        
-        Window = Vec[i:i + WindowSize]
-        # Create an ideal monotonic list based on the sorted vector
-        SortedWindow = sorted(Window).copy()
-
-        SubMDs=[]
-        # Compute MD values between Kernel and window
-        for MinIdx in range(WindowSize):
-            LeftSpaceSize = MinIdx - 0 
-
-            Kernel = KernelGen(SortedWindow, MinIdx, WindowSize)
-            #Kernel = sorted(Window)
-            
-            if Type == 'Cor':
-                # Compute Spearman's rho
-                SubMD = spearmanr(Window, Kernel)[0]
-            elif Type == 'L2':               
-                SubMD = np.sum((Window- Kernel)**2)
-                SubMD = np.log(1/SubMD)
-            elif Type == 'R2':       
-                SubMD = np.maximum(r2_score(Window, Kernel), 0) 
-                
-            # Appeding sub-MD values
-            if Weight == 'WindowSize':
-                WeightVal = WindowSize
-            elif Weight == 'Continuity':
-                WeightVal = np.maximum(WindowSize - np.argmin(Kernel), np.argmin(Kernel)+1)
-            elif Weight == 'Amplitude':
-                WeightVal = np.log(np.sum(Kernel))
-            elif Weight == 'RevHHI':
-                KernelRate = Kernel / np.sum(Kernel)
-                WeightVal = np.exp(1-np.sum(KernelRate**2))
-            elif Weight == None:
-                WeightVal = 1.
-                
-
-            SubMDs.append(abs(SubMD) * WeightVal) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
-
-        MDList.append(max(SubMDs))
-
-
-    return np.mean(MDList) #* Global_Variability # Global_Variability : Weighting by increasing total std.
-
-
-## Permutation Local Monotonicity Index (PLMI)
-def PLMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None, Type='Cor'):
-    assert Weight in ['WindowSize','Continuity', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Continuity','Amplitude' or 'RevHHI' is allowed for 'weight' '''
-    
-    zValues = np.linspace(MinZval , MaxZval , N_Interval)
-    
-    ResList = []
-    for zIdx in range(LatDim):
-        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
-        for zVal in zValues:
-            zZeros[:, zIdx] = zVal
-
-            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
-            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
-            MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
-            
-            MonoRes = []
-            for IDX in MaxIDX:
-                Vec =  Heatmap[:, IDX]
-                MonoRes.append(np.round(MonotonDegree(Vec, MonoWinSize, Weight, Type), 4)) 
-            
-            Res = [zIdx, np.round(zVal,2), np.max(MonoRes)]
-                
-            print(Res)
-            
-            ResList.append(Res)
-            
-    return ResList
-
-
-
-
-
 ### Qualitative and Visual Evaluation
 def HeatMapFrequency (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
@@ -324,6 +210,159 @@ def VisReconGivenFreq (FeatGenModel,  ReconModel, LatDim, FcCommFix, FcEachFix, 
 
 
 
+
+
+
+def KernelGen (SortedWindow, MinIdx, WindowSize):
+    
+    TotalSpace = WindowSize-1
+    LeftSpaceSize = MinIdx - 0 
+    RightSpaceSize = WindowSize-LeftSpaceSize-1
+    InterIDX = 1
+
+
+    LeftSide = []
+    RightSide = []
+
+    # Kernel generation
+    while LeftSpaceSize>0 or RightSpaceSize>0:
+
+        if LeftSpaceSize>0:
+            LeftSide.append(SortedWindow[InterIDX])
+            InterIDX += 1
+            LeftSpaceSize -= 1
+
+        if RightSpaceSize>0:
+            RightSide.append(SortedWindow[InterIDX])
+            InterIDX += 1
+            RightSpaceSize -= 1
+
+    Kernel = np.concatenate([LeftSide[::-1], [SortedWindow[0]], RightSide])    
+    
+    return Kernel
+
+
+
+def MonotonDegree (Vec, WindowSize, Weight, Type):
+    
+    MDList = []
+    Global_Variability = np.std(Vec)
+    
+    for i in range(len(Vec) - WindowSize+1):
+        
+        Window = Vec[i:i + WindowSize]
+        # Create an ideal monotonic list based on the sorted vector
+        SortedWindow = sorted(Window).copy()
+
+        SubMDs=[]
+        # Compute MD values between Kernel and window
+        for MinIdx in range(WindowSize):
+            LeftSpaceSize = MinIdx - 0 
+
+            Kernel = KernelGen(SortedWindow, MinIdx, WindowSize)
+            #Kernel = sorted(Window)
+            
+            if Type == 'Cor':
+                # Compute Spearman's rho
+                SubMD = spearmanr(Window, Kernel)[0]
+            elif Type == 'L2':               
+                SubMD = np.sum((Window- Kernel)**2)
+                SubMD = np.log(1/(SubMD+1e-7))
+            elif Type == 'R2':       
+                SubMD = np.maximum(r2_score(Window, Kernel), 0) 
+                
+            # Appeding sub-MD values
+            if Weight == 'WindowSize':
+                WeightVal = WindowSize
+            elif Weight == 'Continuity':
+                WeightVal = np.maximum(WindowSize - np.argmin(Kernel), np.argmin(Kernel)+1)
+            elif Weight == 'Amplitude':
+                WeightVal = np.log(np.sum(Kernel))
+            elif Weight == 'RevHHI':
+                KernelRate = Kernel / np.sum(Kernel)
+                WeightVal = np.exp(1-np.sum(KernelRate**2))
+            elif Weight == None:
+                WeightVal = 1.
+                
+
+            SubMDs.append(abs(SubMD) * WeightVal) # np.log(Continuity) or log(WindowSize) : Weighting by increasing window size
+
+        MDList.append(max(SubMDs))
+
+
+    return np.mean(MDList) #* Global_Variability # Global_Variability : Weighting by increasing total std.
+
+
+## Permutation Local Monotonicity Index (PLMI)
+def PLMI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None, Type='Cor'):
+    assert Weight in ['WindowSize','Continuity', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Continuity','Amplitude' or 'RevHHI' is allowed for 'weight' '''
+    
+    zValues = np.linspace(MinZval , MaxZval , N_Interval)
+    
+    ResList = []
+    for zIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
+        for zVal in zValues:
+            zZeros[:, zIdx] = zVal
+
+            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
+            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
+            IDXList = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+            
+            MonoRes = []
+            for IDX in IDXList:
+                Vec =  Heatmap[:, IDX]
+                MonoRes.append(np.round(MonotonDegree(Vec, MonoWinSize, Weight, Type), 4)) 
+            
+            Res = [zIdx, np.round(zVal,2), np.max(MonoRes), IDXList.tolist()]
+                
+            print(Res)
+            
+            ResList.append(Res)
+            
+    return ResList
+
+
+
+## Permutation Local Monotonicity Index2 (PLMI2)
+def PLMI2 (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None, Type='Cor'):
+    assert Weight in ['WindowSize','Continuity', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Continuity','Amplitude' or 'RevHHI' is allowed for 'weight' '''
+    
+    zValues = np.linspace(MinZval , MaxZval , N_Interval)
+    
+    ResList = []
+    for zIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
+        for zVal in zValues:
+            zZeros[:, zIdx] = zVal
+
+            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
+            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
+            MaxIDX = np.argsort(Heatmap, axis=1)[:, -N_FreqSel:]
+            IDXList = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+            
+            
+            AmpRevPERes = []
+            for IDSeq in MaxIDX.T:
+                AmpRevPERes.append(np.exp(-np.exp(EH.PermEn(IDSeq)[0][1])))
+            MeanAmpRevPERes = np.mean(AmpRevPERes)  
+            
+            MonoRes = []
+            for IDX in IDXList:
+                Vec =  Heatmap[:, IDX]
+                MonoRes.append(np.round(MonotonDegree(Vec, MonoWinSize, Weight, Type)*MeanAmpRevPERes, 4)) 
+            
+            Res = [zIdx, np.round(zVal,2), np.max(MonoRes), IDXList.tolist()]
+                
+            print(Res)
+            
+            ResList.append(Res)
+            
+    return ResList
+
+
+
+
 ## Local Permutation Entropy Index (LPEI)
 def LPEI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None):
     assert Weight in ['WindowSize', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Amplitude' or 'RevHHI' is allowed for 'weight' '''
@@ -339,10 +378,10 @@ def LPEI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSi
 
             Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
             Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
-            MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+            IDXList = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
             
             MonoRes = []
-            for IDX in MaxIDX:
+            for IDX in IDXList:
                              
                 Kernel = Heatmap[:, IDX]
                 
@@ -357,9 +396,59 @@ def LPEI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSi
                 elif Weight == None:
                     WeightVal = 1.
 
-                MonoRes.append( (1/EH.PermEn(Kernel)[0][1]) * WeightVal ) 
+                MonoRes.append( (1/EH.PermEn(Kernel+np.random.normal(0, 1e-5, len(Kernel)))[0][1]) * WeightVal ) 
                 
-            Res = [zIdx, np.round(zVal,2), np.min(MonoRes), MaxIDX.tolist()]
+            Res = [zIdx, np.round(zVal,2), np.min(MonoRes), IDXList.tolist()]
+                
+            print(Res)
+            
+            ResList.append(Res)
+            
+    return ResList
+
+
+## Local Permutation Entropy Index2 (LPEI2)
+def LPEI2 (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSize=20, MinZval = -3., MaxZval = 3., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None):
+    assert Weight in ['WindowSize', 'Amplitude', 'RevHHI', None], '''either 'WindowSize', 'Amplitude' or 'RevHHI' is allowed for 'weight' '''
+    
+    
+    zValues = np.linspace(MinZval , MaxZval , N_Interval)
+    
+    ResList = []
+    for zIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
+        for zVal in zValues:
+            zZeros[:, zIdx] = zVal
+
+            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
+            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
+            MaxIDX = np.argsort(Heatmap, axis=1)[:, -N_FreqSel:]
+            IDXList = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+            
+            AmpRevPERes = []
+            for IDSeq in MaxIDX.T:
+                AmpRevPERes.append(np.exp(-np.exp(EH.PermEn(IDSeq)[0][1])))
+            MeanAmpRevPERes = np.mean(AmpRevPERes)  
+            
+            MonoRes = []
+            for IDX in IDXList:
+                             
+                Kernel = Heatmap[:, IDX]
+                
+                # Appeding sub-MD values
+                if Weight == 'WindowSize':
+                    WeightVal = MonoWinSize
+                elif Weight == 'Amplitude':
+                    WeightVal = np.log(np.sum(Kernel))
+                elif Weight == 'RevHHI':
+                    KernelRate = Kernel / np.sum(Kernel)
+                    WeightVal = np.exp(1-np.sum(KernelRate**2))
+                elif Weight == None:
+                    WeightVal = 1.
+
+                MonoRes.append( (1/EH.PermEn(Kernel+np.random.normal(0, 1e-5, len(Kernel)))[0][1]) * WeightVal*MeanAmpRevPERes ) 
+                
+            Res = [zIdx, np.round(zVal,2), np.min(MonoRes), IDXList.tolist()]
                 
             print(Res)
             
