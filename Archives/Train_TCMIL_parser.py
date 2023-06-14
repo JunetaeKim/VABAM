@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
-import yaml
+
 
 import tensorflow as tf
 from tensorflow.keras import backend as K
@@ -28,11 +28,6 @@ config.gpu_options.per_process_gpu_memory_fraction = 1.0
 tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))     
 
 
-def read_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
-    
-
 if __name__ == "__main__":
 
     
@@ -40,53 +35,86 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     
     # Add Model related parameters
-    parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
+    parser.add_argument('--LatDim', type=int, required=True, help='The dimensionality of the latent variable z.')
+    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II, filtII')
+    
+    parser.add_argument('--CompSize', type=int, required=False,default=500, help='Signal compression length (unit 0.01 second)')
+    parser.add_argument('--MaskingRate', type=float, required=False, default=0.00, help='The sequence masking ratio refers to the proportion of the sequence that will be masked during training.')
+    parser.add_argument('--NoiseStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation across the entire signal.')
+    parser.add_argument('--MaskStd', type=float, required=False, default=0.00, help='The standard deviation value for Gaussian noise generation applied to the masked signal.')
+    parser.add_argument('--ReparaStd', type=float, required=False, default=0.1, help='The standard deviation value for Gaussian noise generation used in the reparametrization trick.')
+    parser.add_argument('--Capacity_Z', type=float, required=False, default=0.1, help='The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.')
+    parser.add_argument('--Capacity_Fc', type=float, required=False, default=0.1, help='The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.')
+    parser.add_argument('--FcLimit', type=float, required=False, default=0.05, help='The upper threshold value for frequency.')
+    parser.add_argument('--DecayH', type=float, required=False, default=0.00, help='The decay effect on the cutoff frequency when creating a high-pass filter.')
+    parser.add_argument('--DecayL', type=float, required=False, default=0.00, help='The decay effect on the cutoff frequency when creating a low-pass filter.')
+    
+    # Other parameters
+    parser.add_argument('--Patience', type=int, required=False, default=300, help='The patience value for early stopping during model training.')
+    parser.add_argument('--WRec', type=float, required=False, default=200, help='the weight for the reconstruction loss')
+    parser.add_argument('--WFeat', type=float, required=False, default=500, help='the weight for the feature loss')
+    parser.add_argument('--WZ', type=float, required=False, default=0.1, help='the weight for the Z loss')
+    parser.add_argument('--WFC', type=float, required=False, default=0.1, help='the weight for the FC loss')
+    parser.add_argument('--WTC', type=float, required=False, default=0.1, help='the weight for the TC loss')
+    parser.add_argument('--WMI', type=float, required=False, default=0.1, help='the weight for the MI loss')
+    
+    parser.add_argument('--MnWRec', type=float, required=False, default=1, help='the min weight for the reconstruction loss')
+    parser.add_argument('--MnWFeat', type=float, required=False, default=1, help='the min weight for the feature loss')
+    parser.add_argument('--MnWZ', type=float, required=False, default=0.05, help='the min weight for the Z loss')
+    parser.add_argument('--MnWFC', type=float, required=False, default=0.05, help='the min weight for the FC loss')
+    parser.add_argument('--MnWTC', type=float, required=False, default=0.01, help='the min weight for the TC loss')
+    parser.add_argument('--MnWMI', type=float, required=False, default=0.01, help='the min weight for the MI loss')   
 
-    yaml_path = './Config/Config.yml'
-    ConfigSet = read_yaml(yaml_path)
+    parser.add_argument('--MxWRec', type=float, required=False, default=1000, help='the max weight for the reconstruction loss')
+    parser.add_argument('--MxWFeat', type=float, required=False, default=1000, help='the max weight for the feature loss')
+    parser.add_argument('--MxWZ', type=float, required=False, default=0.5, help='the max weight for the Z loss')
+    parser.add_argument('--MxWFC', type=float, required=False, default=0.4, help='the max weight for the FC loss')
+    parser.add_argument('--MxWTC', type=float, required=False, default=0.25, help='the max weight for the TC loss')
+    parser.add_argument('--MxWMI', type=float, required=False, default=0.25, help='the max weight for the MI loss')   
+
 
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
     args = parser.parse_args() # Parse the arguments
     
-    ConfigName = args.Config
+    LatDim = args.LatDim
+    SigType = args.SigType
+    CompSize = args.CompSize
     
-    SigType = ConfigSet[ConfigName]['SigType']
-    LatDim = ConfigSet[ConfigName]['LatDim']
-    CompSize = ConfigSet[ConfigName]['CompSize']
+    assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
     
-    MaskingRate = ConfigSet[ConfigName]['MaskingRate']
-    NoiseStd = ConfigSet[ConfigName]['NoiseStd']
-    MaskStd = ConfigSet[ConfigName]['MaskStd']
-    ReparaStd = ConfigSet[ConfigName]['ReparaStd']
-    Capacity_Z = ConfigSet[ConfigName]['Capacity_Z']
-    Capacity_Fc = ConfigSet[ConfigName]['Capacity_Fc']
-    FcLimit = ConfigSet[ConfigName]['FcLimit']
-    DecayH = ConfigSet[ConfigName]['DecayH']
-    DecayL = ConfigSet[ConfigName]['DecayL']
+    MaskingRate = args.MaskingRate
+    NoiseStd = args.NoiseStd
+    MaskStd = args.MaskStd
+    ReparaStd = args.ReparaStd
+    Capacity_Z = args.Capacity_Z
+    Capacity_Fc = args.Capacity_Fc
+    FcLimit = args.FcLimit
+    DecayH = args.DecayH
+    DecayL = args.DecayL
     
-    Patience = ConfigSet[ConfigName]['Patience']
-    WRec = ConfigSet[ConfigName]['WRec']
-    WFeat = ConfigSet[ConfigName]['WFeat']
-    WZ = ConfigSet[ConfigName]['WZ']
-    WFC = ConfigSet[ConfigName]['WFC']
-    WTC = ConfigSet[ConfigName]['WTC']
-    WMI = ConfigSet[ConfigName]['WMI']
+    Patience = args.Patience
+    WRec = args.WRec
+    WFeat = args.WFeat
+    WZ = args.WZ
+    WFC = args.WFC
+    WTC = args.WTC
+    WMI = args.WMI
     
     ### Other parameters
-    MnWRec = ConfigSet[ConfigName]['MnWRec']
-    MnWFeat = ConfigSet[ConfigName]['MnWFeat']
-    MnWZ = ConfigSet[ConfigName]['MnWZ']
-    MnWFC = ConfigSet[ConfigName]['MnWFC']
-    MnWTC = ConfigSet[ConfigName]['MnWTC']
-    MnWMI = ConfigSet[ConfigName]['MnWMI']
+    MnWRec = args.MnWRec
+    MnWFeat = args.MnWFeat
+    MnWZ = args.MnWZ
+    MnWFC = args.MnWFC
+    MnWTC = args.MnWTC
+    MnWMI = args.MnWMI
     
-    MxWRec = ConfigSet[ConfigName]['MxWRec']
-    MxWFeat = ConfigSet[ConfigName]['MxWFeat']
-    MxWZ = ConfigSet[ConfigName]['MxWZ']
-    MxWFC = ConfigSet[ConfigName]['MxWFC']
-    MxWTC = ConfigSet[ConfigName]['MxWTC']
-    MxWMI = ConfigSet[ConfigName]['MxWMI']
+    MxWRec = args.MxWRec
+    MxWFeat = args.MxWFeat
+    MxWZ = args.MxWZ
+    MxWFC = args.MxWFC
+    MxWTC = args.MxWTC
+    MxWMI = args.MxWMI
     
 
     SavePath = './Results/'
