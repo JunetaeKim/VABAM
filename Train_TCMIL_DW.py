@@ -90,7 +90,7 @@ if __name__ == "__main__":
     
 
     SavePath = './Results/'
-    ModelName = 'TCMILDW_'+str(SigType)+'_Z'+str(LatDim)+'_Comp'+str(CompSize)+'.hdf5'
+    ModelName = ConfigName+'_'+SigType+'.hdf5'
     
     if not os.path.exists(SavePath):
         os.mkdir(SavePath)
@@ -175,8 +175,8 @@ if __name__ == "__main__":
     kl_Loss_MI = Beta_MI * kl_Loss_MI
 
     ### KL Divergence for p(Z) vs q(Z) # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
-    Log_PZ = LogNormalDensity(Zs, 0., 0.)
-    DW_kl_Loss_Z = tf.reduce_mean(Log_QZ_Prod[:,None] - Log_PZ)
+    Log_PZ = tf.reduce_sum(LogNormalDensity(Zs, 0., 0.), axis=1)
+    DW_kl_Loss_Z = tf.reduce_mean(Log_QZ_Prod - Log_PZ)
     kl_Loss_Z = Beta_Z * tf.abs(DW_kl_Loss_Z - Capacity_Z)
     
     

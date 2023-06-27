@@ -90,7 +90,7 @@ if __name__ == "__main__":
     
 
     SavePath = './Results/'
-    ModelName = 'TCMIL_'+str(SigType)+'_Z'+str(LatDim)+'_Comp'+str(CompSize)+'.hdf5'
+    ModelName = ConfigName+'_'+SigType+'.hdf5'
     
     if not os.path.exists(SavePath):
         os.mkdir(SavePath)
