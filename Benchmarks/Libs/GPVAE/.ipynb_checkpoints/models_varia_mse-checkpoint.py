@@ -391,7 +391,7 @@ class VAE(tf.keras.Model):
         if m_mask is not None:
             m_mask = tf.cast(m_mask, tf.bool)
             mse = tf.where(m_mask, mse, tf.zeros_like(mse))  # !!! inverse mask, set zeros for observed
-        return tf.reduce_sum(mse)
+        return tf.reduce_mean(mse) ## reduce_sum (original) -> reduce_mean
 
     def _compute_loss(self, x, m_mask=None, return_parts=False):
         assert len(x.shape) == 3, "Input should have shape: [batch_size, time_length, data_dim]"

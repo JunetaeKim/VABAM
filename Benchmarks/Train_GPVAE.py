@@ -55,7 +55,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args() # Parse the arguments
     SigType = args.SigType
-    assert SigType in ['ART', 'PLETH', 'II'], "Value should be either ART, PLETH, II."
+    #assert SigType in ['ART', 'PLETH', 'II', 'filtII'], "Value should be either ART, PLETH, II."
     
     
     Outdir = './Results/'
@@ -96,8 +96,8 @@ if __name__ == "__main__":
     model = GP_VAE(latent_dim=LatDim, 
                    data_dim=data_dim, 
                    time_length=time_length,
-                   encoder_sizes=[100, 80, 60], encoder=BandedJointEncoderGRU,
-                   decoder_sizes=[60,80,100], decoder=GaussianDecoder,
+                   encoder_sizes=[50, 40, 30], encoder=BandedJointEncoderGRU,
+                   decoder_sizes=[30,40,50], decoder=GaussianDecoder,
                    kernel='cauchy', 
                    sigma=1.,
                    length_scale=1., 
