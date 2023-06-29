@@ -7,6 +7,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import yaml
 
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
@@ -39,6 +40,10 @@ config.gpu_options.per_process_gpu_memory_fraction = 1.0
 tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))     
 
 
+def read_yaml(file_path):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
+
 if __name__ == "__main__":
 
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
@@ -48,17 +53,23 @@ if __name__ == "__main__":
     ### Other parameters
     Patience = 300
     BatchSize = 10000
-    NEpoch = 1000
+    NEpoch = 2000
 
 
     # Create the parser
     parser = ArgumentParser()
-    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II')
+    
+    # Add Model related parameters
+    parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
 
+    yaml_path = './Config/Config.yml'
+    ConfigSet = read_yaml(yaml_path)
+    
     args = parser.parse_args() # Parse the arguments
-    SigType = args.SigType
-    #assert SigType in ['ART', 'PLETH', 'II', 'filtII'], "Value should be either ART, PLETH, II."
-
+    ConfigName = args.Config
+    
+    SigType = ConfigSet[ConfigName]['SigType']
+    LatDim = ConfigSet[ConfigName]['LatDim']
     
     file_pref = 'TimeVae_Lat'+str(LatDim)+'_' 
     Outdir = './Results/'
