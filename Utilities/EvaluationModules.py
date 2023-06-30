@@ -147,7 +147,7 @@ def VisReconGivenZ (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Ge
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
     sm.set_array([])
     cbar = fig.colorbar(sm, cax=cax)
-    cbar.set_label('Frequency ranges', size=14)
+    cbar.set_label('Frequency given for generating signals', size=14)
 
     plt.show()
     
@@ -344,7 +344,7 @@ def PLMI2 (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinS
             
             AmpRevPERes = []
             for IDSeq in MaxIDX.T:
-                AmpRevPERes.append(np.exp(-np.exp(EH.PermEn(IDSeq)[0][1])))
+                AmpRevPERes.append(np.exp(-np.exp(EH.PermEn(IDSeq)[1][-1])))
             MeanAmpRevPERes = np.mean(AmpRevPERes)  
             
             MonoRes = []
@@ -396,7 +396,7 @@ def LPEI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinSi
                 elif Weight == None:
                     WeightVal = 1.
 
-                MonoRes.append( (1/EH.PermEn(Kernel+np.random.normal(0, 1e-5, len(Kernel)))[0][1]) * WeightVal ) 
+                MonoRes.append( (1/EH.PermEn(Kernel+np.random.normal(0, 1e-5, len(Kernel)))[1][-1]) * WeightVal ) 
                 
             Res = [zIdx, np.round(zVal,2), np.min(MonoRes), IDXList.tolist()]
                 
@@ -427,7 +427,7 @@ def LPEI2 (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinS
             
             AmpRevPERes = []
             for IDSeq in MaxIDX.T:
-                AmpRevPERes.append(np.exp(-np.exp(EH.PermEn(IDSeq)[0][1])))
+                AmpRevPERes.append(np.exp(-np.exp(EH.PermEn(IDSeq)[1][-1])))
             MeanAmpRevPERes = np.mean(AmpRevPERes)  
             
             MonoRes = []
@@ -446,7 +446,7 @@ def LPEI2 (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinS
                 elif Weight == None:
                     WeightVal = 1.
 
-                MonoRes.append( (1/EH.PermEn(Kernel+np.random.normal(0, 1e-5, len(Kernel)))[0][1]) * WeightVal*MeanAmpRevPERes ) 
+                MonoRes.append( (1/(EH.PermEn(Kernel+np.random.normal(0, 1e-5, len(Kernel)))[1][-1])+1e-7) * WeightVal*MeanAmpRevPERes ) 
                 
             Res = [zIdx, np.round(zVal,2), np.min(MonoRes), IDXList.tolist()]
                 
@@ -454,4 +454,103 @@ def LPEI2 (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10, MonoWinS
             
             ResList.append(Res)
             
+    return ResList
+
+
+
+## Row and Column Permutation Entropy (RCPEI)
+def RCPEI (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10,  MinZval = -5., MaxZval = 5., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None):
+   
+    zValues = np.linspace(MinZval , MaxZval , N_Interval)
+
+    ResList = []
+    print(['Lat_ID', 'zVal', 'CWPE', 'RWPE', 'HHI', 'CWPE + RWPE - HHI'])
+    for LatIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
+        for zVal in zValues:
+            zZeros[:, LatIdx] = zVal
+
+            ''' When given z latent values that have non-zero values in only one dimension, 
+            generate signals of N_Gen size, then return the amplitude of the frequency through a Fourier transform. 2D Max[N_Gen, Freq.]'''
+            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
+            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
+            np.random.seed(0)
+            Heatmap += np.random.normal(0., 1e-7, (Heatmap.shape))
+
+            ''' Calculate column-wise permutation entropy.'''
+            SortedIDX = np.argsort(Heatmap, axis=1)
+            ListColWisePerEnt = []
+            for IDSeq in SortedIDX.T:
+                ListColWisePerEnt.append(np.maximum(EH.PermEn(IDSeq)[1][-1], 0.))
+            MeanColWisePerEnt = np.mean(ListColWisePerEnt)    
+
+
+            ''' Calculate N(i.e., N_FreqSel) row-wise permutation entropy.'''
+            MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+            ListRowWisePerEnt = []
+            for IDSeq in MaxIDX:
+                ListRowWisePerEnt.append(np.maximum(EH.PermEn(Heatmap[:, IDSeq])[1][-1], 0.))
+            MeanRowWisePerEnt = np.mean(ListRowWisePerEnt)
+            
+            ''' Calculate Amplitude-wise Herfindahl-Hirschman index'''
+            SumHeatmap = np.sum(Heatmap, axis=0)
+            RateHeatmap = SumHeatmap / np.sum(SumHeatmap, axis=0)
+            HHI = np.sum(RateHeatmap**2) * np.log(len(RateHeatmap))
+
+            'Aggregate results.'
+            Res = [LatIdx, np.round(zVal,2), np.round(MeanColWisePerEnt, 4), np.round(MeanRowWisePerEnt, 4), np.round(HHI, 4), np.round(MeanColWisePerEnt + MeanRowWisePerEnt-HHI, 4)]
+            print(Res)
+            ResList.append(Res)
+    
+    return ResList
+
+
+## The ratio of weighted power concentration to uncertainty (RWPCU)
+def RWPCU (FeatGenModel,  ReconModel, LatDim, N_Gen=300, N_Interval=10,  MinZval = -5., MaxZval = 5., N_FreqSel =3 , MinFreq=1, MaxFreq=51, Weight=None):
+   
+    zValues = np.linspace(MinZval , MaxZval , N_Interval)
+
+    ResList = []
+    print(['Lat_ID','zVal',  'Numerator', 'Denominator', 'VCSAE'])
+    for LatIdx in range(LatDim):
+        zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
+        for zVal in zValues:
+            zZeros[:, LatIdx] = zVal
+
+            ''' When given z latent values that have non-zero values in only one dimension, 
+            generate signals of N_Gen size, then return the amplitude of the frequency through a Fourier transform. 2D Max[N_Gen, Freq.]'''
+            Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zZeros, N_Gen=N_Gen, zType='Fixed')[1]
+            Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
+            np.random.seed(0)
+            Heatmap += np.random.normal(0., 1e-7, (Heatmap.shape))
+
+            ''' Calculate row-wise permutation entropy.'''
+            ListRowWisePerEnt = []
+            for Seq in Heatmap.T:
+                ListRowWisePerEnt.append(np.maximum(EH.PermEn(Seq)[0][-1], 0.))
+            RowWisePerEnt = np.array(ListRowWisePerEnt)
+
+            ''' Calculate column-wise permutation entropy.'''
+            Ranking = np.argsort(Heatmap, axis=1).argsort()
+            ListColWisePerEnt = []
+            for IDSeq in Ranking.T:
+                ListColWisePerEnt.append(np.maximum(EH.PermEn(IDSeq)[0][-1], 0.))
+            MeanColWisePerEnt = np.mean(ListColWisePerEnt)    
+
+            "The ratio of the variance concentration of the axis with strong amplitude to entropy"
+            SumHeatmap = np.sum(Heatmap, axis=0) # Total amplitude
+            StdHeatmap = np.std(Heatmap, axis=0) # Total variation
+
+            Weight = np.exp(-RowWisePerEnt)
+            RateHeatmap = (SumHeatmap * Weight * StdHeatmap) / np.sum(SumHeatmap * Weight * StdHeatmap, axis=0)
+
+            Numerator = np.sum(RateHeatmap**2)
+            Denominator = MeanColWisePerEnt
+            RWPCU =  Numerator / Denominator 
+
+            'Aggregate results.'
+            Res = [LatIdx, np.round(zVal, 2), np.round(Numerator, 5), np.round(Denominator, 5), np.round(RWPCU, 5)]
+            print(Res)
+            ResList.append(Res)
+
     return ResList

@@ -7,7 +7,7 @@ import EntropyHub as EH
 
 
 ## Row and Column Permutation Entropy Index for TimeVae Model Benchmarking (RCPEI_BTI)
-def RCPEI_BTI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqSel =3, MinFreq=1, MaxFreq=51 ):
+def RCPEI_TI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqSel =3, MinFreq=1, MaxFreq=51 ):
    
     zValues = np.linspace(MinZval , MaxZval , N_Gen)
     ResList = []
@@ -106,13 +106,15 @@ def RCPEI_GPHI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_Freq
     return ResList
 
 
-## The ratio of the variance concentration of the axis with strong amplitude to entropy (VCSAE)
-def VCSAE_BTI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqSel =3, MinFreq=1, MaxFreq=51 ):
+## The ratio of weighted power concentration to uncertainty (RWPCU)
+def RWPCU_TI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqSel =3, MinFreq=1, MaxFreq=51 ):
+    
+    '''The ratio of weighted power concentration to uncertainty'''
     zValues = np.linspace(MinZval , MaxZval , N_Gen)
     ResList = []
     print(['Lat_ID', 'Numerator', 'Denominator', 'VCSAE'])
     for LatIdx in range(LatDim):
-      
+
         zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
         zZeros[:, LatIdx] = zValues
 
@@ -126,34 +128,32 @@ def VCSAE_BTI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqS
         np.random.seed(0)
         Heatmap += np.random.normal(0., 1e-7, (Heatmap.shape))
 
-        ''' Calculate N(i.e., N_FreqSel) row-wise permutation entropy.'''
-        MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+        ''' Calculate row-wise permutation entropy.'''
         ListRowWisePerEnt = []
-        for IDSeq in MaxIDX:
-            ListRowWisePerEnt.append(np.maximum(EH.PermEn(Heatmap[:, IDSeq])[0][-1], 0.))
-        MeanRowWisePerEnt = np.mean(ListRowWisePerEnt)
+        for Seq in Heatmap.T:
+            ListRowWisePerEnt.append(np.maximum(EH.PermEn(Seq)[0][-1], 0.))
+        RowWisePerEnt = np.array(ListRowWisePerEnt)
 
         ''' Calculate column-wise permutation entropy.'''
-        SortedIDX = np.argsort(Heatmap, axis=1)
+        Ranking = np.argsort(Heatmap, axis=1).argsort()
         ListColWisePerEnt = []
-        for IDSeq in SortedIDX.T:
+        for IDSeq in Ranking.T:
             ListColWisePerEnt.append(np.maximum(EH.PermEn(IDSeq)[0][-1], 0.))
         MeanColWisePerEnt = np.mean(ListColWisePerEnt)    
 
         "The ratio of the variance concentration of the axis with strong amplitude to entropy"
-        SumHeatmap = np.sum(Heatmap, axis=0)
-        StdHeatmap = np.std(Heatmap, axis=0)
+        SumHeatmap = np.sum(Heatmap, axis=0) # Total amplitude
+        StdHeatmap = np.std(Heatmap, axis=0) # Total variation
 
-        Rank = np.argsort(-SumHeatmap).argsort()
-        WeigRank = np.exp(-Rank)
-        RateHeatmap = (SumHeatmap * WeigRank * StdHeatmap) / np.sum(SumHeatmap * WeigRank * StdHeatmap, axis=0)
+        Weight = np.exp(-RowWisePerEnt)
+        RateHeatmap = (SumHeatmap * Weight * StdHeatmap) / np.sum(SumHeatmap * Weight * StdHeatmap, axis=0)
 
         Numerator = np.sum(RateHeatmap**2)
-        Denominator = MeanRowWisePerEnt + MeanColWisePerEnt
-        VCSAE =  Numerator / Denominator 
+        Denominator = MeanColWisePerEnt
+        RWPCU =  Numerator / Denominator 
 
         'Aggregate results.'
-        Res = [LatIdx, np.round(Numerator, 5), np.round(Denominator, 5), np.round(VCSAE, 5)]
+        Res = [LatIdx, np.round(Numerator, 5), np.round(Denominator, 5), np.round(RWPCU, 5)]
         print(Res)
         ResList.append(Res)
 
@@ -161,7 +161,7 @@ def VCSAE_BTI (Model,  LatDim, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqS
 
 
 ## The ratio of the variance concentration of the axis with strong amplitude to entropy (VCSAE)
-def VCSAE_GPHI (Model,  LatDim, Mode, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqSel =3, MinFreq=1, MaxFreq=51 ):
+def RWPCU_GPHI (Model,  LatDim, Mode, N_Gen=300,   MinZval = -5., MaxZval = 5., N_FreqSel =3, MinFreq=1, MaxFreq=51 ):
     
     assert Mode in ['GP','HI'], 'Mode only includes GP and HI'
     TimeN = Model.decoder.net.output.shape[1]
@@ -178,8 +178,8 @@ def VCSAE_GPHI (Model,  LatDim, Mode, N_Gen=300,   MinZval = -5., MaxZval = 5., 
             pass
         elif Mode =='HI':
             zValues = np.transpose(zValues, (0,2,1))
-            
-            
+
+
         ''' When given z latent values that have non-zero values in only one dimension, 
         generate signals of N_Gen size, then return the amplitude of the frequency through a Fourier transform. 2D Max[N_Gen, Zs.]'''
         SigGen = Model.decode(zValues).mean().numpy().reshape(N_Gen, -1)
@@ -191,34 +191,32 @@ def VCSAE_GPHI (Model,  LatDim, Mode, N_Gen=300,   MinZval = -5., MaxZval = 5., 
         np.random.seed(0)
         Heatmap += np.random.normal(0., 1e-7, (Heatmap.shape))
 
-        ''' Calculate N(i.e., N_FreqSel) row-wise permutation entropy.'''
-        MaxIDX = np.argsort(np.mean(Heatmap, axis=0))[-N_FreqSel:]
+        ''' Calculate row-wise permutation entropy.'''
         ListRowWisePerEnt = []
-        for IDSeq in MaxIDX:
-            ListRowWisePerEnt.append(np.maximum(EH.PermEn(Heatmap[:, IDSeq])[0][-1], 0.))
-        MeanRowWisePerEnt = np.mean(ListRowWisePerEnt)
+        for Seq in Heatmap.T:
+            ListRowWisePerEnt.append(np.maximum(EH.PermEn(Seq)[0][-1], 0.))
+        RowWisePerEnt = np.array(ListRowWisePerEnt)
 
         ''' Calculate column-wise permutation entropy.'''
-        SortedIDX = np.argsort(Heatmap, axis=1)
+        Ranking = np.argsort(Heatmap, axis=1).argsort()
         ListColWisePerEnt = []
-        for IDSeq in SortedIDX.T:
+        for IDSeq in Ranking.T:
             ListColWisePerEnt.append(np.maximum(EH.PermEn(IDSeq)[0][-1], 0.))
         MeanColWisePerEnt = np.mean(ListColWisePerEnt)    
 
         "The ratio of the variance concentration of the axis with strong amplitude to entropy"
-        SumHeatmap = np.sum(Heatmap, axis=0)
-        StdHeatmap = np.std(Heatmap, axis=0)
+        SumHeatmap = np.sum(Heatmap, axis=0) # Total amplitude
+        StdHeatmap = np.std(Heatmap, axis=0) # Total variation
 
-        Rank = np.argsort(-SumHeatmap).argsort()
-        WeigRank = np.exp(-Rank)
-        RateHeatmap = (SumHeatmap * WeigRank * StdHeatmap) / np.sum(SumHeatmap * WeigRank * StdHeatmap, axis=0)
+        Weight = np.exp(-RowWisePerEnt)
+        RateHeatmap = (SumHeatmap * Weight * StdHeatmap) / np.sum(SumHeatmap * Weight * StdHeatmap, axis=0)
 
         Numerator = np.sum(RateHeatmap**2)
-        Denominator = MeanRowWisePerEnt + MeanColWisePerEnt
-        VCSAE =  Numerator / Denominator 
+        Denominator = MeanColWisePerEnt
+        RWPCU =  Numerator / Denominator 
 
         'Aggregate results.'
-        Res = [LatIdx, np.round(Numerator, 5), np.round(Denominator, 5), np.round(VCSAE, 5)]
+        Res = [LatIdx, np.round(Numerator, 5), np.round(Denominator, 5), np.round(RWPCU, 5)]
         print(Res)
         ResList.append(Res)
 
@@ -226,7 +224,7 @@ def VCSAE_GPHI (Model,  LatDim, Mode, N_Gen=300,   MinZval = -5., MaxZval = 5., 
 
 
 ### Qualitative and Visual Evaluation
-def HeatMap_BTI (Model,  LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
+def HeatMap_TI (Model,  LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
 
     zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
     for KeyVal in ZFix.items():
@@ -291,7 +289,7 @@ def HeatMap_GPHI (Model, Mode, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
     
     
-def VisReconGivenZ_BTI (Model, LatDim, ZFix,  N_Gen=300, MinFreqR=0, MaxFreqR=0.05):
+def VisReconGivenZ_TI (Model, LatDim, ZFix,  N_Gen=300, MinFreqR=0, MaxFreqR=0.05):
     
     zZeros = np.tile(np.zeros(LatDim), (N_Gen, 1))
     for KeyVal in ZFix.items():
