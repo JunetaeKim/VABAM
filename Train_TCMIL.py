@@ -41,19 +41,29 @@ if __name__ == "__main__":
     
     # Add Model related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
+    args = parser.parse_args() # Parse the arguments
+    ConfigName = args.Config
+    
+    if 'ART' in ConfigName:
+        LoadConfig = 'Config' + 'ART'
+    elif 'PLETH' in ConfigName:
+        LoadConfig = 'Config' + 'PLETH'
+    elif 'II' in ConfigName:
+        LoadConfig = 'Config' + 'II'
+    else:
+        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
-    yaml_path = './Config/Config.yml'
+    yaml_path = './Config/'+LoadConfig+'.yml'
     ConfigSet = read_yaml(yaml_path)
 
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
-    args = parser.parse_args() # Parse the arguments
-    
-    ConfigName = args.Config
+
     
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
     CompSize = ConfigSet[ConfigName]['CompSize']
+    assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
     
     MaskingRate = ConfigSet[ConfigName]['MaskingRate']
     NoiseStd = ConfigSet[ConfigName]['NoiseStd']

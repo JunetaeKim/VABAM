@@ -60,7 +60,6 @@ if __name__ == "__main__":
     LatDim = args.LatDim
     SigType = args.SigType
     CompSize = args.CompSize
-    
     assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
     
     MaskingRate = args.MaskingRate

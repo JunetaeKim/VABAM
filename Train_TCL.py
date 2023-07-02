@@ -54,6 +54,7 @@ if __name__ == "__main__":
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
     CompSize = ConfigSet[ConfigName]['CompSize']
+    assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
     
     MaskingRate = ConfigSet[ConfigName]['MaskingRate']
     NoiseStd = ConfigSet[ConfigName]['NoiseStd']
