@@ -16,7 +16,7 @@ from Utilities.Utilities import *
 
 ## GPU selection
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 # TensorFlow wizardry
 config = tf.compat.v1.ConfigProto()
@@ -41,15 +41,23 @@ if __name__ == "__main__":
     
     # Add Model related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
+    args = parser.parse_args() # Parse the arguments
+    ConfigName = args.Config
+    
+    if 'ART' in ConfigName:
+        LoadConfig = 'Config' + 'ART'
+    elif 'PLETH' in ConfigName:
+        LoadConfig = 'Config' + 'PLETH'
+    elif 'II' in ConfigName:
+        LoadConfig = 'Config' + 'II'
+    else:
+        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
-    yaml_path = './Config/Config.yml'
+    yaml_path = './Config/'+LoadConfig+'.yml'
     ConfigSet = read_yaml(yaml_path)
 
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
-    args = parser.parse_args() # Parse the arguments
-    
-    ConfigName = args.Config
     
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
@@ -104,8 +112,9 @@ if __name__ == "__main__":
     TrData = np.load('./Data/ProcessedData/Tr'+str(SigType)+'.npy')
     ValData = np.load('./Data/ProcessedData/Val'+str(SigType)+'.npy')
     SigDim = TrData.shape[1]
+    BatSize = 3000    
+    NData = TrData.shape[0] 
         
-    
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
     FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, DecayH=DecayH, DecayL=DecayL)
@@ -156,22 +165,31 @@ if __name__ == "__main__":
     ### KL Divergence for p(FCs) vs q(FCs)
     BernP = 0.5 # hyperparameter
     FCs = SigBandRepModel.get_layer('FC_Mu').output 
-    kl_Loss_FC = tf.math.log(FCs) - tf.math.log(BernP) + tf.math.log(1-FCs) - tf.math.log(1-BernP) 
-    kl_Loss_FC = tf.reduce_mean(-kl_Loss_FC )
+    kl_Loss_FC = FCs*(tf.math.log(FCs) - tf.math.log(BernP)) + (1-FCs)*(tf.math.log(1-FCs) - tf.math.log(1-BernP))
+    kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
     kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
 
-    
+    'Reference: https://github.com/YannDubs/disentangling-vae/issues/60#issuecomment-705164833' 
+    'https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54'
     ### KL Divergence for q(Z) vs q(Z)_Prod
     Z_Mu, Z_Log_Sigma, Zs = SigBandRepModel.get_layer('Z_Mu').output, SigBandRepModel.get_layer('Z_Log_Sigma').output, SigBandRepModel.get_layer('Zs').output
     LogProb_QZ = LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None])
-    Log_QZ_Prod = tf.reduce_sum( tf.reduce_logsumexp(LogProb_QZ, axis=1, keepdims=False),   axis=1,  keepdims=False)
-    Log_QZ = tf.reduce_logsumexp(tf.reduce_sum(LogProb_QZ, axis=2, keepdims=False),   axis=1,   keepdims=False)
-    kl_Loss_TC = -tf.reduce_mean(Log_QZ - Log_QZ_Prod)
+    Log_QZ = tf.reduce_logsumexp(tf.reduce_sum(LogProb_QZ, axis=2),   axis=1) - tf.math.log(BatSize * NData * 1.)
+    Log_QZ_Prod = tf.reduce_sum( tf.reduce_logsumexp(LogProb_QZ, axis=1) - tf.math.log(BatSize * NData * 1.),   axis=1)
+
+    # use stratification
+    log_iw_mat = log_importance_weight_matrix(BatSize, NData)
+    log_iw_mat = tf.cast(log_iw_mat, Zs.dtype)  
+
+    Log_QZ = tf.reduce_logsumexp(log_iw_mat + tf.reduce_sum(LogProb_QZ, axis=2), axis=1)         
+    Log_QZ_Prod =  tf.reduce_sum(tf.reduce_logsumexp(tf.reshape(log_iw_mat, [BatSize, BatSize, 1])+LogProb_QZ, axis=1), axis=1)
+
+    kl_Loss_TC = tf.reduce_mean(Log_QZ - Log_QZ_Prod)
     kl_Loss_TC = Beta_TC * kl_Loss_TC
 
     ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
     Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
-    kl_Loss_MI = -tf.reduce_mean((Log_QZX - Log_QZ))
+    kl_Loss_MI = tf.reduce_mean((Log_QZX - Log_QZ))
     kl_Loss_MI = Beta_MI * kl_Loss_MI
 
     ### KL Divergence for p(Z) vs q(Z) # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
@@ -212,6 +230,6 @@ if __name__ == "__main__":
     
     # Model Training
     #SigBandRepModel.load_weights(ModelSaveName)
-    SigBandRepModel.fit(TrData, batch_size=3000, epochs=4000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
+    SigBandRepModel.fit(TrData, batch_size=BatSize, epochs=4000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
