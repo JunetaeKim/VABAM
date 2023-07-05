@@ -5,7 +5,6 @@ import pandas as pd
 from argparse import ArgumentParser
 import yaml
 
-
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
@@ -17,7 +16,7 @@ from Utilities.Utilities import *
 
 ## GPU selection
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 # TensorFlow wizardry
 config = tf.compat.v1.ConfigProto()
@@ -32,10 +31,12 @@ tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))
 def read_yaml(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
+    
 
 if __name__ == "__main__":
 
-        # Create the parser
+    
+    # Create the parser
     parser = ArgumentParser()
     
     # Add Model related parameters
@@ -54,9 +55,10 @@ if __name__ == "__main__":
 
     yaml_path = './Config/'+LoadConfig+'.yml'
     ConfigSet = read_yaml(yaml_path)
-        
+
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
+
     
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
@@ -78,17 +80,23 @@ if __name__ == "__main__":
     WFeat = ConfigSet[ConfigName]['WFeat']
     WZ = ConfigSet[ConfigName]['WZ']
     WFC = ConfigSet[ConfigName]['WFC']
+    WTC = ConfigSet[ConfigName]['WTC']
+    WMI = ConfigSet[ConfigName]['WMI']
     
     ### Other parameters
     MnWRec = ConfigSet[ConfigName]['MnWRec']
     MnWFeat = ConfigSet[ConfigName]['MnWFeat']
     MnWZ = ConfigSet[ConfigName]['MnWZ']
     MnWFC = ConfigSet[ConfigName]['MnWFC']
+    MnWTC = ConfigSet[ConfigName]['MnWTC']
+    MnWMI = ConfigSet[ConfigName]['MnWMI']
     
     MxWRec = ConfigSet[ConfigName]['MxWRec']
     MxWFeat = ConfigSet[ConfigName]['MxWFeat']
     MxWZ = ConfigSet[ConfigName]['MxWZ']
     MxWFC = ConfigSet[ConfigName]['MxWFC']
+    MxWTC = ConfigSet[ConfigName]['MxWTC']
+    MxWMI = ConfigSet[ConfigName]['MxWMI']
     
 
     SavePath = './Results/'
@@ -132,6 +140,8 @@ if __name__ == "__main__":
     ### Weight controller; Apply beta and capacity 
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.05)(FeatGenOut)
     Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.05)(FeatGenOut)
+    Beta_TC = Lossweight(name='Beta_TC', InitVal=0.05)(FeatGenOut)
+    Beta_MI = Lossweight(name='Beta_MI', InitVal=0.05)(FeatGenOut)
     Beta_Rec_ext = Lossweight(name='Beta_Rec_ext', InitVal=500.)(FeatGenOut)
     Beta_Rec_gen = Lossweight(name='Beta_Rec_gen', InitVal=500.)(FeatGenOut)
     Beta_Feat = Lossweight(name='Beta_Feat', InitVal=500.)(FeatGenOut)
@@ -142,6 +152,10 @@ if __name__ == "__main__":
     ReconOut_ext = Beta_Rec_ext * MSE(ReconExtOut, EncInp)
     SigBandRepModel.add_loss(ReconOut_ext)
     SigBandRepModel.add_metric(ReconOut_ext, 'ReconOut_ext')
+    
+    #ReconOut_gen = Beta_Rec_gen * MSE(ReconGenOut, EncInp)
+    #SigBandRepModel.add_loss(ReconOut_gen)
+    #SigBandRepModel.add_metric(ReconOut_gen, 'ReconOut_gen')
     
 
     ### Adding the FeatRecLoss; It allows connection between the extractor and generator
@@ -162,28 +176,50 @@ if __name__ == "__main__":
     kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
     kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
 
+    
+    ### KL Divergence for q(Z) vs q(Z)_Prod
+    LogProb_QZ = LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None])
+    Log_QZ_Prod = tf.reduce_sum( tf.reduce_logsumexp(LogProb_QZ, axis=1, keepdims=False),   axis=1,  keepdims=False)
+    Log_QZ = tf.reduce_logsumexp(tf.reduce_sum(LogProb_QZ, axis=2, keepdims=False),   axis=1,   keepdims=False)
+    kl_Loss_TC = -tf.reduce_mean(Log_QZ - Log_QZ_Prod)
+    kl_Loss_TC = Beta_TC * kl_Loss_TC
+
+    ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
+    Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
+    kl_Loss_MI = -tf.reduce_mean((Log_QZX - Log_QZ))
+    kl_Loss_MI = Beta_MI * kl_Loss_MI
+
+    
+    
     SigBandRepModel.add_loss(kl_Loss_Z )
     SigBandRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
 
     SigBandRepModel.add_loss(kl_Loss_FC )
     SigBandRepModel.add_metric(kl_Loss_FC , 'kl_Loss_FC')
 
+    SigBandRepModel.add_loss(kl_Loss_TC )
+    SigBandRepModel.add_metric(kl_Loss_TC , 'kl_Loss_TC')
+    
+    SigBandRepModel.add_loss(kl_Loss_MI )
+    SigBandRepModel.add_metric(kl_Loss_MI , 'kl_Loss_MI')
+
+    
     ## Model Compile
     SigBandRepModel.compile(optimizer='adam') 
+    SigBandRepModel.summary()
 
 
     ### Loss and KLD_Beta controller
     #KLD_Beta_Z = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Z',  MaxBeta=0.1 , MinBeta=0.1, AnnealEpoch=1, UnderLimit=1e-7, verbose=2)
     #KLD_Beta_Fc = KLAnneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Fc',  MaxBeta=0.005 , MinBeta=0.005, AnnealEpoch=1, UnderLimit=1e-7, verbose=1)
-    
-    RelLossDic = { 'val_ReconOut_ext':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc'}
-    ScalingDic = { 'val_ReconOut_ext':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ, 'val_kl_Loss_FC':WFC}
-    MinLimit = {'Beta_Rec_ext':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ, 'Beta_Fc':MnWFC}
-    MaxLimit = {'Beta_Rec_ext':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ, 'Beta_Fc':MxWFC}
+
+    RelLossDic = { 'val_ReconOut_ext':'Beta_Rec_ext', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc', 'val_kl_Loss_TC':'Beta_TC', 'val_kl_Loss_MI':'Beta_MI'}
+    ScalingDic = { 'val_ReconOut_ext':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ, 'val_kl_Loss_FC':WFC, 'val_kl_Loss_TC':WTC, 'val_kl_Loss_MI':WMI}
+    MinLimit = {'Beta_Rec_ext':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ, 'Beta_Fc':MnWFC, 'Beta_TC':MnWTC, 'Beta_MI':MnWMI}
+    MaxLimit = {'Beta_Rec_ext':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ, 'Beta_Fc':MxWFC, 'Beta_TC':MxWTC, 'Beta_MI':MxWMI}
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_ReconOut_ext'] , SaveWay='max' , SavePath = ModelSaveName)
     
     
-       
     
     # Model Training
     #SigBandRepModel.load_weights(ModelSaveName)

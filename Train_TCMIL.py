@@ -114,7 +114,8 @@ if __name__ == "__main__":
     TrData = np.load('./Data/ProcessedData/Tr'+str(SigType)+'.npy')
     ValData = np.load('./Data/ProcessedData/Val'+str(SigType)+'.npy')
     SigDim = TrData.shape[1]
-        
+    BatSize = 3000   
+    DataSize = TrData.shape[0]
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
@@ -163,32 +164,37 @@ if __name__ == "__main__":
     SigBandRepModel.add_loss(FeatRecLoss)
     SigBandRepModel.add_metric(FeatRecLoss, 'FeatRecLoss')
 
-    ### KL Divergence for p(Z) vs q(Z)
+    ### KL Divergence for p(FCs) vs q(FCs)
+    BernP = 0.5 # hyperparameter
+    FC_Mu = SigBandRepModel.get_layer('FC_Mu').output 
+    kl_Loss_FC = FC_Mu*(tf.math.log(FC_Mu) - tf.math.log(BernP)) + (1-FC_Mu)*(tf.math.log(1-FC_Mu) - tf.math.log(1-BernP))
+    kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
+    kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
+    
+    ### Total Correlation # KL(q(z)||prod_j q(z_j)) = log q(z) - sum_j log q(z_j)
+    'Reference: https://github.com/YannDubs/disentangling-vae/issues/60#issuecomment-705164833' 
+    'https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54'
+    'https://github.com/rtqichen/beta-tcvae/blob/master/elbo_decomposition.py'
     Z_Mu, Z_Log_Sigma, Zs = SigBandRepModel.get_layer('Z_Mu').output, SigBandRepModel.get_layer('Z_Log_Sigma').output, SigBandRepModel.get_layer('Zs').output
+    LogProb_QZi = LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None])
+    LogProb_QZ = -tf.math.log(DataSize*BatSize*1.) + tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
+    JointEntropy  = tf.reduce_logsumexp(LogProb_QZ,   axis=1,   keepdims=False)
+    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*BatSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
+    kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
+    kl_Loss_TC = Beta_TC * kl_Loss_TC
+
+    
+    ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
+    Log_QZX = tf.reduce_logsumexp(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
+    kl_Loss_MI = tf.reduce_mean(Log_QZX - JointEntropy)
+    kl_Loss_MI = Beta_MI * kl_Loss_MI
+    
+    
+    ### KL Divergence for p(Z) vs q(Z)
     kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
     kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
     kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
-
-    ### KL Divergence for p(FCs) vs q(FCs)
-    BernP = 0.5 # hyperparameter
-    FCs = SigBandRepModel.get_layer('FC_Mu').output 
-    kl_Loss_FC = tf.math.log(FCs) - tf.math.log(BernP) + tf.math.log(1-FCs) - tf.math.log(1-BernP) 
-    kl_Loss_FC = tf.reduce_mean(-kl_Loss_FC )
-    kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
-
     
-    ### KL Divergence for q(Z) vs q(Z)_Prod
-    LogProb_QZ = LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None])
-    Log_QZ_Prod = tf.reduce_sum( tf.reduce_logsumexp(LogProb_QZ, axis=1, keepdims=False),   axis=1,  keepdims=False)
-    Log_QZ = tf.reduce_logsumexp(tf.reduce_sum(LogProb_QZ, axis=2, keepdims=False),   axis=1,   keepdims=False)
-    kl_Loss_TC = -tf.reduce_mean(Log_QZ - Log_QZ_Prod)
-    kl_Loss_TC = Beta_TC * kl_Loss_TC
-
-    ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
-    Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
-    kl_Loss_MI = -tf.reduce_mean((Log_QZX - Log_QZ))
-    kl_Loss_MI = Beta_MI * kl_Loss_MI
-
     
     
     SigBandRepModel.add_loss(kl_Loss_Z )
@@ -223,6 +229,6 @@ if __name__ == "__main__":
     
     # Model Training
     #SigBandRepModel.load_weights(ModelSaveName)
-    SigBandRepModel.fit(TrData, batch_size=3000, epochs=4000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
+    SigBandRepModel.fit(TrData, batch_size=BatSize, epochs=2000, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
