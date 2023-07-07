@@ -165,9 +165,9 @@ if __name__ == "__main__":
     'https://github.com/rtqichen/beta-tcvae/blob/master/elbo_decomposition.py'
     Z_Mu, Z_Log_Sigma, Zs = SigBandRepModel.get_layer('Z_Mu').output, SigBandRepModel.get_layer('Z_Log_Sigma').output, SigBandRepModel.get_layer('Zs').output
     LogProb_QZi = LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None])
-    LogProb_QZ = -tf.math.log(DataSize*BatSize*1.) + tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
+    LogProb_QZ = -tf.math.log(BatSize*1.) + tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
     JointEntropy  = tf.reduce_logsumexp(LogProb_QZ,   axis=1,   keepdims=False)
-    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*BatSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
+    MarginalEntropies = tf.reduce_sum( - tf.math.log(BatSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
     kl_Loss_TC = Beta_TC * kl_Loss_TC
     

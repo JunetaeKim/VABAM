@@ -16,7 +16,7 @@ from Utilities.Utilities import *
 
 ## GPU selection
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 # TensorFlow wizardry
 config = tf.compat.v1.ConfigProto()
@@ -176,21 +176,21 @@ if __name__ == "__main__":
     'https://github.com/rtqichen/beta-tcvae/blob/master/elbo_decomposition.py'
     Z_Mu, Z_Log_Sigma, Zs = SigBandRepModel.get_layer('Z_Mu').output, SigBandRepModel.get_layer('Z_Log_Sigma').output, SigBandRepModel.get_layer('Zs').output
     LogProb_QZi = LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None])
-    LogProb_QZ = -tf.math.log(DataSize*BatSize*1.) + tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
-    JointEntropy  = tf.reduce_logsumexp(LogProb_QZ,   axis=1,   keepdims=False)
-    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*BatSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
+    LogProb_QZ = tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
+    JointEntropy  = tf.reduce_logsumexp(-tf.math.log(BatSize*1.) + LogProb_QZ,   axis=1,   keepdims=False)
+    MarginalEntropies = tf.reduce_sum( - tf.math.log(BatSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
     kl_Loss_TC = Beta_TC * kl_Loss_TC
     
 
     ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
-    Log_QZX = tf.reduce_logsumexp(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
+    Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
     kl_Loss_MI = tf.reduce_mean(Log_QZX - JointEntropy)
     kl_Loss_MI = Beta_MI * kl_Loss_MI
     
     
     ### KL Divergence for p(Z) vs q(Z) # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
-    Log_PZ = tf.reduce_logsumexp(LogNormalDensity(Zs, 0., 0.), axis=1)
+    Log_PZ = tf.reduce_sum(LogNormalDensity(Zs, 0., 0.), axis=1)
     DW_kl_Loss_Z = tf.reduce_mean( MarginalEntropies - Log_PZ)
     kl_Loss_Z = Beta_Z * tf.abs(DW_kl_Loss_Z - Capacity_Z)
 
