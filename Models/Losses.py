@@ -1,0 +1,137 @@
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras import Model
+from Utilities.Utilities import Lossweight
+
+
+def LogNormalDensity(LatSamp, LatMean, LogSquaScale):
+    Norm = tf.math.log(2. * tf.constant(np.pi))
+    InvSigma = tf.math.exp(-LogSquaScale)
+    MeanSampDiff = (LatSamp - LatMean)
+    return -0.5 * (MeanSampDiff * MeanSampDiff * InvSigma + LogSquaScale + Norm)
+
+
+def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
+    
+    ### Loss-related parameters
+    Capacity_Z = LossConfigSet['Capacity_Z']
+    Capacity_Fc = LossConfigSet['Capacity_Fc']
+    
+
+    
+    ###-------------------------------- Model structuring -------------------------------------------- ###
+    ## Model core parts
+    EncModel,FeatExtModel,FeatGenModel,ReconModel =  Models
+    EncInp =EncModel.input
+    InpZ = EncModel.output[2]
+    InpFCCommon = EncModel.output[1][:, :2]
+    InpFCEach = EncModel.output[1][:, 2:]
+
+    ## Each output of each model
+    FeatExtOut = FeatExtModel(EncModel.output[:2])
+    FeatGenOut = FeatGenModel([InpFCCommon, InpFCEach, InpZ])
+    ReconExtOut = ReconModel(FeatExtOut)
+    ReconGenOut = ReconModel(FeatGenOut)
+    
+    ### Define the total model
+    SigRepModel = Model(EncInp, [FeatGenOut, ReconExtOut, ReconGenOut])
+    
+    
+    
+    ###-------------------------------- Weights for losses -------------------------------------------- ###
+    ### Weight controller; Apply beta and capacity 
+    Beta_Z = Lossweight(name='Beta_Z', InitVal=0.01)(SigRepModel.input)
+    Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.01)(SigRepModel.input)
+    Beta_TC = Lossweight(name='Beta_TC', InitVal=0.01)(SigRepModel.input)
+    Beta_MI = Lossweight(name='Beta_MI', InitVal=0.01)(SigRepModel.input)
+    Beta_Orig = Lossweight(name='Beta_Orig', InitVal=1.)(SigRepModel.input)
+    Beta_Feat = Lossweight(name='Beta_Feat', InitVal=1.)(SigRepModel.input)
+
+
+
+    ###-------------------------------- Common losses -------------------------------------------- ###
+
+    ### Adding the RecLoss; 
+    MSE = tf.keras.losses.MeanSquaredError()
+    ReconOut_ext = Beta_Orig * MSE(ReconExtOut, EncInp)
+
+    SigRepModel.add_loss(ReconOut_ext)
+    SigRepModel.add_metric(ReconOut_ext, 'OrigRecLoss')
+    print('OrigRecLoss added')
+
+    ### Adding the FeatRecLoss; It allows connection between the extractor and generator
+    FeatRecLoss= Beta_Feat * MSE(tf.concat(FeatGenOut, axis=-1), tf.concat(FeatExtOut, axis=-1))
+
+    SigRepModel.add_loss(FeatRecLoss)
+    SigRepModel.add_metric(FeatRecLoss, 'FeatRecLoss')
+    print('FeatRecLoss added')
+
+
+
+
+    ###-------------------------------- Specific losses -------------------------------------------- ###
+
+    ### Total Correlation # KL(q(z)||prod_j q(z_j)) = log q(z) - sum_j log q(z_j)
+    'Reference: https://github.com/YannDubs/disentangling-vae/issues/60#issuecomment-705164833' 
+    'https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54'
+    'https://github.com/rtqichen/beta-tcvae/blob/master/elbo_decomposition.py'
+    Z_Mu, Z_Log_Sigma, Zs = SigRepModel.get_layer('Z_Mu').output, SigRepModel.get_layer('Z_Log_Sigma').output, SigRepModel.get_layer('Zs').output
+    LogProb_QZi = tf.maximum(LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None]), np.log(1/DataSize)) 
+    LogProb_QZ = tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
+    JointEntropy  = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_QZ ,   axis=1,   keepdims=False)
+    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
+    kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
+    kl_Loss_TC = Beta_TC * kl_Loss_TC
+    
+            
+    ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
+    Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
+    kl_Loss_MI = tf.reduce_mean(Log_QZX - JointEntropy)
+    kl_Loss_MI = Beta_MI * kl_Loss_MI
+    
+    
+    ### KL Divergence for p(FC) vs q(FC)
+    BernP = 0.5 # hyperparameter
+    FC_Mu = SigRepModel.get_layer('FC_Mu').output 
+    kl_Loss_FC = FC_Mu*(tf.math.log(FC_Mu) - tf.math.log(BernP)) + (1-FC_Mu)*(tf.math.log(1-FC_Mu) - tf.math.log(1-BernP))
+    kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
+    kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
+    
+    
+    ### KL Divergence for p(Z) vs q(Z)
+    if 'SKZ' in ModelType: #Standard KLD for Z
+        kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
+        kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
+        kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
+        print('SKZ loss selected')
+    elif 'DKZ' in ModelType: #Dimensional-wise KLD for Z  
+        # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
+        Log_PZ = tf.reduce_sum(LogNormalDensity(Zs, 0., 0.), axis=1)
+        DW_kl_Loss_Z = tf.reduce_mean( MarginalEntropies - Log_PZ)
+        kl_Loss_Z = Beta_Z * tf.abs(DW_kl_Loss_Z - Capacity_Z)
+        print('DKZ loss selected')
+
+
+        
+    ### Adding specific losses
+    SigRepModel.add_loss(kl_Loss_Z )
+    SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
+    print('kl_Loss_Z added')
+    
+    if 'FC' in ModelType :
+        SigRepModel.add_loss(kl_Loss_FC )
+        SigRepModel.add_metric(kl_Loss_FC , 'kl_Loss_FC')
+        print('kl_Loss_FC added')
+    
+    if 'TC' in ModelType :
+        SigRepModel.add_loss(kl_Loss_TC )
+        SigRepModel.add_metric(kl_Loss_TC , 'kl_Loss_TC')
+        print('kl_Loss_TC added')
+
+    if 'MI' in ModelType :
+        SigRepModel.add_loss(kl_Loss_MI )
+        SigRepModel.add_metric(kl_Loss_MI , 'kl_Loss_MI')
+        print('kl_Loss_MI added')
+
+        
+    return SigRepModel
