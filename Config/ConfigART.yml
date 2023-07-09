@@ -1,38 +1,126 @@
-BASE_ART_50_800: # SigType_LatDim_CompSize
-  LatDim: 50 # The dimensionality of the latent variable z.
+SKZFC_ART_50_800: # SigType_LatDim_CompSize
   SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 50 # The dimensionality of the latent variable z.
   CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
   MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
   NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
   MaskStd: 0.00 # The standard deviation value for Gaussian noise generation applied to the masked signal.
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
-  Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
-  Capacity_Fc: 0.01 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.
+  Capacity_Z: 0.05 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
+  Capacity_Fc: 0.005 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.
   FcLimit: 0.05 # The upper threshold value for frequency.
   DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
   DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
   
-  Patience: 300 # The patience value for early stopping during model training.
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
   
-  WRec: 300 # The scaling weight for the reconstruction loss.
-  WFeat: 400 # The scaling weight for the feature loss.
-  WZ: 0.1 # The scaling weight for the Z loss.
-  WFC: 1. # The scaling weight for the FC loss.
+  #Each weight may be activated or not depending on the model type.
+  WRec: 20 # The scaling weight for the reconstruction loss.
+  WFeat: 30 # The scaling weight for the feature loss.
+  WZ: 0.01 # The scaling weight for the Z loss.
+  WFC: 0.2 # The scaling weight for the FC loss.     
+  WTC: 0.0000 # The scaling weight for the TC loss.
+  WMI: 0.0000 # The scaling weight for the MI loss.
+  
+  MnWRec: 1 # The min weight for the reconstruction loss.
+  MnWFeat: 1 # The min weight for the feature loss.
+  MnWZ: 0.001 # The min weight for the Z loss.
+  MnWFC: 0.1 # The min weight for the FC loss.
+  MnWTC: 0.0000 # The min weight for the TC loss.
+  MnWMI: 0.0000 # The min weight for the MI loss.
+  
+  MxWRec: 100 # The max weight for the reconstruction loss.
+  MxWFeat: 100 # The max weight for the feature loss.
+  MxWZ: 0.1 # The max weight for the Z loss.
+  MxWFC: 1. # The max weight for the FC loss. # 0.3
+  MxWTC: 0.0000 # The max weight for the TC loss.
+  MxWMI: 0.0000 # The max weight for the MI loss.  
+  
+  
+DKZFC_ART_50_800: # SigType_LatDim_CompSize
+  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 50 # The dimensionality of the latent variable z.
+  CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
+  MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
+  NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
+  MaskStd: 0.00 # The standard deviation value for Gaussian noise generation applied to the masked signal.
+  ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+  Capacity_Z: 0.05 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
+  Capacity_Fc: 0.005 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.
+  FcLimit: 0.05 # The upper threshold value for frequency.
+  DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
+  DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
+  
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
+  
+  #Each weight may be activated or not depending on the model type.
+  WRec: 20 # The scaling weight for the reconstruction loss.
+  WFeat: 30 # The scaling weight for the feature loss.
+  WZ: 0.0001 # The scaling weight for the Z loss.
+  WFC: 0.75 # The scaling weight for the FC loss.
+  WTC: 0.0000 # The scaling weight for the TC loss.
+  WMI: 0.0000 # The scaling weight for the MI loss.
+  
+  MnWRec: 1 # The min weight for the reconstruction loss.
+  MnWFeat: 1 # The min weight for the feature loss.
+  MnWZ: 0.00001 # The min weight for the Z loss.
+  MnWFC: 0.1 # The min weight for the FC loss.
+  MnWTC: 0.0000 # The min weight for the TC loss.
+  MnWMI: 0.0000 # The min weight for the MI loss.
+  
+  MxWRec: 100 # The max weight for the reconstruction loss.
+  MxWFeat: 100 # The max weight for the feature loss.
+  MxWZ: 0.0002 # The max weight for the Z loss.
+  MxWFC: 1. # The max weight for the FC loss. # 0.3
+  MxWTC: 0.0000 # The max weight for the TC loss.
+  MxWMI: 0.0000 # The max weight for the MI loss.  
+
+
+TCMIDKZFC_ART_50_800_HiKLD: # SigType_LatDim_CompSize
+  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 50 # The dimensionality of the latent variable z.
+  CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
+  MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
+  NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
+  MaskStd: 0.00 # The standard deviation value for Gaussian noise generation applied to the masked signal.
+  ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+  Capacity_Z: 0.05 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
+  Capacity_Fc: 0.005 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.
+  FcLimit: 0.05 # The upper threshold value for frequency.
+  DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
+  DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
+  
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
+  
+  #Each weight may be activated or not depending on the model type.
+  WRec: 20 # The scaling weight for the reconstruction loss.
+  WFeat: 30 # The scaling weight for the feature loss.
+  WZ: 0.01 # The scaling weight for the Z loss.
+  WFC: 0.75 # The scaling weight for the FC loss.
+  WTC: 0.01 # The scaling weight for the TC loss.
+  WMI: 0.01 # The scaling weight for the MI loss.
   
   MnWRec: 1 # The min weight for the reconstruction loss.
   MnWFeat: 1 # The min weight for the feature loss.
   MnWZ: 0.01 # The min weight for the Z loss.
-  MnWFC: 0.2 # The min weight for the FC loss.
+  MnWFC: 0.1 # The min weight for the FC loss.
+  MnWTC: 0.01 # The min weight for the TC loss.
+  MnWMI: 0.01 # The min weight for the MI loss.
   
-  MxWRec: 800 # The max weight for the reconstruction loss.
-  MxWFeat: 800 # The max weight for the feature loss.
-  MxWZ: 0.2 # The max weight for the Z loss.
-  MxWFC: 10. # The max weight for the FC loss.
+  MxWRec: 100 # The max weight for the reconstruction loss.
+  MxWFeat: 100 # The max weight for the feature loss.
+  MxWZ: 0.05 # The max weight for the Z loss.
+  MxWFC: 1. # The max weight for the FC loss. # 0.3
+  MxWTC: 0.05 # The max weight for the TC loss.
+  MxWMI: 0.05 # The max weight for the MI loss.  
 
 
-TCMIL_ART_50_800: # SigType_LatDim_CompSize
-  LatDim: 50 # The dimensionality of the latent variable z.
+TCDKZFC_ART_50_800_LoTCKZ: # SigType_LatDim_CompSize
   SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 50 # The dimensionality of the latent variable z.
   CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
   MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
   NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
@@ -44,28 +132,30 @@ TCMIL_ART_50_800: # SigType_LatDim_CompSize
   DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
   DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
   
-  Patience: 300 # The patience value for early stopping during model training.
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
   
+  #Each weight may be activated or not depending on the model type.
   WRec: 20 # The scaling weight for the reconstruction loss.
-  WFeat: 50 # The scaling weight for the feature loss.
-  WZ: 0.0001 # The scaling weight for the Z loss.
-  WFC: 1. # The scaling weight for the FC loss.
-  WTC: 0.0001 # The scaling weight for the TC loss.
-  WMI: 0.0001 # The scaling weight for the MI loss.
+  WFeat: 30 # The scaling weight for the feature loss.
+  WZ: 0.00001 # The scaling weight for the Z loss.
+  WFC: 0.75 # The scaling weight for the FC loss.
+  WTC: 0.00001 # The scaling weight for the TC loss.
+  WMI: 0.0000 # The scaling weight for the MI loss.
   
   MnWRec: 1 # The min weight for the reconstruction loss.
   MnWFeat: 1 # The min weight for the feature loss.
-  MnWZ: 0.0001 # The min weight for the Z loss.
+  MnWZ: 0.00001 # The min weight for the Z loss.
   MnWFC: 0.1 # The min weight for the FC loss.
-  MnWTC: 0.0001 # The min weight for the TC loss.
-  MnWMI: 0.0001 # The min weight for the MI loss.
+  MnWTC: 0.00001 # The min weight for the TC loss.
+  MnWMI: 0.0000 # The min weight for the MI loss.
   
-  MxWRec: 80 # The max weight for the reconstruction loss.
+  MxWRec: 100 # The max weight for the reconstruction loss.
   MxWFeat: 100 # The max weight for the feature loss.
-  MxWZ: 0.0005 # The max weight for the Z loss.
-  MxWFC: 0.5 # The max weight for the FC loss.
-  MxWTC: 0.0001 # The max weight for the TC loss.
-  MxWMI: 0.0005 # The max weight for the MI loss.  
+  MxWZ: 0.0002 # The max weight for the Z loss.
+  MxWFC: 1. # The max weight for the FC loss. # 0.3
+  MxWTC: 0.0002 # The max weight for the TC loss.
+  MxWMI: 0.0000 # The max weight for the MI loss.  
 
 
 TCMILDW_ART_50_800: # SigType_LatDim_CompSize
@@ -81,6 +171,8 @@ TCMILDW_ART_50_800: # SigType_LatDim_CompSize
   FcLimit: 0.05 # The upper threshold value for frequency.
   DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
   DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
   
   Patience: 300 # The patience value for early stopping during model training.
   
