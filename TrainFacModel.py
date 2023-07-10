@@ -9,6 +9,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from Models.MainModel import *
+from Models.Discriminator import FacDiscriminator
 from Models.Losses import *
 from Utilities.Utilities import *
 
@@ -82,21 +83,18 @@ if __name__ == "__main__":
     WZ = ConfigSet[ConfigName]['WZ']
     WFC = ConfigSet[ConfigName]['WFC']
     WTC = ConfigSet[ConfigName]['WTC']
-    WMI = ConfigSet[ConfigName]['WMI']
     
     MnWRec = ConfigSet[ConfigName]['MnWRec']
     MnWFeat = ConfigSet[ConfigName]['MnWFeat']
     MnWZ = ConfigSet[ConfigName]['MnWZ']
     MnWFC = ConfigSet[ConfigName]['MnWFC']
     MnWTC = ConfigSet[ConfigName]['MnWTC']
-    MnWMI = ConfigSet[ConfigName]['MnWMI']
     
     MxWRec = ConfigSet[ConfigName]['MxWRec']
     MxWFeat = ConfigSet[ConfigName]['MxWFeat']
     MxWZ = ConfigSet[ConfigName]['MxWZ']
     MxWFC = ConfigSet[ConfigName]['MxWFC']
     MxWTC = ConfigSet[ConfigName]['MxWTC']
-    MxWMI = ConfigSet[ConfigName]['MxWMI']
     
 
     SavePath = './Results/'
@@ -123,12 +121,12 @@ if __name__ == "__main__":
     FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, DecayH=DecayH, DecayL=DecayL)
     FeatGenModel = FeatGenerator(SigDim=SigDim,FeatDim=FeatExtModel.output[1].shape[-1], LatDim= LatDim)
     ReconModel = Reconstructor(SigDim=SigDim, FeatDim=FeatExtModel.output[1].shape[-1])
+    FacDiscModel = FacDiscriminator(LatDim, 50)
 
-
-    Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
+    Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel, FacDiscModel] 
 
     # Adding losses
-    SigRepModel = TCLosses(Models, DataSize, ConfigSet[ConfigName], ModelType=ConfigName)
+    SigRepModel = FACLosses(Models, ConfigSet[ConfigName])
 
 
     
@@ -138,28 +136,12 @@ if __name__ == "__main__":
 
 
     ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z'}
-    ScalingDic = { 'val_OrigRecLoss':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ}
-    MinLimit = {'Beta_Orig':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ}
-    MaxLimit = {'Beta_Orig':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ}
+    RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z', 'val_kl_Loss_FC':'Beta_Fc', 'val_kl_Loss_TC':'Beta_TC'}
+    ScalingDic = { 'val_OrigRecLoss':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ,'val_kl_Loss_FC':WFC, 'val_kl_Loss_TC':WTC}
+    MinLimit = {'Beta_Orig':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ, 'Beta_Fc':MnWFC, 'Beta_TC':MnWTC }
+    MaxLimit = {'Beta_Orig':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ, 'Beta_Fc':MxWFC, 'Beta_TC': MxWTC}
     
-    
-    ### Dynamic controller for specific losses and betas
-    if 'FC' in ConfigName :
-        RelLossDic['val_kl_Loss_FC'] = 'Beta_Fc'
-        ScalingDic['val_kl_Loss_FC'] = WFC
-        MinLimit['Beta_Fc'] = MnWFC
-        MaxLimit['Beta_Fc'] = MxWFC
-    if 'TC' in ConfigName :
-        RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = WTC
-        MinLimit['Beta_TC'] = MnWTC
-        MaxLimit['Beta_TC'] = MxWTC
-    if 'MI' in ConfigName :
-        RelLossDic['val_kl_Loss_MI'] = 'Beta_MI'
-        ScalingDic['val_kl_Loss_MI'] = WMI
-        MinLimit['Beta_MI'] = MnWMI
-        MaxLimit['Beta_MI'] = MxWMI
+  
 
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_OrigRecLoss'] , SaveWay='max' , SavePath = ModelSaveName)
     
