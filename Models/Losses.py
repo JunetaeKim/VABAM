@@ -30,11 +30,6 @@ def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
     
 def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
     
-    ### Loss-related parameters
-    Capacity_Z = LossConfigSet['Capacity_Z']
-    Capacity_Fc = LossConfigSet['Capacity_Fc']
-    
-
     
     ###-------------------------------- Model structuring -------------------------------------------- ###
     ## Model core parts
@@ -98,13 +93,13 @@ def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
     JointEntropy  = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_QZ ,   axis=1,   keepdims=False)
     MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
-    kl_Loss_TC = Beta_TC * kl_Loss_TC
+    
     
             
     ### MI Loss ; I[z;x] = KL[q(z,x)||q(x)q(z)] = E_x[KL[q(z|x)||q(z)]]
     Log_QZX = tf.reduce_sum(LogNormalDensity(Zs, Z_Mu, Z_Log_Sigma), axis=1)
     kl_Loss_MI = tf.reduce_mean(Log_QZX - JointEntropy)
-    kl_Loss_MI = Beta_MI * kl_Loss_MI
+    
     
     
     ### KL Divergence for p(FC) vs q(FC)
@@ -112,40 +107,46 @@ def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
     FC_Mu = SigRepModel.get_layer('FC_Mu').output 
     kl_Loss_FC = FC_Mu*(tf.math.log(FC_Mu) - tf.math.log(BernP)) + (1-FC_Mu)*(tf.math.log(1-FC_Mu) - tf.math.log(1-BernP))
     kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
-    kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
+    
     
     
     ### KL Divergence for p(Z) vs q(Z)
     if 'SKZ' in ModelType: #Standard KLD for Z
         kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
         kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
-        kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
         print('SKZ loss selected')
     elif 'DKZ' in ModelType: #Dimensional-wise KLD for Z  
         # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
         Log_PZ = tf.reduce_sum(LogNormalDensity(Zs, 0., 0.), axis=1)
-        DW_kl_Loss_Z = tf.reduce_mean( MarginalEntropies - Log_PZ)
-        kl_Loss_Z = Beta_Z * tf.abs(DW_kl_Loss_Z - Capacity_Z)
+        kl_Loss_Z = tf.reduce_mean( MarginalEntropies - Log_PZ)
         print('DKZ loss selected')
 
 
         
     ### Adding specific losses
+    Capacity_Z = LossConfigSet['Capacity_Z']
+    kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
     SigRepModel.add_loss(kl_Loss_Z )
     SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
     print('kl_Loss_Z added')
     
     if 'FC' in ModelType :
+        Capacity_Fc = LossConfigSet['Capacity_Fc']
+        kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
         SigRepModel.add_loss(kl_Loss_FC )
         SigRepModel.add_metric(kl_Loss_FC , 'kl_Loss_FC')
         print('kl_Loss_FC added')
     
     if 'TC' in ModelType :
+        Capacity_TC = LossConfigSet['Capacity_TC']
+        kl_Loss_TC = Beta_TC * tf.abs(kl_Loss_TC - Capacity_TC)
         SigRepModel.add_loss(kl_Loss_TC )
         SigRepModel.add_metric(kl_Loss_TC , 'kl_Loss_TC')
         print('kl_Loss_TC added')
 
     if 'MI' in ModelType :
+        Capacity_MI = LossConfigSet['Capacity_MI']
+        kl_Loss_MI = Beta_MI * tf.abs(kl_Loss_MI - Capacity_MI)
         SigRepModel.add_loss(kl_Loss_MI )
         SigRepModel.add_metric(kl_Loss_MI , 'kl_Loss_MI')
         print('kl_Loss_MI added')
