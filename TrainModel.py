@@ -11,6 +11,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from Models.MainModel import *
 from Models.Losses import *
 from Utilities.Utilities import *
+from Models.Discriminator import FacDiscriminator
 
 
 def read_yaml(file_path):
@@ -77,28 +78,25 @@ if __name__ == "__main__":
     NEpochs = ConfigSet[ConfigName]['NEpochs']
     
     ### Loss-related parameters
+    LossType = ConfigSet[ConfigName]['LossType']
+    SpecLosses = ConfigSet[ConfigName]['SpecLosses']
+    
+    ### Parameters for dynamic controller for losse weights
     WRec = ConfigSet[ConfigName]['WRec']
     WFeat = ConfigSet[ConfigName]['WFeat']
     WZ = ConfigSet[ConfigName]['WZ']
-    WFC = ConfigSet[ConfigName]['WFC']
-    WTC = ConfigSet[ConfigName]['WTC']
-    WMI = ConfigSet[ConfigName]['WMI']
     
     MnWRec = ConfigSet[ConfigName]['MnWRec']
     MnWFeat = ConfigSet[ConfigName]['MnWFeat']
     MnWZ = ConfigSet[ConfigName]['MnWZ']
-    MnWFC = ConfigSet[ConfigName]['MnWFC']
-    MnWTC = ConfigSet[ConfigName]['MnWTC']
-    MnWMI = ConfigSet[ConfigName]['MnWMI']
     
     MxWRec = ConfigSet[ConfigName]['MxWRec']
     MxWFeat = ConfigSet[ConfigName]['MxWFeat']
     MxWZ = ConfigSet[ConfigName]['MxWZ']
-    MxWFC = ConfigSet[ConfigName]['MxWFC']
-    MxWTC = ConfigSet[ConfigName]['MxWTC']
-    MxWMI = ConfigSet[ConfigName]['MxWMI']
     
-
+    
+    
+    ### Experiment setting
     SavePath = './Results/'
     ModelName = ConfigName+'.hdf5'
     
@@ -124,11 +122,18 @@ if __name__ == "__main__":
     FeatGenModel = FeatGenerator(SigDim=SigDim,FeatDim=FeatExtModel.output[1].shape[-1], LatDim= LatDim)
     ReconModel = Reconstructor(SigDim=SigDim, FeatDim=FeatExtModel.output[1].shape[-1])
 
-
-    Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
+    
 
     # Adding losses
-    SigRepModel = TCLosses(Models, DataSize, ConfigSet[ConfigName], ModelType=ConfigName)
+    if LossType =='TCLosses':
+        Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
+        SigRepModel = TCLosses(Models, DataSize, ConfigSet[ConfigName])
+        
+    elif LossType =='FACLosses':
+        DiscHiddenSize = ConfigSet[ConfigName]['DiscHiddenSize']
+        FacDiscModel = FacDiscriminator(LatDim, DiscHiddenSize)
+        Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel, FacDiscModel] 
+        SigRepModel = FACLosses(Models, ConfigSet[ConfigName])
 
 
     
@@ -136,6 +141,7 @@ if __name__ == "__main__":
     SigRepModel.compile(optimizer='adam') 
     SigRepModel.summary()
 
+    
 
     ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
     RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z'}
@@ -145,21 +151,35 @@ if __name__ == "__main__":
     
     
     ### Dynamic controller for specific losses and betas
-    if 'FC' in ConfigName :
+    if 'FC' in SpecLosses :
         RelLossDic['val_kl_Loss_FC'] = 'Beta_Fc'
-        ScalingDic['val_kl_Loss_FC'] = WFC
-        MinLimit['Beta_Fc'] = MnWFC
-        MaxLimit['Beta_Fc'] = MxWFC
-    if 'TC' in ConfigName :
+        ScalingDic['val_kl_Loss_FC'] = ConfigSet[ConfigName]['WFC']
+        MinLimit['Beta_Fc'] = ConfigSet[ConfigName]['MnWFC']
+        MaxLimit['Beta_Fc'] = ConfigSet[ConfigName]['MxWFC']
+        
+    if 'TC' in SpecLosses :
         RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = WTC
-        MinLimit['Beta_TC'] = MnWTC
-        MaxLimit['Beta_TC'] = MxWTC
-    if 'MI' in ConfigName :
+        ScalingDic['val_kl_Loss_TC'] = ConfigSet[ConfigName]['WTC']
+        MinLimit['Beta_TC'] = ConfigSet[ConfigName]['MnWTC']
+        MaxLimit['Beta_TC'] = ConfigSet[ConfigName]['MxWTC']
+        
+    if 'MI' in SpecLosses :
         RelLossDic['val_kl_Loss_MI'] = 'Beta_MI'
-        ScalingDic['val_kl_Loss_MI'] = WMI
-        MinLimit['Beta_MI'] = MnWMI
-        MaxLimit['Beta_MI'] = MxWMI
+        ScalingDic['val_kl_Loss_MI'] = ConfigSet[ConfigName]['WMI']
+        MinLimit['Beta_MI'] = ConfigSet[ConfigName]['MnWMI']
+        MaxLimit['Beta_MI'] = ConfigSet[ConfigName]['MxWMI']
+        
+    if LossType =='FACLosses':
+        RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
+        ScalingDic['val_kl_Loss_TC'] = ConfigSet[ConfigName]['WTC']
+        MinLimit['Beta_TC'] = ConfigSet[ConfigName]['MnWTC']
+        MaxLimit['Beta_TC'] = ConfigSet[ConfigName]['MxWTC']
+        
+        RelLossDic['val_kl_Loss_DTC'] = 'Beta_DTC'
+        ScalingDic['val_kl_Loss_DTC'] = ConfigSet[ConfigName]['WDTC']
+        MinLimit['Beta_DTC'] = ConfigSet[ConfigName]['MnWDTC']
+        MaxLimit['Beta_DTC'] = ConfigSet[ConfigName]['MxWDTC']
+        
 
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_OrigRecLoss'] , SaveWay='max' , SavePath = ModelSaveName)
     
