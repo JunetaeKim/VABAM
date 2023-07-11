@@ -28,8 +28,8 @@ def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
     
     
     
-def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
-    
+def TCLosses (Models, DataSize, LossConfigSet):
+    SpecLosses = LossConfigSet['SpecLosses']
     
     ###-------------------------------- Model structuring -------------------------------------------- ###
     ## Model core parts
@@ -111,15 +111,15 @@ def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
     
     
     ### KL Divergence for p(Z) vs q(Z)
-    if 'SKZ' in ModelType: #Standard KLD for Z
+    if 'SKZ' in SpecLosses: #Standard KLD for Z
         kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
         kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
-        print('SKZ loss selected')
-    elif 'DKZ' in ModelType: #Dimensional-wise KLD for Z  
+        print('kl_Loss_SKZ selected')
+    elif 'DKZ' in SpecLosses: #Dimensional-wise KLD for Z  
         # dw_kl_loss is KL[q(z)||p(z)] instead of usual KL[q(z|x)||p(z))]
         Log_PZ = tf.reduce_sum(LogNormalDensity(Zs, 0., 0.), axis=1)
         kl_Loss_Z = tf.reduce_mean( MarginalEntropies - Log_PZ)
-        print('DKZ loss selected')
+        print('kl_Loss_DKZ selected')
 
 
         
@@ -130,21 +130,21 @@ def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
     SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
     print('kl_Loss_Z added')
     
-    if 'FC' in ModelType :
+    if 'FC' in SpecLosses :
         Capacity_Fc = LossConfigSet['Capacity_Fc']
         kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
         SigRepModel.add_loss(kl_Loss_FC )
         SigRepModel.add_metric(kl_Loss_FC , 'kl_Loss_FC')
         print('kl_Loss_FC added')
     
-    if 'TC' in ModelType :
+    if 'TC' in SpecLosses :
         Capacity_TC = LossConfigSet['Capacity_TC']
         kl_Loss_TC = Beta_TC * tf.abs(kl_Loss_TC - Capacity_TC)
         SigRepModel.add_loss(kl_Loss_TC )
         SigRepModel.add_metric(kl_Loss_TC , 'kl_Loss_TC')
         print('kl_Loss_TC added')
 
-    if 'MI' in ModelType :
+    if 'MI' in SpecLosses :
         Capacity_MI = LossConfigSet['Capacity_MI']
         kl_Loss_MI = Beta_MI * tf.abs(kl_Loss_MI - Capacity_MI)
         SigRepModel.add_loss(kl_Loss_MI )
@@ -159,12 +159,7 @@ def TCLosses (Models, DataSize, LossConfigSet, ModelType='TCMIDKZ'):
 
 
 def FACLosses (Models, LossConfigSet):
-    
-    ### Loss-related parameters
-    Capacity_Z = LossConfigSet['Capacity_Z']
-    Capacity_Fc = LossConfigSet['Capacity_Fc']
-    
-
+    SpecLosses = LossConfigSet['SpecLosses']
     
     ###-------------------------------- Model structuring -------------------------------------------- ###
     ## Model core parts
@@ -199,6 +194,7 @@ def FACLosses (Models, LossConfigSet):
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.01)(SigRepModel.input)
     Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.01)(SigRepModel.input)
     Beta_TC = Lossweight(name='Beta_TC', InitVal=0.01)(SigRepModel.input)
+    Beta_DTC = Lossweight(name='Beta_DTC', InitVal=0.01)(SigRepModel.input)
     Beta_Orig = Lossweight(name='Beta_Orig', InitVal=1.)(SigRepModel.input)
     Beta_Feat = Lossweight(name='Beta_Feat', InitVal=1.)(SigRepModel.input)
 
@@ -233,23 +229,28 @@ def FACLosses (Models, LossConfigSet):
     Z_Mu_D1 = SplitBatch(Z_Mu, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
     Z_Log_Sigma_D1 = SplitBatch(Z_Log_Sigma, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
 
+    Capacity_Z = LossConfigSet['Capacity_Z']
     kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu_D1**2  +  tf.exp(Z_Log_Sigma_D1)- Z_Log_Sigma_D1-1, axis=1)    
     kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
     kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
+    
     SigRepModel.add_loss(kl_Loss_Z )
     SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
-    print('SKZ loss selected')
+    print('kl_Loss_SKZ added')
 
 
     #### ### Total Correlation # KL(q(z)||prod_j q(z_j)); log(p_true/p_false) = logit_true - logit_false
+    Capacity_TC = LossConfigSet['Capacity_TC']
     kl_Loss_TC = tf.reduce_mean(FacDiscOut_D1[:, 0] - FacDiscOut_D1[:, 1])
-    kl_Loss_TC = Beta_TC * kl_Loss_TC
+    kl_Loss_TC = Beta_TC * tf.abs(kl_Loss_TC - Capacity_TC)
+    
     SigRepModel.add_loss(kl_Loss_TC )
     SigRepModel.add_metric(kl_Loss_TC , 'kl_Loss_TC')
     print('kl_Loss_TC added')
 
     
     # Discriminator Loss
+    Capacity_DTC = LossConfigSet['Capacity_DTC']
     Batch2_Size = tf.shape(Z_D2)[0]
     PermZ_D2 = tf.concat([tf.nn.embedding_lookup(Z_D2[:, i][:,None], tf.random.shuffle(tf.range(Batch2_Size))) for i in range(Z_D1.shape[-1])], axis=1)
     PermZ_D2 = tf.stop_gradient(PermZ_D2) # 
@@ -258,7 +259,10 @@ def FACLosses (Models, LossConfigSet):
     Ones = tf.ones_like(HalfBatchIdx1)[:,None]
     Zeros = tf.zeros_like(HalfBatchIdx2)[:,None]
     CCE = tf.keras.losses.MeanSquaredError()
+    
     kl_Loss_DTC = 0.5 * (CCE(Zeros, FacDiscOut_D1) + CCE(Ones, FacDiscOut_D2))
+    kl_Loss_DTC = Beta_DTC * tf.abs(kl_Loss_DTC - Capacity_DTC)
+    
     SigRepModel.add_loss(kl_Loss_DTC )
     SigRepModel.add_metric(kl_Loss_DTC , 'kl_Loss_DTC')
     print('kl_Loss_DTC added')
@@ -267,16 +271,20 @@ def FACLosses (Models, LossConfigSet):
 
     ###-------------------------------- Specific losses -------------------------------------------- ###
     ### KL Divergence for p(FC) vs q(FC)
-    BernP = 0.5 # hyperparameter
-    FC_Mu = SigRepModel.get_layer('FC_Mu').output 
-    FC_Mu_D1 = SplitBatch(FC_Mu, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
-    kl_Loss_FC = FC_Mu_D1*(tf.math.log(FC_Mu_D1) - tf.math.log(BernP)) + (1-FC_Mu_D1)*(tf.math.log(1-FC_Mu_D1) - tf.math.log(1-BernP))
-    kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
-    kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
-    SigRepModel.add_loss(kl_Loss_FC )
-    SigRepModel.add_metric(kl_Loss_FC , 'kl_Loss_FC')
-    print('kl_Loss_FC added')
+    if 'FC' in SpecLosses :
+        BernP = 0.5 # hyperparameter
+        Capacity_Fc = LossConfigSet['Capacity_Fc']
 
+        FC_Mu = SigRepModel.get_layer('FC_Mu').output 
+        FC_Mu_D1 = SplitBatch(FC_Mu, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
+        kl_Loss_FC = FC_Mu_D1*(tf.math.log(FC_Mu_D1) - tf.math.log(BernP)) + (1-FC_Mu_D1)*(tf.math.log(1-FC_Mu_D1) - tf.math.log(1-BernP))
+        kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
+        kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)
+        SigRepModel.add_loss(kl_Loss_FC )
+        SigRepModel.add_metric(kl_Loss_FC , 'kl_Loss_FC')
+        print('kl_Loss_FC added')
 
         
     return SigRepModel
+
+

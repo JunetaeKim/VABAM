@@ -4,9 +4,9 @@ from tensorflow.keras import Model
 
 
 
-def EvalDiscriminator (SigDim):
+def EvalDiscriminator (SigDim, SlidingSize = 50):
     InpL = Input(shape=(SigDim,), name='Inp_Enc')
-    InpFrame = tf.signal.frame(InpL, 100, 100)
+    InpFrame = tf.signal.frame(InpL, SlidingSize, SlidingSize)
     DiscriLayer = Bidirectional(GRU(30, return_sequences=True))(InpFrame)
     DiscriLayer = Bidirectional(GRU(20, return_sequences=True))(DiscriLayer)
     DiscriLayer = Bidirectional(GRU(10, return_sequences=False))(DiscriLayer)
@@ -24,11 +24,11 @@ def EvalDiscriminator (SigDim):
 def FacDiscriminator (LatDim, HDim):
 
     InpL = Input(shape=(LatDim,))
-    DiscLayer = Dense(HDim, activation='softplus')(InpL)
-    DiscLayer = Dense(HDim, activation='softplus')(DiscLayer)
-    DiscLayer = Dense(HDim, activation='softplus')(DiscLayer)
-    DiscLayer = Dense(HDim, activation='softplus')(DiscLayer)
-    DiscLayer = Dense(HDim, activation='softplus')(DiscLayer)
+    DiscLayer = Dense(HDim, activation='relu')(InpL)
+    DiscLayer = Dense(HDim, activation='relu')(DiscLayer)
+    DiscLayer = Dense(HDim, activation='relu')(DiscLayer)
+    DiscLayer = Dense(HDim, activation='relu')(DiscLayer)
+    DiscLayer = Dense(HDim, activation='relu')(DiscLayer)
     DiscOut = Dense(2, activation='linear')(DiscLayer)
     FacDiscModel = Model(InpL, DiscOut, name='FacDiscModel')
     
