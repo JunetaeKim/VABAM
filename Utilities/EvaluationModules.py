@@ -7,6 +7,36 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import EntropyHub as EH
 
 
+def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
+    # Dimension check; this part operates with 3D tensors.
+    # (Batch_size, N_sample, N_frequency)
+    Data = Data[:,None] if len(Data.shape) < 3 else Data
+
+    # Power Spectral Density
+    HalfLen = Data.shape[-1]//2
+    FFTRes = np.abs(np.fft.fft(Data, axis=-1)[..., :HalfLen])[..., MinFreq:MaxFreq]
+    # (Batch_size, N_sample, N_frequency)
+    PSD = (FFTRes**2)/FFTRes.shape[-1]
+
+    # Probability Density Function
+    if ReducedAxis == 'All':
+        AggPSD = np.mean(PSD, axis=(0,1))
+        # (N_frequency,)
+        AggPSEPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
+    
+    elif ReducedAxis =='Batch':
+        AggPSD = np.mean(PSD, axis=(1))
+        # (Batch_size, N_frequency)
+        AggPSEPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
+    
+    elif ReducedAxis == 'None':
+        # (Batch_size, N_sample, N_frequency)
+        AggPSEPDF = PSD / np.sum(PSD, axis=(-1),keepdims=True)    
+        
+    return AggPSEPDF
+
+
+
 def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200, MinZval = -3., MaxZval = 3.,):
     LatDim= FeatGenModel.input[-1].shape[-1]
     Z_pred = np.linspace(MinZval, MaxZval, N_Gen*LatDim).reshape(N_Gen, -1)

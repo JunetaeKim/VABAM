@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
@@ -31,7 +32,9 @@ class Anneal(tf.keras.callbacks.Callback):
         if type(TargetLossName) != list:
             TargetLossName = [TargetLossName]
         '''
-        
+        #KLD_Beta_Z = Anneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Z',  MaxBeta=0.1 , MinBeta=0.1, AnnealEpoch=1, UnderLimit=1e-7, verbose=2)
+        #KLD_Beta_Fc = Anneal(TargetLossName=['val_FeatRecLoss', 'val_RecLoss'], Threshold=0.001, BetaName='Beta_Fc',  MaxBeta=0.005 , MinBeta=0.005, AnnealEpoch=1, UnderLimit=1e-7, verbose=1)
+
         self.TargetLossName = TargetLossName
         self.Threshold = Threshold
         self.BetaName = BetaName
@@ -81,9 +84,11 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.SavePath = SavePath
         self.Logs = []
         self.SaveLogOnly = SaveLogOnly
-        self.LogsPath = "./Logs_" + SavePath.split('/')[-1].split('.')[0] + '.txt'
+        self.LogsPath = "./Logs/Logs_" + SavePath.split('/')[-1].split('.')[0] + '.txt'
         self.CheckPoint = CheckPoint
         
+        if not os.path.exists('./Logs'):
+            os.mkdir('./Logs')
         
     def on_epoch_end(self, epoch, logs={}):
         
