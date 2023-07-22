@@ -1,6 +1,6 @@
 '''
 Notice
-The original code for GP-VAE can be found in the author's repository. https://github.com/abudesai/timeVAE
+The original code for Time-VAE can be found in the author's repository. https://github.com/abudesai/timeVAE
 '''
 
 import os
@@ -47,9 +47,6 @@ def read_yaml(file_path):
 if __name__ == "__main__":
 
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
-    ### Model related parameters
-    LatDim = 10
-
     ### Other parameters
     Patience = 300
     BatchSize = 10000
@@ -61,12 +58,21 @@ if __name__ == "__main__":
     
     # Add Model related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
-
-    yaml_path = './Config/Config.yml'
-    ConfigSet = read_yaml(yaml_path)
-    
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
+    
+    if 'ART' in ConfigName:
+        LoadConfig = 'Config' + 'ART'
+    elif 'PLETH' in ConfigName:
+        LoadConfig = 'Config' + 'PLETH'
+    elif 'II' in ConfigName:
+        LoadConfig = 'Config' + 'II'
+    else:
+        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
+
+    yaml_path = './Config/'+LoadConfig+'.yml'
+    ConfigSet = read_yaml(yaml_path)
+    
     
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']

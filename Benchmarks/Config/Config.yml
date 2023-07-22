@@ -1,7 +1,0 @@
-TIME_ART_30: # SigType_LatDim_CompSize
-  LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
-
-
-
-

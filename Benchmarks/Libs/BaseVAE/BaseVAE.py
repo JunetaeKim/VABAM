@@ -8,15 +8,8 @@ from tensorflow.keras import Model
 
 
 
-
 def ReName (layer, name):
     return Lambda(lambda x: x, name=name)(layer)
-
-def LogNormalDensity(LatSamp, LatMean, LogSquaScale):
-    Norm = tf.math.log(2. * tf.constant(np.pi))
-    InvSigma = tf.math.exp(-LogSquaScale)
-    MeanSampDiff = (LatSamp - LatMean)
-    return -0.5 * (MeanSampDiff * MeanSampDiff * InvSigma + LogSquaScale + Norm)
 
 ## --------------------------------------------------    Models   ------------------------------------------------------------
 ## --------------------------------------------------   Encoder  -------------------------------------------------------------

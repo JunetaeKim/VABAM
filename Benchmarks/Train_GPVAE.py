@@ -40,7 +40,7 @@ if __name__ == "__main__":
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
     num_steps = 0 # 'Number of training steps: If non-zero it overwrites num_epochs'
-    num_epochs = 1200
+    num_epochs = 2000
     batch_size = 4000
     print_interval = 0
     TrRate = 0.8

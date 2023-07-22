@@ -70,8 +70,9 @@ if __name__ == "__main__":
     ### Model related parameters
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
-    
     ReparaStd = ConfigSet[ConfigName]['ReparaStd']
+    
+    ### Loss-related parameters
     Capacity_Z = ConfigSet[ConfigName]['Capacity_Z']
     
     ### Other parameters
@@ -105,6 +106,7 @@ if __name__ == "__main__":
     ValData = np.load('../Data/ProcessedData/Val'+str(SigType)+'.npy').astype('float32')
     SigDim = TrData.shape[1]
         
+        
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     ## Identifying conditions based on cumulative Power Spectral Entropy (PSE) over each frequency
@@ -120,36 +122,38 @@ if __name__ == "__main__":
     ### Define the total model
     CVAEModel = Model(EncModel.input, ReconOut)
     
+    
+    
+    #### -----------------------------------------------------   Losses   -------------------------------------------------------------------------
     ### Weight controller; Apply beta and capacity 
     Beta_Z = Lossweight(name='Beta_Z', InitVal=1.0)(ReconOut)
     Beta_Rec = Lossweight(name='Beta_Rec', InitVal=1.)(ReconOut)
 
     ### Adding the RecLoss; 
     MSE = tf.keras.losses.MeanSquaredError()
-    
     ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input[0])
-    CVAEModel.add_loss(ReconOutLoss)
-    CVAEModel.add_metric(ReconOutLoss, 'ReconOutLoss')
-    
-    
+
     ### KL Divergence for q(Z) vs q(Z)
     Z_Mu, Z_Log_Sigma, Zs = CVAEModel.get_layer('Z_Mu').output, CVAEModel.get_layer('Z_Log_Sigma').output, CVAEModel.get_layer('Zs').output
     kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
     kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
     kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
     
-        
+    
+    ### Adding losses to the model
+    CVAEModel.add_loss(ReconOutLoss)
+    CVAEModel.add_metric(ReconOutLoss, 'ReconOutLoss')
+    
     CVAEModel.add_loss(kl_Loss_Z )
     CVAEModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
     
-
     
-    ## Model Compile
+    ### Model Compile
     CVAEModel.compile(optimizer='adam') 
     CVAEModel.summary()
 
 
-
+    ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
     RelLossDic = { 'val_ReconOutLoss':'Beta_Rec', 'val_kl_Loss_Z':'Beta_Z' }
     ScalingDic = { 'val_ReconOutLoss':WRec, 'val_kl_Loss_Z':WZ}
     MinLimit = {'Beta_Rec':MnWRec,  'Beta_Z':MnWZ}
@@ -157,9 +161,9 @@ if __name__ == "__main__":
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_ReconOutLoss'] , SaveWay='max' , SavePath = ModelSaveName)
     
     
-    
-    # Model Training
-    #SigBandRepModel.load_weights(ModelSaveName)
+    ### Model Training
+    if Resume == True:
+        CVAEModel.load_weights(ModelSaveName)
     CVAEModel.fit([TrData, Tr_Cond], batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =([ValData, Val_Cond], None) , callbacks=[  RelLoss]) 
 
     
