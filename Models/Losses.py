@@ -88,10 +88,10 @@ def TCLosses (Models, DataSize, LossConfigSet):
     'https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54'
     'https://github.com/rtqichen/beta-tcvae/blob/master/elbo_decomposition.py'
     Z_Mu, Z_Log_Sigma, Zs = SigRepModel.get_layer('Z_Mu').output, SigRepModel.get_layer('Z_Log_Sigma').output, SigRepModel.get_layer('Zs').output
-    LogProb_QZi = tf.maximum(LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None]), np.log(1/DataSize)) 
-    LogProb_QZ = tf.reduce_sum(LogProb_QZi, axis=2, keepdims=False)
-    JointEntropy  = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_QZ ,   axis=1,   keepdims=False)
-    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_QZi, axis=1),  axis=1)
+    LogProb_Prod_QZi = tf.maximum(LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None]), np.log(1/DataSize)) 
+    LogProb_Prod_QZ = tf.reduce_sum(LogProb_Prod_QZi, axis=2, keepdims=False)
+    JointEntropy  = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_Prod_QZ ,   axis=1,   keepdims=False)
+    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1),  axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
     
     
@@ -239,7 +239,7 @@ def FACLosses (Models, LossConfigSet):
     print('kl_Loss_SKZ added')
 
 
-    #### ### Total Correlation # KL(q(z)||prod_j q(z_j)); log(p_true/p_false) = logit_true - logit_false
+    ### Total Correlation # KL(q(z)||prod_j q(z_j)); log(p_true/p_false) = logit_true - logit_false
     Capacity_TC = LossConfigSet['Capacity_TC']
     kl_Loss_TC = tf.reduce_mean(FacDiscOut_D1[:, 0] - FacDiscOut_D1[:, 1])
     kl_Loss_TC = Beta_TC * tf.abs(kl_Loss_TC - Capacity_TC)
