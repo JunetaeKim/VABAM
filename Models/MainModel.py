@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda
 from tensorflow.keras import Model
+from Utilities.Utilities import ReName
 
 
 def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
@@ -22,6 +23,7 @@ def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
     NoisVec = RevMaskIDX * tf.random.normal(tf.shape(RevMaskIDX), stddev=MaskStd)
     NoisVec = tf.reshape(NoisVec, (NBatch, -1))[:,:,None]
     return MaskVec, NoisVec
+
 
 def GenLowFilter (LF, N = 401, Decay=0):
     nVec = np.arange(N, dtype=np.float32)
@@ -65,14 +67,10 @@ def GenHighFilter (HF, N = 401, Decay=0):
     if Decay != 0:
         HPF *= tf.exp(-Decay * nVec) 
         #HPF *= tf.exp(-HF * Decay * nVec) 
-        
     
     return HPF[:,None] 
 
 
-
-def ReName (layer, name):
-    return Lambda(lambda x: x, name=name)(layer)
 
 
 ## --------------------------------------------------    Models   ------------------------------------------------------------

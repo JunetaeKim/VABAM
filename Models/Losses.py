@@ -1,32 +1,9 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
-from Utilities.Utilities import Lossweight
+from Utilities.Utilities import Lossweight, LogNormalDensity, SplitBatch
 
 
-def LogNormalDensity(LatSamp, LatMean, LogSquaScale):
-    Norm = tf.math.log(2. * tf.constant(np.pi))
-    InvSigma = tf.math.exp(-LogSquaScale)
-    MeanSampDiff = (LatSamp - LatMean)
-    return -0.5 * (MeanSampDiff * MeanSampDiff * InvSigma + LogSquaScale + Norm)
-
-
-
-def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
-    
-    HalfBatch1 = tf.nn.embedding_lookup(Vec, HalfBatchIdx1)
-    HalfBatch2 = tf.nn.embedding_lookup(Vec, HalfBatchIdx2)
-    
-    if mode=='Both':
-        return  HalfBatch1, HalfBatch2
-    elif mode=='D1':
-        return  HalfBatch1
-    elif mode=='D2':
-        return  HalfBatch2
-    
-    
-    
-    
     
 def TCLosses (Models, DataSize, LossConfigSet):
     SpecLosses = LossConfigSet['SpecLosses']
