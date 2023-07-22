@@ -28,9 +28,12 @@ if __name__ == "__main__":
     # Add Experiment-related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
+    parser.add_argument('--Resume', type=bool, required=False, default=False)
+    
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
     GPU_ID = args.GPUID
+    Resume = args.Resume
     
     
     ## GPU selection
@@ -60,7 +63,7 @@ if __name__ == "__main__":
     ConfigSet = read_yaml(yaml_path)
 
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
-    ### Model related parameters
+    ### Model-related parameters
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
     CompSize = ConfigSet[ConfigName]['CompSize']
@@ -81,11 +84,12 @@ if __name__ == "__main__":
     LossType = ConfigSet[ConfigName]['LossType']
     SpecLosses = ConfigSet[ConfigName]['SpecLosses']
     
-    ### Parameters for dynamic controller for losse weights
+    ### Parameters for constant losse weights
     WRec = ConfigSet[ConfigName]['WRec']
     WFeat = ConfigSet[ConfigName]['WFeat']
     WZ = ConfigSet[ConfigName]['WZ']
     
+    ### Parameters for dynamic controller for losse weights
     MnWRec = ConfigSet[ConfigName]['MnWRec']
     MnWFeat = ConfigSet[ConfigName]['MnWFeat']
     MnWZ = ConfigSet[ConfigName]['MnWZ']
@@ -186,7 +190,8 @@ if __name__ == "__main__":
     
     
     # Model Training
-    #SigRepModel.load_weights(ModelSaveName)
+    if Resume == True:
+        SigRepModel.load_weights(ModelSaveName)
     SigRepModel.fit(TrData, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
 
 
