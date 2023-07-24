@@ -123,8 +123,8 @@ if __name__ == "__main__":
     # Defining Modesl
     EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
     FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(SigDim=SigDim,FeatDim=FeatExtModel.output[1].shape[-1], LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, FeatDim=FeatExtModel.output[1].shape[-1])
+    FeatGenModel = FeatGenerator(SigDim=SigDim,CompSize= CompSize, LatDim= LatDim)
+    ReconModel = Reconstructor(SigDim=SigDim, CompSize= CompSize)
 
     
 

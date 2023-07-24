@@ -8,7 +8,7 @@ from tensorflow.keras import Model
 from Utilities.Utilities import ReName
 
 
-def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
+def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     ## Masking vector generation 1 vs 0
     NBatch = tf.shape(InpRegul)[0]
     
@@ -25,7 +25,7 @@ def MaskingGen ( InpRegul, MaskingRate = 0.025, MaskStd = 0.1):
     return MaskVec, NoisVec
 
 
-def GenLowFilter (LF, N = 401, Decay=0):
+def GenLowFilter (LF, N, Decay):
     nVec = np.arange(N, dtype=np.float32)
     Window = tf.signal.hamming_window(N)
 
@@ -45,7 +45,7 @@ def GenLowFilter (LF, N = 401, Decay=0):
     return LPF[:,None] 
 
 
-def GenHighFilter (HF, N = 401, Decay=0):
+def GenHighFilter (HF, N, Decay):
     nVec = np.arange(N, dtype=np.float32)
     Window = tf.signal.hamming_window(N)
 
@@ -75,14 +75,14 @@ def GenHighFilter (HF, N = 401, Decay=0):
 
 ## --------------------------------------------------    Models   ------------------------------------------------------------
 ## --------------------------------------------------   Encoder  -------------------------------------------------------------
-def Encoder(SigDim, SlidingSize = 50, LatDim= 2, Type = '', MaskingRate = 0.025, NoiseStd = 0.002, MaskStd = 0.1, ReparaStd = 0.1 , Reparam = False, FcLimit=0.1):
+def Encoder(SigDim, SlidingSize = 50, LatDim= 2, Type = '', MaskingRate = 0., NoiseStd = 0., MaskStd = 0., ReparaStd = 0.1 , Reparam = False, FcLimit=0.05):
 
     InpL = Input(shape=(SigDim,), name='Inp_Enc')
     InpFrame = tf.signal.frame(InpL, SlidingSize, SlidingSize)
 
-    '''This part has been skipped in the research. 
-    This can be activated for the purpose of enhancing model prediction generalization by adding noise. '''
     if Reparam: 
+        '''MaskingGen and InpRegul parts have been skipped in the research. 
+        These can be activated for the purpose of enhancing model prediction generalization by adding noise. '''
         InpRegul = GaussianNoise(stddev=NoiseStd)(InpFrame, training=Reparam)
         MaskVec, NoisVec = MaskingGen(InpRegul, MaskingRate, MaskStd)
         EncInp = Masking(mask_value=0.)(InpRegul * MaskVec )
@@ -205,7 +205,7 @@ def FeatExtractor(SigDim, LatDim= 2, CompSize = 600, DecayH = 0. , DecayL = 0. )
 
 
 ## --------------------------------------------------   FeatGenerator  -------------------------------------------------------------
-def FeatGenerator (SigDim, FeatDim, LatDim= 2, SlidingSize= 50):
+def FeatGenerator (SigDim, CompSize, LatDim= 2, SlidingSize= 50):
     
     InpZ = Input(shape=(LatDim,), name='Inp_Z')
     FCCommon = Input(shape=(2,), name='Inp_FCCommon')
@@ -223,7 +223,7 @@ def FeatGenerator (SigDim, FeatDim, LatDim= 2, SlidingSize= 50):
     Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
     Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
     Dec_Sig_HH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HH)
-    Dec_Sig_HH = Dense(FeatDim//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_HH)
+    Dec_Sig_HH = Dense(CompSize//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_HH)
     Sig_HH= Flatten(name='Sig_HH_Gen')(Dec_Sig_HH)
     
     # ---------------------------------------------------------------------- #
@@ -237,7 +237,7 @@ def FeatGenerator (SigDim, FeatDim, LatDim= 2, SlidingSize= 50):
     Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
     Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
     Dec_Sig_HL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_HL)
-    Dec_Sig_HL = Dense(FeatDim//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_HL)
+    Dec_Sig_HL = Dense(CompSize//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_HL)
     Sig_HL= Flatten(name='Sig_HL_Gen')(Dec_Sig_HL)
 
     
@@ -252,7 +252,7 @@ def FeatGenerator (SigDim, FeatDim, LatDim= 2, SlidingSize= 50):
     Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
     Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
     Dec_Sig_LH = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LH)
-    Dec_Sig_LH = Dense(FeatDim//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_LH)
+    Dec_Sig_LH = Dense(CompSize//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_LH)
     Sig_LH= Flatten(name='Sig_LH_Gen')(Dec_Sig_LH)
     
     # ---------------------------------------------------------------------- #
@@ -266,7 +266,7 @@ def FeatGenerator (SigDim, FeatDim, LatDim= 2, SlidingSize= 50):
     Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
     Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
     Dec_Sig_LL = Bidirectional(GRU(10, return_sequences=True))(Dec_Sig_LL)
-    Dec_Sig_LL = Dense(FeatDim//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_LL)
+    Dec_Sig_LL = Dense(CompSize//Dec_Sig_HH.shape[1],'tanh')(Dec_Sig_LL)
     Sig_LL= Flatten(name='Sig_LL_Gen')(Dec_Sig_LL)
     
     return  Model([FCCommon, FCEach, InpZ], [Sig_HH, Sig_HL, Sig_LH, Sig_LL], name='FeatGenModel')
@@ -274,12 +274,12 @@ def FeatGenerator (SigDim, FeatDim, LatDim= 2, SlidingSize= 50):
 
 
 ## --------------------------------------------------   Reconstructor  -------------------------------------------------------------
-def Reconstructor(SigDim , SlidingSize = 50, FeatDim=600 ):
+def Reconstructor(SigDim , SlidingSize = 50, CompSize=600 ):
     
-    Sig_HH = Input(shape=(FeatDim,), name='Inp_Sig_HH')
-    Sig_HL = Input(shape=(FeatDim,), name='Inp_Sig_HL')
-    Sig_LH = Input(shape=(FeatDim,), name='Inp_Sig_LH')
-    Sig_LL = Input(shape=(FeatDim,), name='Inp_Sig_LL')
+    Sig_HH = Input(shape=(CompSize,), name='Inp_Sig_HH')
+    Sig_HL = Input(shape=(CompSize,), name='Inp_Sig_HL')
+    Sig_LH = Input(shape=(CompSize,), name='Inp_Sig_LH')
+    Sig_LL = Input(shape=(CompSize,), name='Inp_Sig_LL')
     
 
     ## GRU NET -------------------------------------------------------------------
