@@ -99,11 +99,17 @@ def Sampler (Data, SampModel,BatchSize=100):
 # Conditional Mutual Information to evaluate model performance 
 def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=100, NGen=100, FcLimit=0.05, 
             MinFreq=1, MaxFreq=51, NSelZ = 1, FCmuEps = 0.05, ReparaStd = 10, PredBatchSize = 1000):
-
+    
+    # Parameters and values for the operation
     Ndata = len(AnalData)
     MASize = Ndata//NMiniBat
     LatDim = SampModel.output.shape[-1]
     NFCs = GenModel.get_layer('Inp_FCCommon').output.shape[-1] + GenModel.get_layer('Inp_FCEach').output.shape[-1]
+    
+    # Result tracking
+    SubResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
+    AggResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
+
 
     ### monte carlo approximation
     I_zE_Z = 0
@@ -265,7 +271,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 Q_FcPSE_ZjFcMu = ProbPermutation(SubPSE_ZjFcMu, Nframe=3, EpsProb = 1e-7)
                 Q_FcPSE_ZjFcAr = ProbPermutation(SubPSE_ZjFcAr, Nframe=3, EpsProb = 1e-7)
 
-
+                
                 # Conditional mutual information
                 I_zE_Z_ = MeanKLD(Q_PSE_ZFc, P_PSE[None] ) # I(zE;Z)
                 I_zE_ZjZ_ = MeanKLD(Q_PSE_ZjFc, Q_PSE_ZFc )  # I(zE;Zj|Z)
@@ -276,25 +282,31 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
 
                 print('I_zE_Z :', I_zE_Z_)
+                SubResDic['I_zE_Z'].append(I_zE_Z_)
                 I_zE_Z += I_zE_Z_
 
                 print('I_zE_ZjZ :', I_zE_ZjZ_)
+                SubResDic['I_zE_ZjZ'].append(I_zE_ZjZ_)
                 I_zE_ZjZ += I_zE_ZjZ_
 
                 print('I_zE_ZjFm :', I_zE_ZjFm_)
+                SubResDic['I_zE_ZjFm'].append(I_zE_ZjFm_)
                 I_zE_ZjFm += I_zE_ZjFm_
 
                 print('I_zE_FaZj :', I_zE_FaZj_)
+                SubResDic['I_zE_FaZj'].append(I_zE_FaZj_)
                 I_zE_FaZj += I_zE_FaZj_
 
                 print('I_fcE_FmZj :', I_fcE_FmZj_)
+                SubResDic['I_fcE_FmZj'].append(I_fcE_FmZj_)
                 I_fcE_FmZj += I_fcE_FmZj_
 
                 print('I_fcE_FaZj :', I_fcE_FaZj_)
+                SubResDic['I_fcE_FaZj'].append(I_fcE_FaZj_)
                 I_fcE_FaZj += I_fcE_FaZj_
 
 
-                # Locating the candidate Z values that generate good signals.
+                # Locating the candidate Z values that generate plausible signals.
                 H_zE_ZjFa = -np.sum(Q_PSE_ZjFcAr * np.log(Q_PSE_ZjFcAr), axis=-1)
                 H_fcE_ZjFa = np.mean(-np.sum(Q_FcPSE_ZjFcAr * np.log(Q_FcPSE_ZjFcAr), axis=-1), axis=-1)
                 SumH_ZjFa = H_zE_ZjFa + H_fcE_ZjFa
@@ -312,21 +324,30 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
     # CMI(V;Zj, Z)
     I_zE_Z /= (MASize*SimSize)
+    AggResDic['I_zE_Z'].append(I_zE_Z)
     I_zE_ZjZ /= (MASize*SimSize)
+    AggResDic['I_zE_ZjZ'].append(I_zE_ZjZ)
     CMI_zE_ZjZ = I_zE_Z + I_zE_ZjZ             
+    AggResDic['CMI_zE_ZjZ'].append(CMI_zE_ZjZ)
 
     # CMI(V;FC,Zj)
     I_zE_ZjFm /= (MASize*SimSize)
+    AggResDic['I_zE_ZjFm'].append(I_zE_ZjFm)
     I_zE_FaZj /= (MASize*SimSize)
-    CMI_zE_FcZj = I_zE_ZjFm + I_zE_FaZj             
+    AggResDic['I_zE_FaZj'].append(I_zE_FaZj)
+    CMI_zE_FcZj = I_zE_ZjFm + I_zE_FaZj       
+    AggResDic['CMI_zE_FcZj'].append(CMI_zE_FcZj)
 
     # CMI(VE;FA,FM)
     I_fcE_FmZj /= (MASize*SimSize)
+    AggResDic['I_fcE_FmZj'].append(I_fcE_FmZj)
     I_fcE_FaZj /= (MASize*SimSize)
+    AggResDic['I_fcE_FaZj'].append(I_fcE_FaZj)
     CMI_fcE_FaFm = I_fcE_FmZj + I_fcE_FaZj    
+    AggResDic['CMI_fcE_FaFm'].append(CMI_fcE_FaFm)
     
     
-    return CMI_zE_ZjZ, CMI_zE_FcZj, CMI_fcE_FaFm
+    return AggResDic, SubResDic
 
 
 
