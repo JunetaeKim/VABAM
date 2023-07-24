@@ -17,6 +17,8 @@ from Benchmarks.Libs.BaseVAE.BaseVAE import *
 from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import *
 
+import warnings
+warnings.filterwarnings('ignore')
 
 def read_yaml(file_path):
     with open(file_path, 'r') as file:
