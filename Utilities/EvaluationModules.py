@@ -1,12 +1,21 @@
 import numpy as np
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, mode
 from sklearn.metrics import r2_score
+
+import tensorflow as tf
+from tensorflow.keras import Model
+import itertools
+import EntropyHub as EH
+
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-import EntropyHub as EH
+from tqdm import trange, tqdm
 
 
+
+
+# Power spectral entropy 
 def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     # Dimension check; this part operates with 3D tensors.
     # (Batch_size, N_sample, N_frequency)
@@ -34,6 +43,292 @@ def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
         AggPSEPDF = PSD / np.sum(PSD, axis=(-1),keepdims=True)    
         
     return AggPSEPDF
+
+
+# Permutation entropy given PSE over each generation
+def ProbPermutation(Data, Nframe=3, EpsProb = 1e-7):
+    
+    # Generate true permutation cases
+    TruePerms = np.concatenate(list(itertools.permutations(np.arange(Nframe)))).reshape(-1, Nframe)
+
+    # Get all permutation cases
+    Data_Ext = tf.signal.frame(Data, frame_length=Nframe, frame_step=1, axis=-1)
+    PermsTable =  np.argsort(Data_Ext, axis=-1)
+
+    CountPerms = 1- (TruePerms[None,None,None] == PermsTable[:,:,:, None])
+    CountPerms = 1-np.sum(CountPerms, axis=-1).astype('bool')
+    CountPerms = np.sum(CountPerms, axis=(2))
+    ProbCountPerms = CountPerms / np.sum(CountPerms, axis=-1, keepdims=True)
+    
+    return np.maximum(ProbCountPerms, EpsProb)    
+
+
+# Searching for candidate Zj for plausible signal generation
+def LocCandZs (FreqZs_Idx, Mode_Value, SumH, Samp_Z):
+    
+    for Freq, _ in FreqZs_Idx.items():
+        Mode_Idx = np.where(Mode_Value == Freq)[0]
+
+        # Skipping the remainder of the code if there are no mode values present at the predefined frequencies.
+        if len(Mode_Idx) <1: 
+            continue;
+
+        # Calculating the minimum of sum of H (Min_SumH) and Candidate Z-values(CandZs)
+        Min_SumH_Idx = np.argmin(SumH[Mode_Idx])
+        Min_SumH = np.min(SumH[Mode_Idx])
+        CandZs = Samp_Z[[Mode_Idx[Min_SumH_Idx]]][0].flatten()
+        CandZ_Idx = np.where(CandZs!=0)[0]
+        
+        # Updating the Min_SumH value if the current iteration value is smaller.
+        if Min_SumH < FreqZs_Idx[Freq][0]:
+            FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx, CandZs[CandZ_Idx]]
+    
+    return FreqZs_Idx
+
+
+def MeanKLD(P,Q):
+    return np.mean(np.sum(P*np.log(P/Q), axis=-1))
+
+
+def Sampler (Data, SampModel,BatchSize=100):
+    return SampModel.predict(Data, batch_size=BatchSize, verbose=1)   
+
+
+
+
+# Conditional Mutual Information to evaluate model performance 
+def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=100, NGen=100, FcLimit=0.05, 
+            MinFreq=1, MaxFreq=51, NSelZ = 1, FCmuEps = 0.05, ReparaStd = 10, PredBatchSize = 1000):
+
+    Ndata = len(AnalData)
+    MASize = Ndata//NMiniBat
+    LatDim = SampModel.output.shape[-1]
+    NFCs = GenModel.get_layer('Inp_FCCommon').output.shape[-1] + GenModel.get_layer('Inp_FCEach').output.shape[-1]
+
+    ### monte carlo approximation
+    I_zE_Z = 0
+    I_zE_ZjZ = 0
+    I_zE_ZjFm = 0
+    I_zE_FaZj = 0
+    I_fcE_FmZj = 0
+    I_fcE_FaZj = 0
+
+    FreqZs_Idx =  {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
+
+    P_PSE = FFT_PSE(AnalData, 'All')
+
+    for sim in range(SimSize):
+
+        SplitData = np.array_split(AnalData, MASize)
+        with trange(MASize, leave=False) as t:
+
+            for mini in range(MASize):
+
+                '''
+                ### Sampling Samp_Z and FCs and Reconstructing SigGen_ZFc ###
+
+                - Shape of UniqSamp_Z: (NMiniBat, LatDim)
+                - UniqSamp_Z ~ Q(z|y)
+
+                - Samp_Z is a 3D tensor expanded by repeating the first axis (i.e., 0) of UniqSamp_Z by NGen times.
+                - Shape of Samp_Z: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+                - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+
+                - SigGen_ZFc ~ Q(y | Samp_Z, FCs)*Q(Samp_Z | Y)*Q(FCs) 
+                - UniqSamp_Z ~ Q(z|y), FCs ~ Bern(fc, μ=0.5)
+
+                '''
+                # Sampling Samp_Z 
+                UniqSamp_Z = Sampler(SplitData[mini], SampModel)
+                Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
+                FCs = np.random.rand(NMiniBat *NGen, NFCs) * FcLimit
+
+
+                '''
+                ### Reconstructing SigGen_ZjFc ###
+
+                - Masking is applied to select Samp_Zj from Samp_Z 
+                  by assuming that the Samp_Z with indices other than j have a fixed mean value of '0' following a Gaussian distribution.
+
+                - Shape of Samp_Zj: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+                - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+
+                - SigGen_ZjFc ~ Q(y | Samp_Zj, FCs)*Q(Samp_Zj)*Q(j)*Q(FCs) 
+                - Samp_Zj ~ Q(z|y), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
+
+                '''
+
+                # Masking for selecting Samp_Zj from Samp_Z 
+                Mask_Z = np.zeros((NMiniBat*NGen, LatDim))
+                for i in range(NMiniBat*NGen):
+                    Mask_Z[i, np.random.choice(LatDim, NSelZ,replace=False )] = 1
+                Samp_Zj = Samp_Z * Mask_Z
+
+
+                '''
+                ### Reconstructing SigGen_ZjFcRPT ###
+
+                - Samp_ZjRPT is sampled from a Gaussian distribution with a mean of 0 and standard deviation; Samp_ZjRPT ~ N(0, ReparaStd)
+                  by assuming that the Samp_Z with indices other than j have a fixed mean value of '0', 
+                  then it's repeated NGen times along the second axis (i.e., 1).
+
+                - Shape of Samp_ZjRPT: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+                - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+
+                - SigGen_ZjFcRPT ~ Q(y | Samp_ZjRPT, FCs)*Q(Samp_ZjRPT)*Q(j)*Q(FCs) 
+                - Samp_ZjRPT ~ N(0, ReparaStd), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
+
+                '''
+
+                # Selecting Samp_Zj from Guassian dist.
+                Samp_ZjRPT = []
+                for i in range(NMiniBat):
+                    Mask_Z = np.zeros((LatDim))
+                    # LatDim-wise Z sampling
+                    Mask_Z[ np.random.choice(LatDim, NSelZ,replace=False )]= np.random.normal(0, ReparaStd)
+                    # Setting the same Z value within the N generated signals (NGen).
+                    Samp_ZjRPT.append(np.broadcast_to(Mask_Z[None], (NGen,LatDim))[None]) 
+                Samp_ZjRPT = np.concatenate(Samp_ZjRPT).reshape(NMiniBat *NGen, LatDim)
+
+
+                '''
+                ### Reconstructing SigGen_ZjFcAr ###
+
+                - FC_Arange: The FC values are generated NGen times, based on the linspace with a fixed interval (0 ~ FcLimit).
+                  Thus, each sample(i.e., NMiniBat) has FC values that are sorted and generated by the linspace (i.e., NGen).
+
+                - Shape of Samp_ZjRPT: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+                - Shape of FC_Arange: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+
+                - SigGen_ZjFcAr ~ Q(y | Samp_ZjRPT, FC_Arange)*Q(Samp_ZjRPT)*Q(j)*Q(FC_Arange)
+                - Samp_ZjRPT ~ N(0, ReparaStd), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
+
+                '''
+
+                # The FC values are generated NGen times, based on the linspace with a fixed interval.
+                FC_Arange = np.broadcast_to(FC_ArangeInp[None], (NMiniBat, NGen, NFCs)).reshape(-1, NFCs)
+
+
+
+                '''
+                ### Reconstructing SigGen_ZjFcMu ###
+
+                - Given that FC ~ (fc, μ=0.5), the expected value of FCmu should be 0.5 x FcLimit.
+                  This would result in all values within a single sample (NMiniBat, NGen) being equal.
+                  Thus, we assumed FC_Rand as FC_μ x FcLimit + eps, where FC_μ=0.5 and eps ~ N(0, 0.5*FcLimit*FCmuEps)
+
+                - Shape of Samp_ZjRPT: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+                - Shape of FC_Rand: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+
+                - SigGen_ZjFcMu ~ Q(y | Samp_ZjRPT, FC_Rand)*Q(Samp_ZjRPT)*Q(j)*Q(FC_Arange)
+                - Samp_ZjRPT ~ N(0, ReparaStd), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
+
+                '''
+
+                # FC_Rand are sampled as FC_μ x FcLimit + eps, where FC_μ=0.5 and eps ~ N(0, 0.5*FcLimit*FCmuEps)
+                FC_Rand = np.zeros_like(FCs) + FcLimit * 0.5 + np.random.normal(0, (FcLimit * 0.5)*FCmuEps, (FCs.shape))
+
+
+
+                '''
+                ### Signal reconstruction ###
+
+                - To maximize the efficiency of GPU utilization, 
+                  we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, NFCs) for FCs, respectively, 
+                  transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, NFCs). 
+                  After the computation, we then reverted them back to their original dimensions.
+
+                '''
+
+                Set_FCs = np.concatenate([FCs,FCs,FCs,FC_Arange,FC_Rand])
+                Set_Zs = np.concatenate([Samp_Z,Samp_Zj,Samp_ZjRPT,Samp_ZjRPT,Samp_ZjRPT])
+                Set_Pred = GenModel.predict([Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs], batch_size=PredBatchSize, verbose=1).reshape(-1, NMiniBat, NGen, AnalData.shape[-1])
+                SigGen_ZFc, SigGen_ZjFc, SigGen_ZjFcRPT, SigGen_ZjFcAr, SigGen_ZjFcMu = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 5) ]  
+
+
+
+                # Cumulative Power Spectral Entropy (PSE) over each frequency
+                Q_PSE_ZFc = FFT_PSE(SigGen_ZFc, 'Batch')
+                Q_PSE_ZjFc = FFT_PSE(SigGen_ZjFc, 'Batch')
+
+                Q_PSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'Batch')
+                Q_PSE_ZjFcAr = FFT_PSE(SigGen_ZjFcAr, 'Batch')
+                Q_PSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'Batch')
+
+                SubPSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'None').transpose(0,2,1)
+                SubPSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'None').transpose(0,2,1)
+                SubPSE_ZjFcAr = FFT_PSE(SigGen_ZjFcAr, 'None').transpose(0,2,1)
+
+
+                # Permutation Entropy given PSE over each generation
+                Q_FcPSE_ZjFcRPT = ProbPermutation(SubPSE_ZjFcRPT, Nframe=3, EpsProb = 1e-7)
+                Q_FcPSE_ZjFcMu = ProbPermutation(SubPSE_ZjFcMu, Nframe=3, EpsProb = 1e-7)
+                Q_FcPSE_ZjFcAr = ProbPermutation(SubPSE_ZjFcAr, Nframe=3, EpsProb = 1e-7)
+
+
+                # Conditional mutual information
+                I_zE_Z_ = MeanKLD(Q_PSE_ZFc, P_PSE[None] ) # I(zE;Z)
+                I_zE_ZjZ_ = MeanKLD(Q_PSE_ZjFc, Q_PSE_ZFc )  # I(zE;Zj|Z)
+                I_zE_ZjFm_ =  MeanKLD(Q_PSE_ZjFcMu, P_PSE[None] ) # I(zE;Zj)
+                I_zE_FaZj_ = MeanKLD(Q_PSE_ZjFcAr, Q_PSE_ZjFcMu ) # I(zE;FC|Zj)
+                I_fcE_FmZj_ = MeanKLD(Q_FcPSE_ZjFcMu, Q_FcPSE_ZjFcRPT) # I(fcE;Zj)
+                I_fcE_FaZj_ = MeanKLD(Q_FcPSE_ZjFcAr, Q_FcPSE_ZjFcMu) # I(fcE;FC|Zj)
+
+
+                print('I_zE_Z :', I_zE_Z_)
+                I_zE_Z += I_zE_Z_
+
+                print('I_zE_ZjZ :', I_zE_ZjZ_)
+                I_zE_ZjZ += I_zE_ZjZ_
+
+                print('I_zE_ZjFm :', I_zE_ZjFm_)
+                I_zE_ZjFm += I_zE_ZjFm_
+
+                print('I_zE_FaZj :', I_zE_FaZj_)
+                I_zE_FaZj += I_zE_FaZj_
+
+                print('I_fcE_FmZj :', I_fcE_FmZj_)
+                I_fcE_FmZj += I_fcE_FmZj_
+
+                print('I_fcE_FaZj :', I_fcE_FaZj_)
+                I_fcE_FaZj += I_fcE_FaZj_
+
+
+                # Locating the candidate Z values that generate good signals.
+                H_zE_ZjFa = -np.sum(Q_PSE_ZjFcAr * np.log(Q_PSE_ZjFcAr), axis=-1)
+                H_fcE_ZjFa = np.mean(-np.sum(Q_FcPSE_ZjFcAr * np.log(Q_FcPSE_ZjFcAr), axis=-1), axis=-1)
+                SumH_ZjFa = H_zE_ZjFa + H_fcE_ZjFa
+
+
+                # Calculating mode values of SigGen_ZjFcAr
+                Q_PSE_ZjFcAr_3D = FFT_PSE(SigGen_ZjFcAr, 'None')
+                # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
+                Max_Value_Label = np.argmax(Q_PSE_ZjFcAr_3D, axis=-1) + 1
+                Mode_Value = mode(Max_Value_Label.T, axis=0, keepdims=False)[0]
+                UniqSamp_ZjRPT = Samp_ZjRPT.reshape(NMiniBat, NGen, -1)[:, 0]
+                FreqZs_Idx = LocCandZs (FreqZs_Idx, Mode_Value, SumH_ZjFa, UniqSamp_ZjRPT)
+
+                t.update(1)
+
+    # CMI(V;Zj, Z)
+    I_zE_Z /= (MASize*SimSize)
+    I_zE_ZjZ /= (MASize*SimSize)
+    CMI_zE_ZjZ = I_zE_Z + I_zE_ZjZ             
+
+    # CMI(V;FC,Zj)
+    I_zE_ZjFm /= (MASize*SimSize)
+    I_zE_FaZj /= (MASize*SimSize)
+    CMI_zE_FcZj = I_zE_ZjFm + I_zE_FaZj             
+
+    # CMI(VE;FA,FM)
+    I_fcE_FmZj /= (MASize*SimSize)
+    I_fcE_FaZj /= (MASize*SimSize)
+    CMI_fcE_FaFm = I_fcE_FmZj + I_fcE_FaZj    
+    
+    
+    return CMI_zE_ZjZ, CMI_zE_FcZj, CMI_fcE_FaFm
+
+
 
 
 
