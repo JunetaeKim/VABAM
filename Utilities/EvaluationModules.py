@@ -81,7 +81,8 @@ def LocCandZs (FreqZs_Idx, Mode_Value, SumH, Samp_Z):
         
         # Updating the Min_SumH value if the current iteration value is smaller.
         if Min_SumH < FreqZs_Idx[Freq][0]:
-            FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx, CandZs[CandZ_Idx]]
+            FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx.item(), CandZs[CandZ_Idx].item()]
+            print(Freq, FreqZs_Idx[Freq])
     
     return FreqZs_Idx
 
@@ -98,7 +99,7 @@ def Sampler (Data, SampModel,BatchSize=100):
 
 # Conditional Mutual Information to evaluate model performance 
 def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=100, NGen=100, FcLimit=0.05, 
-            MinFreq=1, MaxFreq=51, NSelZ = 1, FCmuEps = 0.05, ReparaStd = 10, PredBatchSize = 1000):
+            MinFreq=1, MaxFreq=51, NSelZ = 1, FCmuEps = 0.05, ReparaStd = 1, PredBatchSize = 1000):
     
     # Parameters and values for the operation
     Ndata = len(AnalData)
@@ -110,7 +111,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     SubResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
     AggResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[], 
                  'CMI_zE_ZjZ':[], 'CMI_zE_FcZj':[], 'CMI_fcE_FaFm':[]}
-  
+    FreqZs_Idx =  {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
 
     ### monte carlo approximation
     I_zE_Z = 0
@@ -120,7 +121,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     I_fcE_FmZj = 0
     I_fcE_FaZj = 0
 
-    FreqZs_Idx =  {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
+    
 
     P_PSE = FFT_PSE(AnalData, 'All')
 
@@ -348,7 +349,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     AggResDic['CMI_fcE_FaFm'].append(CMI_fcE_FaFm)
     
     
-    return AggResDic, SubResDic
+    return AggResDic, SubResDic, FreqZs_Idx
 
 
 
