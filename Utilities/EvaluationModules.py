@@ -122,14 +122,15 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     I_fcE_FaZj = 0
 
     
-
+    # P(V=v)
     P_PSE = FFT_PSE(AnalData, 'All')
 
-    for sim in range(SimSize):
+    with trange(MASize, leave=False) as t:
+        
+        for sim in range(SimSize):
 
-        SplitData = np.array_split(AnalData, MASize)
-        with trange(MASize, leave=False) as t:
-
+            SplitData = np.array_split(AnalData, MASize)
+        
             for mini in range(MASize):
 
                 '''
@@ -172,7 +173,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                     Mask_Z[i, np.random.choice(LatDim, NSelZ,replace=False )] = 1
                 Samp_Zj = Samp_Z * Mask_Z
 
-                
+
 
                 '''
                 ### Reconstructing SigGen_ZjFcRPT ###
@@ -190,12 +191,13 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
                 '''
                 
+                # Random sampling of Samp_Zj; Rand_Samp_Zj ~ N(0, ReparaStdZj)
+                Rand_Samp_Zj = np.random.normal(0, ReparaStdZj)
+                
                 for LatDimID in range(LatDim):
-                    
+
                     print()
                     print('Z Dim LOC:', LatDimID)
-                    # Random sampling of Samp_Zj; Rand_Samp_Zj ~ N(0, ReparaStdZj)
-                    Rand_Samp_Zj = np.random.normal(0, ReparaStdZj)
                     
                     # Selecting Samp_Zj from Guassian dist.
                     Samp_ZjRPT = []
@@ -335,29 +337,29 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
                     t.update(1)
 
-    # CMI(V;Zj, Z)
-    I_zE_Z /= (MASize*SimSize)
-    AggResDic['I_zE_Z'].append(I_zE_Z)
-    I_zE_ZjZ /= (MASize*SimSize)
-    AggResDic['I_zE_ZjZ'].append(I_zE_ZjZ)
-    CMI_zE_ZjZ = I_zE_Z + I_zE_ZjZ             
-    AggResDic['CMI_zE_ZjZ'].append(CMI_zE_ZjZ)
+        # CMI(V;Zj, Z)
+        I_zE_Z /= (MASize*SimSize)
+        AggResDic['I_zE_Z'].append(I_zE_Z)
+        I_zE_ZjZ /= (MASize*SimSize)
+        AggResDic['I_zE_ZjZ'].append(I_zE_ZjZ)
+        CMI_zE_ZjZ = I_zE_Z + I_zE_ZjZ             
+        AggResDic['CMI_zE_ZjZ'].append(CMI_zE_ZjZ)
 
-    # CMI(V;FC,Zj)
-    I_zE_ZjFm /= (MASize*SimSize)
-    AggResDic['I_zE_ZjFm'].append(I_zE_ZjFm)
-    I_zE_FaZj /= (MASize*SimSize)
-    AggResDic['I_zE_FaZj'].append(I_zE_FaZj)
-    CMI_zE_FcZj = I_zE_ZjFm + I_zE_FaZj       
-    AggResDic['CMI_zE_FcZj'].append(CMI_zE_FcZj)
+        # CMI(V;FC,Zj)
+        I_zE_ZjFm /= (MASize*SimSize)
+        AggResDic['I_zE_ZjFm'].append(I_zE_ZjFm)
+        I_zE_FaZj /= (MASize*SimSize)
+        AggResDic['I_zE_FaZj'].append(I_zE_FaZj)
+        CMI_zE_FcZj = I_zE_ZjFm + I_zE_FaZj       
+        AggResDic['CMI_zE_FcZj'].append(CMI_zE_FcZj)
 
-    # CMI(VE;FA,FM)
-    I_fcE_FmZj /= (MASize*SimSize)
-    AggResDic['I_fcE_FmZj'].append(I_fcE_FmZj)
-    I_fcE_FaZj /= (MASize*SimSize)
-    AggResDic['I_fcE_FaZj'].append(I_fcE_FaZj)
-    CMI_fcE_FaFm = I_fcE_FmZj + I_fcE_FaZj    
-    AggResDic['CMI_fcE_FaFm'].append(CMI_fcE_FaFm)
+        # CMI(VE;FA,FM)
+        I_fcE_FmZj /= (MASize*SimSize)
+        AggResDic['I_fcE_FmZj'].append(I_fcE_FmZj)
+        I_fcE_FaZj /= (MASize*SimSize)
+        AggResDic['I_fcE_FaZj'].append(I_fcE_FaZj)
+        CMI_fcE_FaFm = I_fcE_FmZj + I_fcE_FaZj    
+        AggResDic['CMI_fcE_FaFm'].append(CMI_fcE_FaFm)
     
     
     return AggResDic, SubResDic, FreqZs_Idx
