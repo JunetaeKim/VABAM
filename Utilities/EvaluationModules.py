@@ -81,9 +81,9 @@ def LocCandZs (FreqZs_Idx, Mode_Value, SumH, Samp_Z):
         
         # Updating the Min_SumH value if the current iteration value is smaller.
         if Min_SumH < FreqZs_Idx[Freq][0]:
-            FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx.item(), CandZs[CandZ_Idx].item()]
+            FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx, CandZs[CandZ_Idx]]
             print('Updated! ', 'Freq:', Freq, ', SumH_ZjFa:', np.round(Min_SumH, 4) , 
-                  ' Z LOC:', CandZ_Idx.item(), ' Z:', np.round(CandZs[CandZ_Idx].item(), 4))
+                  ' Z LOC:', CandZ_Idx, ' Z:', np.round(CandZs[CandZ_Idx], 4))
     
     return FreqZs_Idx
 
@@ -201,7 +201,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                     Mask_Z = np.zeros((LatDim))
                     
                     # LatDim-wise Z sampling
-                    Mask_Z[ np.random.choice(LatDim, NSelZ,replace=False )]= np.random.normal(0, ReparaStdZj)
+                    Mask_Z[ np.random.choice(LatDim, NSelZ,replace=False )]= np.random.normal(0, ReparaStdZj, NSelZ)
 
                     # Setting the same Z value within the N generated signals (NGen).
                     Samp_ZjRPT.append(np.broadcast_to(Mask_Z[None], (NGen,LatDim))[None]) 
