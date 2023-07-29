@@ -99,7 +99,7 @@ def Sampler (Data, SampModel,BatchSize=100):
 
 # Conditional Mutual Information to evaluate model performance 
 def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=100, NGen=100, FcLimit=0.05, 
-            MinFreq=1, MaxFreq=51, NSelZ = 1, FCmuEps = 0.05, ReparaStd = 1, PredBatchSize = 1000):
+            MinFreq=1, MaxFreq=51, NSelZ = 1, FCmuEps = 0.05, ReparaStdZj = 10, PredBatchSize = 1000):
     
     # Parameters and values for the operation
     Ndata = len(AnalData)
@@ -176,7 +176,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 '''
                 ### Reconstructing SigGen_ZjFcRPT ###
 
-                - Samp_ZjRPT is sampled from a Gaussian distribution with a mean of 0 and standard deviation; Samp_ZjRPT ~ N(0, ReparaStd)
+                - Samp_ZjRPT is sampled from a Gaussian distribution with a mean of 0 and standard deviation; Samp_ZjRPT ~ N(0, ReparaStdZj)
                   by assuming that the Samp_Z with indices other than j have a fixed mean value of '0', 
                   then it's repeated NGen times along the second axis (i.e., 1).
 
@@ -184,7 +184,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
                 - SigGen_ZjFcRPT ~ Q(y | Samp_ZjRPT, FCs)*Q(Samp_ZjRPT)*Q(j)*Q(FCs) 
-                - Samp_ZjRPT ~ N(0, ReparaStd), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
+                - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
 
                 '''
 
@@ -193,7 +193,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 for i in range(NMiniBat):
                     Mask_Z = np.zeros((LatDim))
                     # LatDim-wise Z sampling
-                    Mask_Z[ np.random.choice(LatDim, NSelZ,replace=False )]= np.random.normal(0, ReparaStd)
+                    Mask_Z[ np.random.choice(LatDim, NSelZ,replace=False )]= np.random.normal(0, ReparaStdZj)
                     # Setting the same Z value within the N generated signals (NGen).
                     Samp_ZjRPT.append(np.broadcast_to(Mask_Z[None], (NGen,LatDim))[None]) 
                 Samp_ZjRPT = np.concatenate(Samp_ZjRPT).reshape(NMiniBat *NGen, LatDim)
@@ -209,7 +209,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of FC_Arange: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
                 - SigGen_ZjFcAr ~ Q(y | Samp_ZjRPT, FC_Arange)*Q(Samp_ZjRPT)*Q(j)*Q(FC_Arange)
-                - Samp_ZjRPT ~ N(0, ReparaStd), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
+                - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
 
                 '''
 
@@ -229,7 +229,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of FC_Rand: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
                 - SigGen_ZjFcMu ~ Q(y | Samp_ZjRPT, FC_Rand)*Q(Samp_ZjRPT)*Q(j)*Q(FC_Arange)
-                - Samp_ZjRPT ~ N(0, ReparaStd), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
+                - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
 
                 '''
 
