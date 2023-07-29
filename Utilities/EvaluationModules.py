@@ -82,7 +82,7 @@ def LocCandZs (FreqZs_Idx, Mode_Value, SumH, Samp_Z):
         # Updating the Min_SumH value if the current iteration value is smaller.
         if Min_SumH < FreqZs_Idx[Freq][0]:
             FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx.item(), CandZs[CandZ_Idx].item()]
-            print('Updated! ', Freq, FreqZs_Idx[Freq])
+            print('Updated! ', Freq, Min_SumH)
     
     return FreqZs_Idx
 
@@ -125,7 +125,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     # P(V=v)
     P_PSE = FFT_PSE(AnalData, 'All')
 
-    with trange(MASize, leave=False) as t:
+    with trange(MASize * SimSize * LatDim, leave=False) as t:
         
         for sim in range(SimSize):
 
@@ -197,7 +197,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 for LatDimID in range(LatDim):
 
                     print()
-                    print('Z Dim LOC:', LatDimID)
+                    print('Z Dim LOC:', LatDimID, ', Rand_Samp_Zj:', Rand_Samp_Zj)
                     
                     # Selecting Samp_Zj from Guassian dist.
                     Samp_ZjRPT = []
