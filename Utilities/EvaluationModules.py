@@ -64,9 +64,9 @@ def ProbPermutation(Data, Nframe=3, EpsProb = 1e-7):
 
 
 # Searching for candidate Zj for plausible signal generation
-def LocCandZs (FreqZs_Idx, Mode_Value, SumH, Samp_Z):
+def LocCandZs (BestZsMetrics, TrackZs, TrackMetrics, Mode_Value, SumH, Samp_Z):
     
-    for Freq, _ in FreqZs_Idx.items():
+    for Freq, _ in BestZsMetrics.items():
         Mode_Idx = np.where(Mode_Value == Freq)[0]
 
         # Skipping the remainder of the code if there are no mode values present at the predefined frequencies.
@@ -79,13 +79,17 @@ def LocCandZs (FreqZs_Idx, Mode_Value, SumH, Samp_Z):
         CandZs = Samp_Z[[Mode_Idx[Min_SumH_Idx]]][0].flatten()
         CandZ_Idx = np.where(CandZs!=0)[0]
         
+        #tracking results
+        TrackZs[Freq].append(CandZs[CandZ_Idx])
+        TrackMetrics[Freq].append(Min_SumH)
+
         # Updating the Min_SumH value if the current iteration value is smaller.
-        if Min_SumH < FreqZs_Idx[Freq][0]:
-            FreqZs_Idx[Freq] = [Min_SumH, CandZ_Idx, CandZs[CandZ_Idx]]
+        if Min_SumH < BestZsMetrics[Freq][0]:
+            BestZsMetrics[Freq] = [Min_SumH, CandZ_Idx, CandZs[CandZ_Idx]]
             print('Updated! ', 'Freq:', Freq, ', SumH_ZjFa:', np.round(Min_SumH, 4) , 
                   ' Z LOC:', CandZ_Idx, ' Z:', np.round(CandZs[CandZ_Idx], 4))
     
-    return FreqZs_Idx
+    return BestZsMetrics, TrackZs, TrackMetrics
 
 
 def MeanKLD(P,Q):
@@ -112,8 +116,10 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     SubResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
     AggResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[], 
                  'CMI_zE_ZjZ':[], 'CMI_zE_FcZj':[], 'CMI_fcE_FaFm':[]}
-    FreqZs_Idx =  {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
-
+    BestZsMetrics =  {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
+    TrackZs =  {i:[] for i in range(1, MaxFreq - MinFreq + 2)}
+    TrackMetrics =  {i:[] for i in range(1, MaxFreq - MinFreq + 2)}
+    
     ### monte carlo approximation
     I_zE_Z = 0
     I_zE_ZjZ = 0
@@ -332,7 +338,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 Max_Value_Label = np.argmax(Q_PSE_ZjFcAr_3D, axis=-1) + 1
                 Mode_Value = mode(Max_Value_Label.T, axis=0, keepdims=False)[0]
                 UniqSamp_ZjRPT = Samp_ZjRPT.reshape(NMiniBat, NGen, -1)[:, 0]
-                FreqZs_Idx = LocCandZs (FreqZs_Idx, Mode_Value, SumH_ZjFa, UniqSamp_ZjRPT)
+                BestZsMetrics, TrackZs, TrackMetrics = LocCandZs (BestZsMetrics, TrackZs, TrackMetrics, Mode_Value, SumH_ZjFa, UniqSamp_ZjRPT)
 
                 t.update(1)
 
@@ -361,7 +367,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
         AggResDic['CMI_fcE_FaFm'].append(CMI_fcE_FaFm)
     
     
-    return AggResDic, SubResDic, FreqZs_Idx
+    return AggResDic, SubResDic, (BestZsMetrics, TrackZs, TrackMetrics)
 
 
 
