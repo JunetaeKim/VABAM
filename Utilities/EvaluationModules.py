@@ -64,7 +64,7 @@ def ProbPermutation(Data, Nframe=3, EpsProb = 1e-7):
 
 
 # Searching for candidate Zj for plausible signal generation
-def LocCandZs (BestZsMetrics, TrackZs, TrackMetrics, Mode_Value, SumH, Samp_Z):
+def LocCandZs (BestZsMetrics, TrackerCandZ, Mode_Value, SumH, Samp_Z):
     
     for Freq, _ in BestZsMetrics.items():
         Mode_Idx = np.where(Mode_Value == Freq)[0]
@@ -80,8 +80,9 @@ def LocCandZs (BestZsMetrics, TrackZs, TrackMetrics, Mode_Value, SumH, Samp_Z):
         CandZ_Idx = np.where(CandZs!=0)[0]
         
         #tracking results
-        TrackZs[Freq].append(CandZs[CandZ_Idx])
-        TrackMetrics[Freq].append(Min_SumH)
+        TrackerCandZ[Freq]['TrackZLOC'].append(CandZ_Idx[None])
+        TrackerCandZ[Freq]['TrackZs'].append(CandZs[CandZ_Idx][None])
+        TrackerCandZ[Freq]['TrackMetrics'].append(Min_SumH[None])
 
         # Updating the Min_SumH value if the current iteration value is smaller.
         if Min_SumH < BestZsMetrics[Freq][0]:
@@ -89,7 +90,7 @@ def LocCandZs (BestZsMetrics, TrackZs, TrackMetrics, Mode_Value, SumH, Samp_Z):
             print('Updated! ', 'Freq:', Freq, ', SumH_ZjFa:', np.round(Min_SumH, 4) , 
                   ' Z LOC:', CandZ_Idx, ' Z:', np.round(CandZs[CandZ_Idx], 4))
     
-    return BestZsMetrics, TrackZs, TrackMetrics
+    return BestZsMetrics, TrackerCandZ
 
 
 def MeanKLD(P,Q):
@@ -116,9 +117,9 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     SubResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
     AggResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[], 
                  'CMI_zE_ZjZ':[], 'CMI_zE_FcZj':[], 'CMI_fcE_FaFm':[]}
-    BestZsMetrics =  {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
-    TrackZs =  {i:[] for i in range(1, MaxFreq - MinFreq + 2)}
-    TrackMetrics =  {i:[] for i in range(1, MaxFreq - MinFreq + 2)}
+    BestZsMetrics = {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
+    TrackerCandZ = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, MaxFreq - MinFreq + 2)} 
+     
     
     ### monte carlo approximation
     I_zE_Z = 0
@@ -338,7 +339,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 Max_Value_Label = np.argmax(Q_PSE_ZjFcAr_3D, axis=-1) + 1
                 Mode_Value = mode(Max_Value_Label.T, axis=0, keepdims=False)[0]
                 UniqSamp_ZjRPT = Samp_ZjRPT.reshape(NMiniBat, NGen, -1)[:, 0]
-                BestZsMetrics, TrackZs, TrackMetrics = LocCandZs (BestZsMetrics, TrackZs, TrackMetrics, Mode_Value, SumH_ZjFa, UniqSamp_ZjRPT)
+                BestZsMetrics, TrackerCandZ = LocCandZs (BestZsMetrics, TrackerCandZ, Mode_Value, SumH_ZjFa, UniqSamp_ZjRPT)
 
                 t.update(1)
 
@@ -367,7 +368,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
         AggResDic['CMI_fcE_FaFm'].append(CMI_fcE_FaFm)
     
     
-    return AggResDic, SubResDic, (BestZsMetrics, TrackZs, TrackMetrics)
+    return AggResDic, SubResDic, (BestZsMetrics,TrackerCandZ)
 
 
 
