@@ -25,7 +25,7 @@ def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     HalfLen = Data.shape[-1]//2
     FFTRes = np.abs(np.fft.fft(Data, axis=-1)[..., :HalfLen])[..., MinFreq:MaxFreq]
     # (Batch_size, N_sample, N_frequency)
-    PSD = (FFTRes**2)/FFTRes.shape[-1]
+    PSD = (FFTRes**2)/Data.shape[-1]
 
     # Probability Density Function
     if ReducedAxis == 'All':
