@@ -15,8 +15,8 @@ from tqdm import trange, tqdm
 
 
 
-# Power spectral entropy 
-def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
+# Power spectral density 
+def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     # Dimension check; this part operates with 3D tensors.
     # (Batch_size, N_sample, N_frequency)
     Data = Data[:,None] if len(Data.shape) < 3 else Data
@@ -31,21 +31,21 @@ def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     if ReducedAxis == 'All':
         AggPSD = np.mean(PSD, axis=(0,1))
         # (N_frequency,)
-        AggPSEPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
+        AggPSPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
     
     elif ReducedAxis =='Sample':
         AggPSD = np.mean(PSD, axis=(1))
         # (Batch_size, N_frequency)
-        AggPSEPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
+        AggPSPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
     
     elif ReducedAxis == 'None':
         # (Batch_size, N_sample, N_frequency)
-        AggPSEPDF = PSD / np.sum(PSD, axis=(-1),keepdims=True)    
+        AggPSPDF = PSD / np.sum(PSD, axis=(-1),keepdims=True)    
         
-    return AggPSEPDF
+    return AggPSPDF
 
 
-# Permutation entropy given PSE over each generation
+# Permutation entropy given PSD over each generation
 def ProbPermutation(Data, Nframe=3, EpsProb = 1e-7):
     
     # Generate true permutation cases
@@ -114,25 +114,25 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     NFCs = GenModel.get_layer('Inp_FCCommon').output.shape[-1] + GenModel.get_layer('Inp_FCEach').output.shape[-1]
     
     # Result tracking
-    SubResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
-    AggResDic = {'I_zE_Z':[],'I_zE_ZjZ':[],'I_zE_ZjFm':[],'I_zE_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[], 
-                 'CMI_zE_ZjZ':[], 'CMI_zE_FcZj':[], 'CMI_fcE_FaFm':[]}
+    SubResDic = {'I_zD_Z':[],'I_zD_ZjZ':[],'I_zD_ZjFm':[],'I_zD_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[]}
+    AggResDic = {'I_zD_Z':[],'I_zD_ZjZ':[],'I_zD_ZjFm':[],'I_zD_FaZj':[],'I_fcE_FmZj':[],'I_fcE_FaZj':[], 
+                 'CMI_zD_ZjZ':[], 'CMI_zD_FcZj':[], 'CMI_fcE_FaFm':[]}
     BestZsMetrics = {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
     TrackerCandZ = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, MaxFreq - MinFreq + 2)} 
      
     
     ### monte carlo approximation
-    I_zE_Z = 0
-    I_zE_ZjZ = 0
-    I_zE_ZjFm = 0
-    I_zE_FaZj = 0
+    I_zD_Z = 0
+    I_zD_ZjZ = 0
+    I_zD_ZjFm = 0
+    I_zD_FaZj = 0
     I_fcE_FmZj = 0
     I_fcE_FaZj = 0
     
     
     
     # P(V=v)
-    P_PSE = FFT_PSE(AnalData, 'All')
+    P_PSPDF = FFT_PSD(AnalData, 'All')
 
     with trange(MASize * SimSize , leave=False) as t:
         
@@ -274,49 +274,49 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
 
 
-                # Cumulative Power Spectral Entropy (PSE) over each frequency
-                Q_PSE_ZFc = FFT_PSE(SigGen_ZFc, 'Sample')
-                Q_PSE_ZjFc = FFT_PSE(SigGen_ZjFc, 'Sample')
+                # Cumulative Power Spectral Density (PSD) over each frequency
+                Q_PSPDF_ZFc = FFT_PSD(SigGen_ZFc, 'Sample')
+                Q_PSPDF_ZjFc = FFT_PSD(SigGen_ZjFc, 'Sample')
 
-                Q_PSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'Sample')
-                Q_PSE_ZjFcAr = FFT_PSE(SigGen_ZjFcAr, 'Sample')
-                Q_PSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'Sample')
+                Q_PSPDF_ZjFcRPT = FFT_PSD(SigGen_ZjFcRPT, 'Sample')
+                Q_PSPDF_ZjFcAr = FFT_PSD(SigGen_ZjFcAr, 'Sample')
+                Q_PSPDF_ZjFcMu = FFT_PSD(SigGen_ZjFcMu, 'Sample')
 
-                SubPSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'None').transpose(0,2,1)
-                SubPSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'None').transpose(0,2,1)
-                SubPSE_ZjFcAr = FFT_PSE(SigGen_ZjFcAr, 'None').transpose(0,2,1)
-
-
-                # Permutation Entropy given PSE over each generation
-                Q_FcPSE_ZjFcRPT = ProbPermutation(SubPSE_ZjFcRPT, Nframe=3, EpsProb = 1e-7)
-                Q_FcPSE_ZjFcMu = ProbPermutation(SubPSE_ZjFcMu, Nframe=3, EpsProb = 1e-7)
-                Q_FcPSE_ZjFcAr = ProbPermutation(SubPSE_ZjFcAr, Nframe=3, EpsProb = 1e-7)
+                SubPSPDF_ZjFcRPT = FFT_PSD(SigGen_ZjFcRPT, 'None').transpose(0,2,1)
+                SubPSPDF_ZjFcMu = FFT_PSD(SigGen_ZjFcMu, 'None').transpose(0,2,1)
+                SubPSPDF_ZjFcAr = FFT_PSD(SigGen_ZjFcAr, 'None').transpose(0,2,1)
 
 
-                # Conditional mutual information; zE and fcE stand for z-wise power spectral entropy and fc-wise permutation entropy, respectively.
-                I_zE_Z_ = MeanKLD(Q_PSE_ZFc, P_PSE[None] ) # I(zE;Z)
-                I_zE_ZjZ_ = MeanKLD(Q_PSE_ZjFc, Q_PSE_ZFc )  # I(zE;Zj|Z)
-                I_zE_ZjFm_ =  MeanKLD(Q_PSE_ZjFcMu, P_PSE[None] ) # I(zE;Zj)
-                I_zE_FaZj_ = MeanKLD(Q_PSE_ZjFcAr, Q_PSE_ZjFcMu ) # I(zE;FC|Zj)
-                I_fcE_FmZj_ = MeanKLD(Q_FcPSE_ZjFcMu, Q_FcPSE_ZjFcRPT) # I(fcE;Zj)
-                I_fcE_FaZj_ = MeanKLD(Q_FcPSE_ZjFcAr, Q_FcPSE_ZjFcMu) # I(fcE;FC|Zj)
+                # Permutation Entropy given PSD over each generation
+                Q_FcPSPDF_ZjFcRPT = ProbPermutation(SubPSPDF_ZjFcRPT, Nframe=3, EpsProb = 1e-7)
+                Q_FcPSPDF_ZjFcMu = ProbPermutation(SubPSPDF_ZjFcMu, Nframe=3, EpsProb = 1e-7)
+                Q_FcPSPDF_ZjFcAr = ProbPermutation(SubPSPDF_ZjFcAr, Nframe=3, EpsProb = 1e-7)
 
 
-                print('I_zE_Z :', I_zE_Z_)
-                SubResDic['I_zE_Z'].append(I_zE_Z_)
-                I_zE_Z += I_zE_Z_
+                # Conditional mutual information; zD and fcE stand for z-wise power spectral density and fc-wise permutation entropy, respectively.
+                I_zD_Z_ = MeanKLD(Q_PSPDF_ZFc, P_PSPDF[None] ) # I(zD;Z)
+                I_zD_ZjZ_ = MeanKLD(Q_PSPDF_ZjFc, Q_PSPDF_ZFc )  # I(zD;Zj|Z)
+                I_zD_ZjFm_ =  MeanKLD(Q_PSPDF_ZjFcMu, P_PSPDF[None] ) # I(zD;Zj)
+                I_zD_FaZj_ = MeanKLD(Q_PSPDF_ZjFcAr, Q_PSPDF_ZjFcMu ) # I(zD;FC|Zj)
+                I_fcE_FmZj_ = MeanKLD(Q_FcPSPDF_ZjFcMu, Q_FcPSPDF_ZjFcRPT) # I(fcE;Zj)
+                I_fcE_FaZj_ = MeanKLD(Q_FcPSPDF_ZjFcAr, Q_FcPSPDF_ZjFcMu) # I(fcE;FC|Zj)
 
-                print('I_zE_ZjZ :', I_zE_ZjZ_)
-                SubResDic['I_zE_ZjZ'].append(I_zE_ZjZ_)
-                I_zE_ZjZ += I_zE_ZjZ_
 
-                print('I_zE_ZjFm :', I_zE_ZjFm_)
-                SubResDic['I_zE_ZjFm'].append(I_zE_ZjFm_)
-                I_zE_ZjFm += I_zE_ZjFm_
+                print('I_zD_Z :', I_zD_Z_)
+                SubResDic['I_zD_Z'].append(I_zD_Z_)
+                I_zD_Z += I_zD_Z_
 
-                print('I_zE_FaZj :', I_zE_FaZj_)
-                SubResDic['I_zE_FaZj'].append(I_zE_FaZj_)
-                I_zE_FaZj += I_zE_FaZj_
+                print('I_zD_ZjZ :', I_zD_ZjZ_)
+                SubResDic['I_zD_ZjZ'].append(I_zD_ZjZ_)
+                I_zD_ZjZ += I_zD_ZjZ_
+
+                print('I_zD_ZjFm :', I_zD_ZjFm_)
+                SubResDic['I_zD_ZjFm'].append(I_zD_ZjFm_)
+                I_zD_ZjFm += I_zD_ZjFm_
+
+                print('I_zD_FaZj :', I_zD_FaZj_)
+                SubResDic['I_zD_FaZj'].append(I_zD_FaZj_)
+                I_zD_FaZj += I_zD_FaZj_
 
                 print('I_fcE_FmZj :', I_fcE_FmZj_)
                 SubResDic['I_fcE_FmZj'].append(I_fcE_FmZj_)
@@ -328,15 +328,15 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
 
                 # Locating the candidate Z values that generate plausible signals.
-                H_zE_ZjFa = -np.sum(Q_PSE_ZjFcAr * np.log(Q_PSE_ZjFcAr), axis=-1)
-                H_fcE_ZjFa = np.mean(-np.sum(Q_FcPSE_ZjFcAr * np.log(Q_FcPSE_ZjFcAr), axis=-1), axis=-1)
-                SumH_ZjFa = H_zE_ZjFa + H_fcE_ZjFa
+                H_zD_ZjFa = -np.sum(Q_PSPDF_ZjFcAr * np.log(Q_PSPDF_ZjFcAr), axis=-1)
+                H_fcE_ZjFa = np.mean(-np.sum(Q_FcPSPDF_ZjFcAr * np.log(Q_FcPSPDF_ZjFcAr), axis=-1), axis=-1)
+                SumH_ZjFa = H_zD_ZjFa + H_fcE_ZjFa
 
 
                 # Calculating mode values of SigGen_ZjFcAr
-                Q_PSE_ZjFcAr_3D = FFT_PSE(SigGen_ZjFcAr, 'None')
+                Q_PSPDF_ZjFcAr_3D = FFT_PSD(SigGen_ZjFcAr, 'None')
                 # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-                Max_Value_Label = np.argmax(Q_PSE_ZjFcAr_3D, axis=-1) + 1
+                Max_Value_Label = np.argmax(Q_PSPDF_ZjFcAr_3D, axis=-1) + 1
                 Mode_Value = mode(Max_Value_Label.T, axis=0, keepdims=False)[0]
                 UniqSamp_ZjRPT = Samp_ZjRPT.reshape(NMiniBat, NGen, -1)[:, 0]
                 BestZsMetrics, TrackerCandZ = LocCandZs (BestZsMetrics, TrackerCandZ, Mode_Value, SumH_ZjFa, UniqSamp_ZjRPT)
@@ -344,20 +344,20 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 t.update(1)
 
         # CMI(V;Zj, Z)
-        I_zE_Z /= (MASize*SimSize)
-        AggResDic['I_zE_Z'].append(I_zE_Z)
-        I_zE_ZjZ /= (MASize*SimSize)
-        AggResDic['I_zE_ZjZ'].append(I_zE_ZjZ)
-        CMI_zE_ZjZ = I_zE_Z + I_zE_ZjZ             
-        AggResDic['CMI_zE_ZjZ'].append(CMI_zE_ZjZ)
+        I_zD_Z /= (MASize*SimSize)
+        AggResDic['I_zD_Z'].append(I_zD_Z)
+        I_zD_ZjZ /= (MASize*SimSize)
+        AggResDic['I_zD_ZjZ'].append(I_zD_ZjZ)
+        CMI_zD_ZjZ = I_zD_Z + I_zD_ZjZ             
+        AggResDic['CMI_zD_ZjZ'].append(CMI_zD_ZjZ)
 
         # CMI(V;FC,Zj)
-        I_zE_ZjFm /= (MASize*SimSize)
-        AggResDic['I_zE_ZjFm'].append(I_zE_ZjFm)
-        I_zE_FaZj /= (MASize*SimSize)
-        AggResDic['I_zE_FaZj'].append(I_zE_FaZj)
-        CMI_zE_FcZj = I_zE_ZjFm + I_zE_FaZj       
-        AggResDic['CMI_zE_FcZj'].append(CMI_zE_FcZj)
+        I_zD_ZjFm /= (MASize*SimSize)
+        AggResDic['I_zD_ZjFm'].append(I_zD_ZjFm)
+        I_zD_FaZj /= (MASize*SimSize)
+        AggResDic['I_zD_FaZj'].append(I_zD_FaZj)
+        CMI_zD_FcZj = I_zD_ZjFm + I_zD_FaZj       
+        AggResDic['CMI_zD_FcZj'].append(CMI_zD_FcZj)
 
         # CMI(VE;FA,FM)
         I_fcE_FmZj /= (MASize*SimSize)
