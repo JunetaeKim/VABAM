@@ -33,7 +33,7 @@ def FFT_PSE (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
         # (N_frequency,)
         AggPSEPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
     
-    elif ReducedAxis =='Batch':
+    elif ReducedAxis =='Sample':
         AggPSD = np.mean(PSD, axis=(1))
         # (Batch_size, N_frequency)
         AggPSEPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
@@ -153,7 +153,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of Samp_Z: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
                 - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
-                - SigGen_ZFc ~ Q(y | Samp_Z, FCs)*Q(Samp_Z | Y)*Q(FCs) 
+                - SigGen_ZFc ~ Q(y | Samp_Z, FCs)
                 - UniqSamp_Z ~ Q(z|y), FCs ~ Bern(fc, μ=0.5)
 
                 '''
@@ -172,7 +172,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of Samp_Zj: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
                 - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
-                - SigGen_ZjFc ~ Q(y | Samp_Zj, FCs)*Q(Samp_Zj)*Q(j)*Q(FCs) 
+                - SigGen_ZjFc ~ Q(y | Samp_Zj, FCs)
                 - Samp_Zj ~ Q(z|y), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
 
                 '''
@@ -195,7 +195,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of Samp_ZjRPT: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
                 - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
-                - SigGen_ZjFcRPT ~ Q(y | Samp_ZjRPT, FCs)*Q(Samp_ZjRPT)*Q(j)*Q(FCs) 
+                - SigGen_ZjFcRPT ~ Q(y | Samp_ZjRPT, FCs)
                 - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
                 - In the expression j∼U(1,LatDim), j corresponds to LatDim and all js are selected randomly.
 
@@ -225,7 +225,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of Samp_ZjRPT: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
                 - Shape of FC_Arange: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
-                - SigGen_ZjFcAr ~ Q(y | Samp_ZjRPT, FC_Arange)*Q(Samp_ZjRPT)*Q(j)*Q(FC_Arange)
+                - SigGen_ZjFcAr ~ Q(y | Samp_ZjRPT, FC_Arange)
                 - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
                 - j corresponds to LatDim and all js are selected randomly.
 
@@ -246,7 +246,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of Samp_ZjRPT: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
                 - Shape of FC_Rand: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
-                - SigGen_ZjFcMu ~ Q(y | Samp_ZjRPT, FC_Rand)*Q(Samp_ZjRPT)*Q(j)*Q(FC_Arange)
+                - SigGen_ZjFcMu ~ Q(y | Samp_ZjRPT, FC_Rand)
                 - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FC_Arange∼U(0,FcLimit)
                 - j corresponds to LatDim and all js are selected randomly.
 
@@ -275,12 +275,12 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
 
                 # Cumulative Power Spectral Entropy (PSE) over each frequency
-                Q_PSE_ZFc = FFT_PSE(SigGen_ZFc, 'Batch')
-                Q_PSE_ZjFc = FFT_PSE(SigGen_ZjFc, 'Batch')
+                Q_PSE_ZFc = FFT_PSE(SigGen_ZFc, 'Sample')
+                Q_PSE_ZjFc = FFT_PSE(SigGen_ZjFc, 'Sample')
 
-                Q_PSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'Batch')
-                Q_PSE_ZjFcAr = FFT_PSE(SigGen_ZjFcAr, 'Batch')
-                Q_PSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'Batch')
+                Q_PSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'Sample')
+                Q_PSE_ZjFcAr = FFT_PSE(SigGen_ZjFcAr, 'Sample')
+                Q_PSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'Sample')
 
                 SubPSE_ZjFcRPT = FFT_PSE(SigGen_ZjFcRPT, 'None').transpose(0,2,1)
                 SubPSE_ZjFcMu = FFT_PSE(SigGen_ZjFcMu, 'None').transpose(0,2,1)
