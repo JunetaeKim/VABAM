@@ -154,10 +154,10 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
                 - SigGen_ZFc ~ Q(y | Samp_Z, FCs)
-                - UniqSamp_Z ~ Q(z|y), FCs ~ Bern(fc, μ=0.5)
+                - UniqSamp_Z ~ N(Zμ|y, σ), FCs ~ Bern(fc, μ=0.5)
 
                 '''
-                # Sampling Samp_Z 
+                # Sampling Samp_Z and FCs
                 UniqSamp_Z = Sampler(SplitData[mini], SampModel)
                 Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
                 FCs = np.random.rand(NMiniBat *NGen, NFCs) * FcLimit
@@ -173,7 +173,8 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 - Shape of FCs: (NMiniBat, NGen, NFCs) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
 
                 - SigGen_ZjFc ~ Q(y | Samp_Zj, FCs)
-                - Samp_Zj ~ Q(z|y), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
+                - Samp_Zj ~ N(Zμj|y, σj), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
+                - In the expression j∼U(1,LatDim), j corresponds to LatDim and all js are selected randomly.
 
                 '''
 
@@ -197,7 +198,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
                 - SigGen_ZjFcRPT ~ Q(y | Samp_ZjRPT, FCs)
                 - Samp_ZjRPT ~ N(0, ReparaStdZj), j∼U(1,LatDim), FCs ~ Bern(fc, μ=0.5)
-                - In the expression j∼U(1,LatDim), j corresponds to LatDim and all js are selected randomly.
+                - j corresponds to LatDim and all js are selected randomly.
 
                 '''
                 
@@ -359,7 +360,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
         CMI_zD_FcZj = I_zD_ZjFm + I_zD_FaZj       
         AggResDic['CMI_zD_FcZj'].append(CMI_zD_FcZj)
 
-        # CMI(VE;FA,FM)
+        # CMI(VE;FC,Zj)
         I_fcE_FmZj /= (MASize*SimSize)
         AggResDic['I_fcE_FmZj'].append(I_fcE_FmZj)
         I_fcE_FaZj /= (MASize*SimSize)
