@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
 import yaml
+import re
 
 import tensorflow as tf
 from tensorflow.keras import Model
@@ -32,6 +33,8 @@ if __name__ == "__main__":
     
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
+    CompSize = re.findall(r'\d+', ConfigName)[-1]
+    assert CompSize in [ num for i in os.listdir('./Config') for num in re.findall(r'\d+', i)], "Please chek 'CompSize' included in the ConfigName."
     GPU_ID = args.GPUID
     Resume = args.Resume
     
@@ -51,11 +54,11 @@ if __name__ == "__main__":
     
     
     if 'ART' in ConfigName:
-        LoadConfig = 'Config' + 'ART'
+        LoadConfig = 'Config' + 'ART' + CompSize
     elif 'PLETH' in ConfigName:
-        LoadConfig = 'Config' + 'PLETH'
+        LoadConfig = 'Config' + 'PLETH' + CompSize
     elif 'II' in ConfigName:
-        LoadConfig = 'Config' + 'II'
+        LoadConfig = 'Config' + 'II' + CompSize
     else:
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 

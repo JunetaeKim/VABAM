@@ -1,0 +1,63 @@
+SKZ_ART_50_500: # SigType_LatDim_CompSize
+  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 50 # The dimensionality of the latent variable z.
+  CompSize: 500 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
+  MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
+  NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
+  MaskStd: 0.00 # The standard deviation value for Gaussian noise generation applied to the masked signal.
+  ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+  Capacity_Z: 0.05 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
+  FcLimit: 0.05 # The upper threshold value for frequency.
+  DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
+  DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
+  
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
+  LossType: 'TCLosses' # The loss type for the experiment.: TCLosses or FACLosses
+  SpecLosses: ['SKZ'] # A list set of specific loss nicknames to add, aside from the common losses ['SKZ' 'DKZ' 'FC' 'TC' 'MI']; this can be used for ablation purposes
+  
+  #Each weight may be activated or not depending on the model type.
+  WRec: 20 # The scaling weight for the reconstruction loss.
+  WFeat: 30 # The scaling weight for the feature loss.
+  WZ: 0.001 # The scaling weight for the Z loss. 
+  
+  MnWRec: 1 # The min weight for the reconstruction loss.
+  MnWFeat: 1 # The min weight for the feature loss.
+  MnWZ: 0.001 # The min weight for the Z loss. 0.0005
+  
+  MxWRec: 100 # The max weight for the reconstruction loss.
+  MxWFeat: 100 # The max weight for the feature loss.
+  MxWZ: 0.002 # The max weight for the Z loss.   
+
+SKZ_ART_30_500: # SigType_LatDim_CompSize
+  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 30 # The dimensionality of the latent variable z.
+  CompSize: 500 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
+  MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
+  NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
+  MaskStd: 0.00 # The standard deviation value for Gaussian noise generation applied to the masked signal.
+  ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+  Capacity_Z: 0.05 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
+  FcLimit: 0.05 # The upper threshold value for frequency.
+  DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
+  DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
+  
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 2000 # The epoch size for the training
+  LossType: 'TCLosses' # The loss type for the experiment.: TCLosses or FACLosses
+  SpecLosses: ['SKZ'] # A list set of specific loss nicknames to add, aside from the common losses ['SKZ' 'DKZ' 'FC' 'TC' 'MI']; this can be used for ablation purposes
+  
+  #Each weight may be activated or not depending on the model type.
+  WRec: 20 # The scaling weight for the reconstruction loss.
+  WFeat: 30 # The scaling weight for the feature loss.
+  WZ: 0.001 # The scaling weight for the Z loss. 
+  
+  MnWRec: 1 # The min weight for the reconstruction loss.
+  MnWFeat: 1 # The min weight for the feature loss.
+  MnWZ: 0.001 # The min weight for the Z loss. 0.0005
+  
+  MxWRec: 100 # The max weight for the reconstruction loss.
+  MxWFeat: 100 # The max weight for the feature loss.
+  MxWZ: 0.002 # The max weight for the Z loss.   
+
+  
