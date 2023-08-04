@@ -118,7 +118,7 @@ if __name__ == "__main__":
     
     # ModelName selection
     if 'BaseVAE' in ConfigName:
-        ModelLoad = BaseVae
+        BenchModel = BaseVae(SigDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
     
     elif 'TCVAE' in ConfigName:
         ModelLoad = TCVAE
