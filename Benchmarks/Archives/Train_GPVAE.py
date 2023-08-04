@@ -1,6 +1,6 @@
 '''
 Notice
-The original author's cost function has been modified: instead of maximizing p(x|z), the minimization of MSE (Mean Squared Error) is used.
+The original author's cost function has been modified in this script: instead of maximizing p(x|z), the minimization of MSE (Mean Squared Error) is used.
 In the original author's paper, the study was conducted with relatively short timesteps, so latent variables zs were generated for all timesteps. 
 However, in the case of this study, the raw dimensional setting has 1000 timesteps (10 seconds with a sample rate of 100), which becomes an overly burdensome setting. 
 Therefore, latent variables zs were generated for every second instead. In other words, z values were generated for a total of 10 seconds across the timesteps.
@@ -11,6 +11,7 @@ import time
 from datetime import datetime
 import sys
 import os
+from argparse import ArgumentParser
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -39,15 +40,23 @@ if __name__ == "__main__":
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
     num_steps = 0 # 'Number of training steps: If non-zero it overwrites num_epochs'
-    num_epochs = 500
-    batch_size = 1000
+    num_epochs = 2000
+    batch_size = 4000
     print_interval = 0
     TrRate = 0.8
     LatDim = 10
     learning_rate = 0.001
     gradient_clip = 1e4
     debug= True
-
+    
+    # Create the parser
+    parser = ArgumentParser()
+    parser.add_argument('--SigType', type=str, required=True, help='Types of signals to train on.: ART, PLETH, II')
+    
+    args = parser.parse_args() # Parse the arguments
+    SigType = args.SigType
+    #assert SigType in ['ART', 'PLETH', 'II', 'filtII'], "Value should be either ART, PLETH, II."
+    
     
     Outdir = './Results/'
     if not os.path.exists(Outdir):
@@ -55,20 +64,12 @@ if __name__ == "__main__":
         
     
     #### -----------------------------------------------------   Data load and processing   -------------------------------------------------------------------------    
-    DATA = np.load('../Data/AsanTRSet.npy')
-    SigDim = DATA.shape[1]
-    
-    SigDim = DATA.shape[1]
+    TrData = np.load('../Data/ProcessedData/Tr'+str(SigType)+'.npy').astype('float32')
+    ValData = np.load('../Data/ProcessedData/Val'+str(SigType)+'.npy').astype('float32')
+  
 
-    np.random.seed(7)
-    PermutedDATA = np.random.permutation(DATA)
-    TrLen = int(PermutedDATA.shape[0] * TrRate)
-
-    TrData = PermutedDATA[:TrLen]
-    ValData = PermutedDATA[TrLen:]
-
-    TrDataFrame = tf.signal.frame(TrData, 100, 100).numpy()
-    ValDataFrame = tf.signal.frame(ValData, 100, 100).numpy()
+    TrDataFrame = tf.signal.frame(TrData, 50, 50).numpy()
+    ValDataFrame = tf.signal.frame(ValData, 50, 50).numpy()
     # 0 is missing, 1 is observed
     m_train_miss = np.zeros_like(TrDataFrame)
     m_val_miss = np.zeros_like(ValDataFrame)
@@ -95,8 +96,8 @@ if __name__ == "__main__":
     model = GP_VAE(latent_dim=LatDim, 
                    data_dim=data_dim, 
                    time_length=time_length,
-                   encoder_sizes=[100, 80, 60], encoder=BandedJointEncoderGRU,
-                   decoder_sizes=[60,80,100], decoder=GaussianDecoder,
+                   encoder_sizes=[50, 40, 30], encoder=BandedJointEncoderGRU,
+                   decoder_sizes=[30,40,50], decoder=GaussianDecoder,
                    kernel='cauchy', 
                    sigma=1.,
                    length_scale=1., 
@@ -114,10 +115,10 @@ if __name__ == "__main__":
     
     #### -----------------------------------------------------   Model Fit   -----------------------------------------------------------------------    
     # Load weights
-    if os.path.isfile(Outdir+'GPVAE_Encoder.hdf5'):
-        model.encoder.net.load_weights(Outdir+'GPVAE_Encoder.hdf5')
-    if os.path.isfile(Outdir+'GPVAE_Decoder.hdf5'):
-        model.decoder.net.load_weights(Outdir+'GPVAE_Decoder.hdf5')
+    if os.path.isfile(Outdir+SigType+'_GPVAE_Encoder.hdf5'):
+        model.encoder.net.load_weights(Outdir+SigType+'_GPVAE_Encoder.hdf5')
+    if os.path.isfile(Outdir+SigType+'_GPVAE_Decoder.hdf5'):
+        model.decoder.net.load_weights(Outdir+SigType+'_GPVAE_Decoder.hdf5')
 
 
     losses_train = []
@@ -166,8 +167,8 @@ if __name__ == "__main__":
             if val_loss_check > val_loss:
                 print(val_loss_check, val_loss)
                 val_loss_check = val_loss
-                model.encoder.net.save_weights(Outdir+'GPVAE_Encoder.hdf5')
-                model.decoder.net.save_weights(Outdir+'GPVAE_Decoder.hdf5')
+                model.encoder.net.save_weights(Outdir+SigType+'_GPVAE_Encoder.hdf5')
+                model.decoder.net.save_weights(Outdir+SigType+'_GPVAE_Decoder.hdf5')
 
 
 
