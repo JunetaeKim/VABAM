@@ -8,6 +8,63 @@ from Utilities.Utilities import *
 from Utilities.EvaluationModules import *
 
 
+def SKLDZ (model, Beta_Z, Capacity_Z):
+    
+    Z_Mu, Z_Log_Sigma, Zs = model.get_layer('Z_Mu').output, model.get_layer('Z_Log_Sigma').output, model.get_layer('Zs').output
+    kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
+    kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
+    kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
+    
+    return kl_Loss_Z
+
+
+def BaseVAE (SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
+    
+    ### Loss-related parameters
+    Capacity_Z = ConfigSpec['Capacity_Z']
+    
+
+    #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
+    EncModel = Encoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim, Reparam = True)
+    ReconModel = Decoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim)
+    
+    ## Model core parts
+    ReconOut =ReconModel(EncModel.output)
+
+    ### Define the model
+    VAEModel = Model(EncModel.input, ReconOut)
+    
+    
+    
+    #### -----------------------------------------------------   Losses   -------------------------------------------------------------------------
+    ### Weight controller; Apply beta and capacity 
+    Beta_Z = Lossweight(name='Beta_Z', InitVal=0.01)(VAEModel.input)
+    Beta_Rec = Lossweight(name='Beta_Rec', InitVal=1.)(VAEModel.input)
+
+    ### Adding the RecLoss; 
+    MSE = tf.keras.losses.MeanSquaredError()
+
+    ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input)
+    VAEModel.add_loss(ReconOutLoss)
+    VAEModel.add_metric(ReconOutLoss, 'ReconOutLoss')
+    print('ReconOutLoss added')
+
+
+    ### KL Divergence for q(Z) vs q(Z)
+    kl_Loss_Z = SKLDZ(VAEModel, Beta_Z, Capacity_Z)
+    VAEModel.add_loss(kl_Loss_Z )
+    VAEModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
+    print('kl_Loss_SKZ added')
+    
+    
+    ### Model Compile
+    VAEModel.compile(optimizer='adam') 
+    VAEModel.summary()
+
+   
+    return VAEModel
+
+
 
 
 
@@ -42,20 +99,16 @@ def ConVAE (TrData, ValData,  SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, R
     MSE = tf.keras.losses.MeanSquaredError()
     ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input[0])
 
-    ### KL Divergence for q(Z) vs q(Z)
-    Z_Mu, Z_Log_Sigma, Zs = CVAEModel.get_layer('Z_Mu').output, CVAEModel.get_layer('Z_Log_Sigma').output, CVAEModel.get_layer('Zs').output
-    kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
-    kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
-    kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
-    
-    
     ### Adding losses to the model
     CVAEModel.add_loss(ReconOutLoss)
     CVAEModel.add_metric(ReconOutLoss, 'ReconOutLoss')
     
+    ### KL Divergence for q(Z) vs q(Z)
+    kl_Loss_Z = SKLDZ(CVAEModel, Beta_Z, Capacity_Z)
     CVAEModel.add_loss(kl_Loss_Z )
     CVAEModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
-    
+    print('kl_Loss_SKZ added')
+
     
     ### Model Compile
     CVAEModel.compile(optimizer='adam') 
