@@ -1,4 +1,4 @@
-'''This part contains the code for the basic VAE (Variational Autoencoder) structure used in TCVAE and FactorVAE.'''
+'''This part contains the code for the basic VAE (Variational Autoencoder) structure used in CVAE, TCVAE and FactorVAE.'''
 
 import numpy as np
 import tensorflow as tf
