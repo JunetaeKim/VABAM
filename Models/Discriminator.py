@@ -5,7 +5,7 @@ from tensorflow.keras import Model
 
 
 def EvalDiscriminator (SigDim, SlidingSize = 50):
-    InpL = Input(shape=(SigDim,), name='Inp_Enc')
+    InpL = Input(shape=(SigDim,), name='InpGen')
     InpFrame = tf.signal.frame(InpL, SlidingSize, SlidingSize)
     DiscriLayer = Bidirectional(GRU(30, return_sequences=True))(InpFrame)
     DiscriLayer = Bidirectional(GRU(20, return_sequences=True))(DiscriLayer)
@@ -16,7 +16,7 @@ def EvalDiscriminator (SigDim, SlidingSize = 50):
     DiscriOut = Dense(1, activation='sigmoid')(DiscriLayer)
     
     EvalDiscModel = Model(InpL, DiscriOut, name='EvalDiscModel')
-    EvalDiscModel.compile(loss=tf.losses.binary_crossentropy, optimizer='adam')
+    #EvalDiscModel.compile(loss=tf.losses.binary_crossentropy, optimizer='adam')
     
     return EvalDiscModel
 

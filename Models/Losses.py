@@ -1,7 +1,8 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
-from Utilities.Utilities import Lossweight, LogNormalDensity, SplitBatch
+from Utilities.Utilities import Lossweight
+from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch
 
 
     
