@@ -7,23 +7,9 @@ import tensorflow as tf
 from tensorflow.keras import Model
 
 
-def GenSig_zVar (FeatGenModel, ReconModel, FC, N_Gen=200, MinZval = -3., MaxZval = 3.,):
-    LatDim= FeatGenModel.input[-1].shape[-1]
-    Z_pred = np.linspace(MinZval, MaxZval, N_Gen*LatDim).reshape(N_Gen, -1)
-    FC_Comm = np.tile(np.ones(2) * FC, (N_Gen,1))
-    FC_Each = np.tile(np.ones(4) * FC, (N_Gen,1))
-    FeatGen = FeatGenModel([FC_Comm,FC_Each, Z_pred])
-    PredFCs = np.concatenate([FC_Comm,FC_Each], axis=-1)
-    SigGen = ReconModel([FeatGen])
-
-    HalfLen = SigGen.shape[1]//2
-    FFTRes = np.abs(np.fft.fft(SigGen, axis=-1)[:, :HalfLen]) 
-    Amplitude = FFTRes/HalfLen
-    
-    return SigGen, Amplitude
 
 
-def GenSig_FcVar (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZval = -3., MaxZval = 3., zType='Fixed'):
+def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZval = -3., MaxZval = 3., zType='Fixed'):
     LatDim= FeatGenModel.input[-1].shape[-1]
     if zType=='Random':
         Z_pred=np.random.normal(0, 1, ( N_Gen, LatDim))
@@ -47,30 +33,37 @@ def GenSig_FcVar (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, Mi
     return SigGen, Amplitude
 
 
-def GenSig_ZFcVar (FeatGenModel, ReconModel, Z_pred, FC_Comm, FC_Each, FreqRange=[9,12]):
 
-    #[GenSig_ZFcVar(zValues[i], FCValues[i]) for i in range(N_Gen)]
-    FeatGen = FeatGenModel([FC_Comm,FC_Each, Z_pred])
-    PredFCs = np.concatenate([FC_Comm,FC_Each], axis=-1)
-    SigGen = ReconModel([FeatGen])
-
+### Qualitative and Visual Evaluation
+def HeatMapFreqZ ( SigGen, MinFreq=1, MaxFreq=51):
+    
+    N_Gen = SigGen.shape[0]
+    
     HalfLen = SigGen.shape[1]//2
     FFTRes = np.abs(np.fft.fft(SigGen, axis=-1)[:, :HalfLen]) 
     Amplitude = FFTRes/HalfLen
+    Heatmap = Amplitude[:, MinFreq:MaxFreq]
+
+    fig, ax = plt.subplots(figsize=(7,6))
+    cax = fig.add_axes([0.95, 0.25, 0.04, 0.5])
+
+    im = ax.imshow(Heatmap,  cmap='viridis', aspect='auto',interpolation='nearest') 
+    #ax.set(yticks=np.arange(1, N_Gen)[::25], yticklabels=np.round(np.arange(1, N_Gen)[::25], 1));
+    ax.set(xticks=np.arange(1, MaxFreq)[::5]-0.5, xticklabels=np.arange(1, MaxFreq)[::5]);
+    ax.set_xlabel('Frequency', fontsize=16)
+    ax.set_ylabel('Generated signals', fontsize=16) 
+
+    fig.colorbar(im, cax=cax, orientation='vertical')
+    plt.show()
     
-    return Amplitude[:, FreqRange[0]:FreqRange[1]+1].max(axis=-1)
-
-
-
-
-### Qualitative and Visual Evaluation
-def HeatMapFrequency (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
+    
+def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
     zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
     for KeyVal in ZFix.items():
         zVal[:,KeyVal[0]] = KeyVal[1]
     
-    SigGen_FcVar, Amplitude_FcVar = GenSig_FcVar(FeatGenModel,  ReconModel, zVal, N_Gen=N_Gen, zType='Fixed')
+    SigGen_FcVar, Amplitude_FcVar = GenSig_FCA(FeatGenModel,  ReconModel, zVal, N_Gen=N_Gen, zType='Fixed')
     Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
 
     fig, ax = plt.subplots(figsize=(7,6))
@@ -86,7 +79,7 @@ def HeatMapFrequency (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFre
     plt.show()
     
     
-def VisReconExtract (ValData, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, N_Gen=300):
+def VisReconExtractZ_FC (ValData, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, N_Gen=300):
     
     Sample = np.tile(ValData[idx][None], (N_Gen, 1))
     print(Sample.shape)
@@ -103,7 +96,35 @@ def VisReconExtract (ValData, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, N
     return RecPred, HH,HL,LH, LL
 
 
-def VisReconGivenZ (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
+
+def VisReconGivenZ (ReconModel, LatDim, ZFix,  MinFreqR=0, MaxFreqR=0.05):
+    N_Gen = len(ZFix)
+    zVal = np.tile(np.zeros(LatDim), (len(ZFix), 1))
+
+    for Num, KeyVal in enumerate (ZFix.items()):
+        zVal[Num,list(KeyVal[1].keys())] = list(KeyVal[1].values())
+
+    
+    ''' When given z latent values that have non-zero values in only one dimension, 
+    generate signals of N_Gen size, then return the amplitude of the frequency through a Fourier transform. 2D Max[N_Gen, Zs.]'''
+    SigGen = ReconModel.predict(zVal)
+    
+    # Create a colormap and normalize it based on the number of experiments
+    cmap = cm.get_cmap('viridis')
+    norm = plt.Normalize(0, N_Gen-1)
+
+    fig, ax = plt.subplots(figsize=(15, 7))
+    for i in range(0, N_Gen):
+        color = cmap(norm(i))
+        ax.plot(SigGen[i], color=color)
+
+    plt.show()
+    
+    return SigGen
+
+
+
+def VisReconGivenZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
     
     assert Mode in ['Origin','HH','HL','LH','LL'], '''either 'Origin', 'HH', 'HL', 'LH', and 'LL' is allowed for 'Mode' '''
 
@@ -154,8 +175,7 @@ def VisReconGivenZ (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Ge
     return SigGen, FeatGen[0], FeatGen[1], FeatGen[2], FeatGen[3]
 
     
-    
-def VisReconGivenFreq (FeatGenModel,  ReconModel, LatDim, FcCommFix, FcEachFix,  Mode='Origin', N_Gen=300, MinZval = -3., MaxZval = 3., CutLower=-0.1, CutUpper = 0.1):
+def VisReconGivenFC_ZA (FeatGenModel,  ReconModel, LatDim, FcCommFix, FcEachFix,  Mode='Origin', N_Gen=300, MinZval = -3., MaxZval = 3., CutLower=-0.1, CutUpper = 0.1):
     
     zVal = np.linspace(MinZval, MaxZval, N_Gen*LatDim).reshape(N_Gen, -1)
 
