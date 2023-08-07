@@ -9,7 +9,7 @@ from tensorflow.keras import Model
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj
 
 
        
@@ -74,7 +74,7 @@ class Evaluator ():
         Results = {next(Cnt):{ TrackZLOC[i] : TrackZs[i] for i in range(NSelZ)} 
                     for TrackZLOC,TrackZs, TrackMetrics 
                     in zip(SubTrackerCandZ['TrackZLOC'], SubTrackerCandZ['TrackZs'], SubTrackerCandZ['TrackMetrics'])
-                    if TrackMetrics < MetricCut }
+                    if TrackMetrics < self.MetricCut }
         return Results
     
     
@@ -103,10 +103,11 @@ class Evaluator ():
     
     
     ### ------------------- Selecting post-sampled Z values for generating plausible signals ------------------- ###
-    def SelPostSamp_Zj (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCandZ=None, NSelZ=None, InterDataSave=True ):
+    def SelPostSamp_Zj (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCandZ=None, NSelZ=None, SavePath=None ):
         
         ## Optional parameters
         # MetricCut: The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut
+        self.MetricCut = MetricCut
 
         # Setting arguments
         BestZsMetrics = self.BestZsMetrics if BestZsMetrics is None else BestZsMetrics
@@ -114,7 +115,7 @@ class Evaluator ():
         NSelZ = self.NSelZ if NSelZ is None else NSelZ
                 
         # Exploring FreqIDs available for signal generation  
-        self.CandFreqIDs = [item[0] for item in BestZsMetrics.items() if (item[1][0] != np.inf) and (item[1][0] < MetricCut)]
+        self.CandFreqIDs = [item[0] for item in BestZsMetrics.items() if (item[1][0] != np.inf) and (item[1][0] < self.MetricCut)]
 
         # Selecting nested Z-LOC and Z values
         self.NestedZFix = {FreqID : self.SubNestedZFix(TrackerCandZ[FreqID], ) for FreqID in self.CandFreqIDs}
@@ -123,7 +124,7 @@ class Evaluator ():
         PostSamp_Zj = []
         for SubZFix in self.NestedZFix.items():
             for item in SubZFix[1].items():
-                Mask_Z = np.zeros((LatDim))
+                Mask_Z = np.zeros((self.LatDim))
                 Mask_Z[list(item[1].keys())] =  list(item[1].values())
                 PostSamp_Zj.append(Mask_Z[None])
         self.PostSamp_Zj = np.concatenate(PostSamp_Zj, axis=0)
@@ -138,8 +139,8 @@ class Evaluator ():
 
         
         # Saving intermedicate results into the hard disk
-        if InterDataSave ==True:
-            np.save('./Data/IntermediateData/PostSamp_Zj_'+str(SigType)+'_'+str(NSelZ)+'.npy', PostSamp_Zj) # Save data
+        if SavePath is not None:
+            np.save(SavePath, PostSamp_Zj) # Save data
 
         return self.PostSamp_Zj, self.NestedZFix
     
@@ -249,8 +250,8 @@ class Evaluator ():
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_FcZj':[],'I_fcPE_FaZj':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_FcZj':[],'I_fcPE_FaZj':[], 
                          'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
-            self.BestZsMetrics = {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, MaxFreq - MinFreq + 2)} 
+            self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
+            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_FcZj, self.I_fcPE_FaZj = 0,0,0,0,0,0
         
         
@@ -464,8 +465,8 @@ class Evaluator ():
             ## Result trackers
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'CMI_zPSD_ZjZ':[]}
-            self.BestZsMetrics = {i:[np.inf] for i in range(1, MaxFreq - MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, MaxFreq - MinFreq + 2)} 
+            self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
+            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
 
 
@@ -501,9 +502,9 @@ class Evaluator ():
             # Choosing GPU or CPU and generating signals 
             if self.GPU==False:
                 with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1).reshape(-1, NMiniBat, self.SigDim)
+                    Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1).reshape(-1, self.NMiniBat, self.SigDim)
             else:
-                Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1).reshape(-1, NMiniBat, self.SigDim)
+                Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1).reshape(-1, self.NMiniBat, self.SigDim)
 
 
             # Re-splitting predictions for each case
