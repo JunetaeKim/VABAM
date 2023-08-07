@@ -10,28 +10,7 @@ def ReName (layer, name):
     return Lambda(lambda x: x, name=name)(layer)
 
 
-def LogNormalDensity(LatSamp, LatMean, LogSquaScale):
-    Norm = tf.math.log(2. * tf.constant(np.pi))
-    InvSigma = tf.math.exp(-LogSquaScale)
-    MeanSampDiff = (LatSamp - LatMean)
-    return -0.5 * (MeanSampDiff * MeanSampDiff * InvSigma + LogSquaScale + Norm)
 
-
-
-def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
-    
-    HalfBatch1 = tf.nn.embedding_lookup(Vec, HalfBatchIdx1)
-    HalfBatch2 = tf.nn.embedding_lookup(Vec, HalfBatchIdx2)
-    
-    if mode=='Both':
-        return  HalfBatch1, HalfBatch2
-    elif mode=='D1':
-        return  HalfBatch1
-    elif mode=='D2':
-        return  HalfBatch2
-    
-
-    
 class Lossweight(tf.keras.layers.Layer):
     
     def __init__(self, InitVal = 0., name='Lossweight'):

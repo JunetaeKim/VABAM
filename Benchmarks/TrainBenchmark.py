@@ -15,7 +15,6 @@ from tensorflow.keras import Model
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from Benchmarks.Models.BaseModels import *
 from Utilities.Utilities import *
-from Utilities.EvaluationModules import *
 from Models.BenchmarkModels import *
 
 import warnings
