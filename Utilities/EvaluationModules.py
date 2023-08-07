@@ -47,6 +47,7 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
 
 # Permutation entropy given PSD over each generation
 def ProbPermutation(Data, Nframe=3, EpsProb = 1e-7):
+    # Data shape: (Batch_size, N_frequency, N_sample)
     
     # Generate true permutation cases
     TruePerms = np.concatenate(list(itertools.permutations(np.arange(Nframe)))).reshape(-1, Nframe)
@@ -58,6 +59,8 @@ def ProbPermutation(Data, Nframe=3, EpsProb = 1e-7):
     CountPerms = 1- (TruePerms[None,None,None] == PermsTable[:,:,:, None])
     CountPerms = 1-np.sum(CountPerms, axis=-1).astype('bool')
     CountPerms = np.sum(CountPerms, axis=(2))
+    
+    # Data shape: (Batch_size, N_frequency, N_permutation_cases)
     ProbCountPerms = CountPerms / np.sum(CountPerms, axis=-1, keepdims=True)
     
     return np.maximum(ProbCountPerms, EpsProb)    
@@ -132,7 +135,8 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
     
     
     # P(V=v)
-    P_PSPDF = FFT_PSD(AnalData, 'All')
+    # Data shape: (N_frequency)
+    P_PSPDF = FFT_PSD(AnalData, 'All', MaxFreq=MaxFreq)
 
     with trange(MASize * SimSize , leave=False) as t:
         
@@ -268,6 +272,7 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
                 '''
 
+                # Bind the samples together, generate signals through the model, and then re-split for each case
                 Set_FCs = np.concatenate([FCs,FCs,FCs,FC_Arange,FC_Rand])
                 Set_Zs = np.concatenate([Samp_Z,Samp_Zj,Samp_ZjRPT,Samp_ZjRPT,Samp_ZjRPT])
                 Set_Pred = GenModel.predict([Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs], batch_size=PredBatchSize, verbose=1).reshape(-1, NMiniBat, NGen, AnalData.shape[-1])
@@ -276,19 +281,22 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
 
 
                 # Cumulative Power Spectral Density (PSD) over each frequency
-                Q_PSPDF_ZFc = FFT_PSD(SigGen_ZFc, 'Sample')
-                Q_PSPDF_ZjFc = FFT_PSD(SigGen_ZjFc, 'Sample')
+                # Data shape: (Batch_size, N_frequency)
+                Q_PSPDF_ZFc = FFT_PSD(SigGen_ZFc, 'Sample', MaxFreq=MaxFreq)
+                Q_PSPDF_ZjFc = FFT_PSD(SigGen_ZjFc, 'Sample', MaxFreq=MaxFreq)
 
-                Q_PSPDF_ZjFcRPT = FFT_PSD(SigGen_ZjFcRPT, 'Sample')
-                Q_PSPDF_ZjFcAr = FFT_PSD(SigGen_ZjFcAr, 'Sample')
-                Q_PSPDF_ZjFcMu = FFT_PSD(SigGen_ZjFcMu, 'Sample')
+                Q_PSPDF_ZjFcRPT = FFT_PSD(SigGen_ZjFcRPT, 'Sample', MaxFreq=MaxFreq)
+                Q_PSPDF_ZjFcAr = FFT_PSD(SigGen_ZjFcAr, 'Sample', MaxFreq=MaxFreq)
+                Q_PSPDF_ZjFcMu = FFT_PSD(SigGen_ZjFcMu, 'Sample', MaxFreq=MaxFreq)
 
-                SubPSPDF_ZjFcRPT = FFT_PSD(SigGen_ZjFcRPT, 'None').transpose(0,2,1)
-                SubPSPDF_ZjFcMu = FFT_PSD(SigGen_ZjFcMu, 'None').transpose(0,2,1)
-                SubPSPDF_ZjFcAr = FFT_PSD(SigGen_ZjFcAr, 'None').transpose(0,2,1)
+                # Data shape: (Batch_size, N_frequency, N_sample)
+                SubPSPDF_ZjFcRPT = FFT_PSD(SigGen_ZjFcRPT, 'None', MaxFreq=MaxFreq).transpose(0,2,1)
+                SubPSPDF_ZjFcMu = FFT_PSD(SigGen_ZjFcMu, 'None', MaxFreq=MaxFreq).transpose(0,2,1)
+                SubPSPDF_ZjFcAr = FFT_PSD(SigGen_ZjFcAr, 'None', MaxFreq=MaxFreq).transpose(0,2,1)
 
 
                 # Permutation Entropy given PSD over each generation
+                # Data shape: (Batch_size, N_frequency, N_permutation_cases)
                 Q_FcPSPDF_ZjFcRPT = ProbPermutation(SubPSPDF_ZjFcRPT, Nframe=3, EpsProb = 1e-7)
                 Q_FcPSPDF_ZjFcMu = ProbPermutation(SubPSPDF_ZjFcMu, Nframe=3, EpsProb = 1e-7)
                 Q_FcPSPDF_ZjFcAr = ProbPermutation(SubPSPDF_ZjFcAr, Nframe=3, EpsProb = 1e-7)
@@ -297,10 +305,10 @@ def CondMI (AnalData, SampModel, GenModel, FC_ArangeInp, SimSize = 1, NMiniBat=1
                 # Conditional mutual information; zD and fcE stand for z-wise power spectral density and fc-wise permutation entropy, respectively.
                 I_zD_Z_ = MeanKLD(Q_PSPDF_ZFc, P_PSPDF[None] ) # I(zD;Z)
                 I_zD_ZjZ_ = MeanKLD(Q_PSPDF_ZjFc, Q_PSPDF_ZFc )  # I(zD;Zj|Z)
-                I_zD_ZjFm_ =  MeanKLD(Q_PSPDF_ZjFcMu, P_PSPDF[None] ) # I(zD;Zj)
-                I_zD_FaZj_ = MeanKLD(Q_PSPDF_ZjFcAr, Q_PSPDF_ZjFcMu ) # I(zD;FC|Zj)
-                I_fcE_FmZj_ = MeanKLD(Q_FcPSPDF_ZjFcMu, Q_FcPSPDF_ZjFcRPT) # I(fcE;Zj)
-                I_fcE_FaZj_ = MeanKLD(Q_FcPSPDF_ZjFcAr, Q_FcPSPDF_ZjFcMu) # I(fcE;FC|Zj)
+                I_zD_ZjFm_ =  MeanKLD(Q_PSPDF_ZjFcMu, P_PSPDF[None] ) # I(zD;Zj) 
+                I_zD_FaZj_ = MeanKLD(Q_PSPDF_ZjFcAr, Q_PSPDF_ZjFcMu ) # I(zD;FC|Zj) 
+                I_fcE_FmZj_ = MeanKLD(Q_FcPSPDF_ZjFcMu, Q_FcPSPDF_ZjFcRPT) # I(fcE;Zj)  
+                I_fcE_FaZj_ = MeanKLD(Q_FcPSPDF_ZjFcAr, Q_FcPSPDF_ZjFcMu) # I(fcE;FC|Zj) 
 
 
                 print('I_zD_Z :', I_zD_Z_)
