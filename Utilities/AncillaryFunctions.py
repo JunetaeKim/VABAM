@@ -102,13 +102,14 @@ def Sampler (Data, SampModel,BatchSize=100, GPU=True):
 
 
 
-def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, SampZType='GaussRptA'):
+def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, SampZType='GaussRptA', SecDataType=None, ReparaStdZj=1.):
     
     '''
     Sampling Samp_Z 
 
     - Shape of UniqSamp_Z: (NMiniBat, LatDim)
-    - UniqSamp_Z ~ N(Zμ|y, σ) for Type =='Model'
+    - UniqSamp_Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) for Type =='Model'
+    - UniqSamp_Z ~ N(Zμ|y, cond, σ) for Type =='Model' and when there are ancillary (i.e., Conditional VAE) data inputs 
     - RandSamp_Z ~ N(0, ReparaStdZj) for Type =='Gauss'
 
     - Samp_Z is a 3D tensor expanded by repeating the first axis (i.e., 0) of UniqSamp_Z or RandSamp_Z by NGen times.
@@ -117,19 +118,26 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
     - ModelRptA: The predicted values are repeated NGen times after the prediction. 
                  It is strongly recommended in cases where there are variations in the ancillary data inputs.  
     - ModelRptB: The data is repeated NGen times before the prediction.
-                 It is strongly recommended when there is no ancillary data inputs or variations in the ancillary data.
+                 It is strongly recommended when there is no ancillary data inputs or variations in the ancillary data.     
+    - Gauss:     The data is sampled NMiniBat*NGen times. 
+                 It is recommended to detect the influence of changes in the value of j on the performance metrics, 
+                 when the same ancillary data input is repeated NGen times (i.e., for Conditional VAE).
     - GaussRptA: The data sampled from the Gaussian distribution is repeated NGen times.
                  It is recommended for both cases: when there are no ancillary data inputs and when there is ancillary data input.
                   
     '''
     
     # Sampling Samp_Z
-    if SampZType =='ModelRptA': # Z ~ N(Zμ|y, σ);
+    if SampZType =='ModelRptA': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) 
         UniqSamp_Z = Sampler(Data, SampModel, GPU=GPU)
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
     
-    elif SampZType =='ModelRptB': # Z ~ N(Zμ|y, σ)
-        DataRpt = np.repeat(Data, NGen, axis=0)
+    elif SampZType =='ModelRptB': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ)
+        
+        if SecDataType == 'PSC': # For the CondVAE
+            DataRpt = [np.repeat(arr, NGen, axis=0) for arr in Data]
+        else:
+            DataRpt = np.repeat(Data, NGen, axis=0)
         Samp_Z = Sampler(DataRpt, SampModel, GPU=GPU)
         
     elif SampZType =='Gauss': # Z ~ N(0, ReparaStdZj)

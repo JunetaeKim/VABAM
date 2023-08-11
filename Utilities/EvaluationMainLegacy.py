@@ -81,32 +81,23 @@ class Evaluator ():
     
     ### ------------------------------ Conducting task iteration ------------------------------ ###
     def Iteration (self, TaskLogic):
-
+        
         # Just functional code for setting the initial position of the progress bar 
         self.StartBarPoint = self.TotalIterSize*(self.iter/self.TotalIterSize) 
         with trange(self.iter, self.TotalIterSize , initial=self.StartBarPoint, leave=False) as t:
 
             for sim in range(self.sim, self.SimSize):
                 self.sim = sim
-
-                # Check the types of ancillary data fed into the sampler model and define the pipeline accordingly.
-                if self.SecDataType == 'PSC' : 
-                    SplitData = [np.array_split(sub, self.SubIterSize) for sub in self.AnalData]   
-
-                else: # For models with a single input such as VAE and TCVAE.
-                    SplitData = np.array_split(self.AnalData, self.SubIterSize)    
-
+                SplitData = np.array_split(self.AnalData, self.SubIterSize)
+                
                 for mini in range(self.mini, self.SubIterSize):
                     self.mini = mini
                     self.iter += 1
                     print()
-
+                    
                     # Core part; the task logic as the function
-                    if self.SecDataType  == 'PSC' : 
-                        TaskLogic([subs[mini] for subs in SplitData])
-                    else:
-                        TaskLogic(SplitData[mini])
-
+                    TaskLogic(SplitData[mini])
+                    
                     t.update(1)
     
     
@@ -156,7 +147,7 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, RepeatSize=1, PostSamp_Zj=None, FcLimit=None, PlotDist=True, SecDataType=None):
+    def KLD_TrueGen (self, RepeatSize=1, PostSamp_Zj=None, SecDataType=None,FcLimit=None, PlotDist=True):
     
         # GPU vs CPU
         def CompResource (Data): 
@@ -190,32 +181,20 @@ class Evaluator ():
         
         if SecDataType == 'FCR': # FC random
             Ext_Samp_FCs = np.random.rand(NSamp, NVar, self.NFCs) * self.FcLimit
-            Ext_Samp_FCs = np.reshape(Ext_Samp_FCs, (-1, self.NFCs))
-            Data = [Ext_Samp_FCs[:, :2], Ext_Samp_FCs[:, 2:], Ext_Samp_Zj]
-            
         elif SecDataType == 'FCA': # FC arrange
             Ext_Samp_FCs = np.tile(np.linspace(1e-7, self.FcLimit, RepeatSize)[None, :, None], (NSamp, 1, self.NFCs))
+
+
+        if SecDataType is not None:
             Ext_Samp_FCs = np.reshape(Ext_Samp_FCs, (-1, self.NFCs))
-            Data = [Ext_Samp_FCs[:, :2], Ext_Samp_FCs[:, 2:], Ext_Samp_Zj]
-            
-        elif SecDataType == 'PSC': # PSC (power spectral density as conditional inputs)
-            RandIdx = np.random.permutation(len(Ext_Samp_Zj))
-            Data = [Ext_Samp_Zj, self.AnalData[1][RandIdx]]
-        
+            self.GenSamp = self.GenModel.predict([Ext_Samp_FCs[:, :2], Ext_Samp_FCs[:, 2:], Ext_Samp_Zj], batch_size=self.GenBatchSize, verbose=1)
         else:
-            Data = Ext_Samp_Zj
-
-
-        self.GenSamp = CompResource (Data)
+            self.GenSamp = CompResource (Ext_Samp_Zj)
             
 
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = 1, MaxFreq = 51)
-        if SecDataType == 'PSC': # PSC (power spectral density as conditional inputs)
-            PSDTrueData =  FFT_PSD(self.AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
-        else:
-            PSDTrueData =  FFT_PSD(self.AnalData, 'All', MinFreq = 1, MaxFreq = 51)
-            
+        PSDTrueData =  FFT_PSD(self.AnalData, 'All', MinFreq = 1, MaxFreq = 51)
         self.KldPSD_GenTrue = MeanKLD(PSDGenSamp, PSDTrueData)
         self.KldPSD_TrueGen  = MeanKLD(PSDTrueData, PSDGenSamp)
         self.MeanKld_GTTG = (self.KldPSD_GenTrue + self.KldPSD_TrueGen) / 2
@@ -236,19 +215,16 @@ class Evaluator ():
         
     
     
-    
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalData, SampModel, GenModel, FC_ArangeInp, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model', SecDataType='FCA'):
+    def Eval_ZFC (self, AnalData, SampModel, GenModel, FC_ArangeInp, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model'):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.FC_ArangeInp = FC_ArangeInp     # The 2D matrix (N_sample, NFCs) containing FCs values that the user creates and inputs directly.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'PSC' for power spectral density as conditional inputs.
         
         
         ## Optional parameters with default values ##
@@ -295,7 +271,7 @@ class Evaluator ():
 
             # Sampling Samp_Z 
             self.Samp_Z = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType, ReparaStdZj=self.ReparaStdZj)
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType)
 
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
@@ -306,7 +282,7 @@ class Evaluator ():
 
 
             # Sampling FCs
-            ## Shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
+            ## Shape of FCs: (NMiniBat*NGen, LatDim) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
             self.FCs = np.random.rand(self.NMiniBat * self.NGen, self.NFCs) * FcLimit
 
             # Generating FCμ: 
@@ -458,20 +434,16 @@ class Evaluator ():
         self.AggResDic['CMI_fcPE_FaFc'].append(self.CMI_fcPE_FaFc)
 
         
-        
-        
     
     
     ### -------------------------- Evaluating the performance of the model using only Z inputs  -------------------------- ###
-    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='Model', SecDataType=None):
+    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='Model'):
 
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'PSC' for power spectral density as conditional inputs.
-        
+
 
         ## Optional parameters with default values ##
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
@@ -514,7 +486,7 @@ class Evaluator ():
 
             # Sampling Samp_Z 
             self.Samp_Z = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType, ReparaStdZj=self.ReparaStdZj)
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType)
 
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
@@ -523,15 +495,17 @@ class Evaluator ():
 
 
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
+
             ## Binding the samples together, generate signals through the model 
             Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
-            
+
             # Choosing GPU or CPU and generating signals 
             if self.GPU==False:
                 with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1)
+                    Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1).reshape(-1, self.NMiniBat, self.SigDim)
             else:
-                Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1)
+                Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1).reshape(-1, self.NMiniBat, self.SigDim)
+
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
@@ -601,160 +575,4 @@ class Evaluator ():
         
         
         
-        
-        
-        
-
-    ### -------------------------- Evaluating the performance of the model using both Z and PSE -------------------------- ###
-    def Eval_Z_PSE (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model', SecDataType=None):
-        
-        ## Required parameters
-        self.AnalData = AnalData             # The data to be used for analysis.
-        self.SampModel = SampModel           # The model that samples Zs.
-        self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'PSC' for power spectral density as conditional inputs.
-        
-        
-        ## Optional parameters with default values ##
-        # WindowSize: The window size when calculating permutation entropy (default: 3)
-        # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
-        self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
-        self.FcLimit = FcLimit # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
-            
-        ## Intermediate variables
-        self.Ndata = len(AnalData[0]) # The dimension size of the data.
-        self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
-        self.SigDim = AnalData[0].shape[-1] # The dimension (i.e., length) size of the raw signal.
-        self.SubIterSize = self.Ndata//self.NMiniBat
-        self.TotalIterSize = self.SubIterSize * self.SimSize
-        
-        
-        # Functional trackers
-        if Continue == False or not hasattr(self, 'iter'):
-            self.sim, self.mini, self.iter = 0, 0, 0
-        
-            ## Result trackers
-            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
-            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'CMI_zPSD_ZjZ':[]}
-            self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
-            self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
-        
-        
-
-
-        ### ------------------------------------------------ Task logics ------------------------------------------------ ###
-        
-        # P(V=v)
-        ## Data shape: (N_frequency)
-        self.P_PSPDF = FFT_PSD(self.AnalData[0], 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-        
-        
-        def TaskLogic(SubData):
-            
-            
-
-            ### ------------------------------------------------ Sampling ------------------------------------------------ ###
-            # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
-            self.NMiniBat = len(SubData[0]) 
-
-            # Sampling Samp_Z 
-            self.Samp_Z = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType, SecDataType=self.SecDataType)
-
-            # Selecting Samp_Zj from Samp_Z 
-            ## For Samp_Zj, j is selected randomly across both the j and generation axes.
-            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, Axis=1)
-
-
-            # Setting PSE 
-            ## Shape of PSE: (NMiniBat*NGen, PSEDim) 
-            self.PSERpt = np.repeat(SubData[1], NGen, axis=0)
-
-
-
-            ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
-            '''
-            - To maximize the efficiency of GPU utilization, 
-              we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, NFCs) for FCs, respectively, 
-              transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, NFCs). 
-              After the computation, we then reverted them back to their original dimensions.
-
-            '''
-            ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
-            Set_PSERpt = np.concatenate([self.PSERpt,  self.PSERpt])
-
-            # Choosing GPU or CPU and generating signals 
-            if self.GPU==False:
-                with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict( [Set_Zs, Set_PSERpt], batch_size=self.GenBatchSize, verbose=1)
-            else:
-                Set_Pred = self.GenModel.predict( [Set_Zs, Set_PSERpt], batch_size=self.GenBatchSize, verbose=1)
-
-            # Re-splitting predictions for each case
-            Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.SigGen_Z, self.SigGen_Zj = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 2)]  
-
-
-
-            ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Return shape: (Batch_size, N_frequency)
-            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-
-
-
-            ### ---------------------------------------- Conditional mutual information ---------------------------------------- ###
-            # zPSD stands for z-wise power spectral density.
-            I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
-            I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
-
-
-
-            print('I_zPSD_Z :', I_zPSD_Z_)
-            self.SubResDic['I_zPSD_Z'].append(I_zPSD_Z_)
-            self.I_zPSD_Z += I_zPSD_Z_
-
-            print('I_zPSD_ZjZ :', I_zPSD_ZjZ_)
-            self.SubResDic['I_zPSD_ZjZ'].append(I_zPSD_ZjZ_)
-            self.I_zPSD_ZjZ += I_zPSD_ZjZ_
-
-
-
-            ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            self.H_zPSD_Zj = -np.sum(self.Q_PSPDF_Zj * np.log(self.Q_PSPDF_Zj), axis=-1)
-
-            # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
-            # Return shape: (Batch_size, N_sample, N_frequency)
-            self.Q_PSPDF_Zj_Local = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-            # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            # Return shape: (Batch_size, N_sample)
-            Max_Freq_Label = np.argmax(self.Q_PSPDF_Zj_Local, axis=-1) + 1
-
-            # Return shape: (Batch_size, )
-            ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
-            self.LocCandZs ( ModeMax_Freq, self.H_zPSD_Zj, self.Samp_Zj)
-
-            # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackZLOC': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZLOC']), 
-                                   'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
-                                   'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackZLOC']) > 0} 
-
-
-        # Conducting the task iteration
-        self.Iteration(TaskLogic)
-
-
-        # CMI(V;Zj, Z)
-        self.I_zPSD_Z /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
-        self.I_zPSD_ZjZ /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_ZjZ'].append(self.I_zPSD_ZjZ)
-        self.CMI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
-        self.AggResDic['CMI_zPSD_ZjZ'].append(self.CMI_zPSD_ZjZ)
 
