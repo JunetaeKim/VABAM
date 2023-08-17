@@ -90,7 +90,7 @@ class Evaluator ():
                 self.sim = sim
 
                 # Check the types of ancillary data fed into the sampler model and define the pipeline accordingly.
-                if self.SecDataType == 'PSC' : 
+                if self.SecDataType == 'CON' : 
                     SplitData = [np.array_split(sub, self.SubIterSize) for sub in self.AnalData]   
 
                 else: # For models with a single input such as VAE and TCVAE.
@@ -102,7 +102,7 @@ class Evaluator ():
                     print()
 
                     # Core part; the task logic as the function
-                    if self.SecDataType  == 'PSC' : 
+                    if self.SecDataType  == 'CON' : 
                         TaskLogic([subs[mini] for subs in SplitData])
                     else:
                         TaskLogic(SplitData[mini])
@@ -174,7 +174,7 @@ class Evaluator ():
         # RepeatSize: The number of iterations to repetitively generate identical PostSamp_Zj; 
                     # this is to observe variations in other inputs such as FCs while PostSamp_Zj remains constant.
         # SecDataType: Secondary data type; Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                    # and 'PSC' for power spectral density as conditional inputs.
+                    # and 'CON' for conditional inputs such as power spectral density.
 
     
         # Setting arguments
@@ -198,7 +198,7 @@ class Evaluator ():
             Ext_Samp_FCs = np.reshape(Ext_Samp_FCs, (-1, self.NFCs))
             Data = [Ext_Samp_FCs[:, :2], Ext_Samp_FCs[:, 2:], Ext_Samp_Zj]
             
-        elif SecDataType == 'PSC': # PSC (power spectral density as conditional inputs)
+        elif SecDataType == 'CON': # Conditional inputs such as power spectral density
             RandIdx = np.random.permutation(len(Ext_Samp_Zj))
             Data = [Ext_Samp_Zj, self.AnalData[1][RandIdx]]
         
@@ -211,7 +211,7 @@ class Evaluator ():
 
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = 1, MaxFreq = 51)
-        if SecDataType == 'PSC': # PSC (power spectral density as conditional inputs)
+        if SecDataType == 'CON': # Conditional inputs such as power spectral density
             PSDTrueData =  FFT_PSD(self.AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
         else:
             PSDTrueData =  FFT_PSD(self.AnalData, 'All', MinFreq = 1, MaxFreq = 51)
@@ -248,7 +248,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.FC_ArangeInp = FC_ArangeInp     # The 2D matrix (N_sample, NFCs) containing FCs values that the user creates and inputs directly.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'PSC' for power spectral density as conditional inputs.
+                                             # and 'CON' for conditional inputs such as power spectral density.
         
         
         ## Optional parameters with default values ##
@@ -470,7 +470,7 @@ class Evaluator ():
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'PSC' for power spectral density as conditional inputs.
+                                             # and 'CON' for conditional inputs such as power spectral density.
         
 
         ## Optional parameters with default values ##
@@ -605,15 +605,15 @@ class Evaluator ():
         
         
 
-    ### -------------------------- Evaluating the performance of the model using both Z and PSE -------------------------- ###
-    def Eval_Z_PSE (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model', SecDataType=None):
+    ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
+    def Eval_Z_CON (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model', SecDataType=None):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'PSC' for power spectral density as conditional inputs.
+                                             # and 'CON' for conditional inputs such as power spectral density.
         
         
         ## Optional parameters with default values ##
@@ -668,9 +668,9 @@ class Evaluator ():
             self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, Axis=1)
 
 
-            # Setting PSE 
-            ## Shape of PSE: (NMiniBat*NGen, PSEDim) 
-            self.PSERpt = np.repeat(SubData[1], NGen, axis=0)
+            # Setting CON 
+            ## Shape of CON: (NMiniBat*NGen, CONDim) 
+            self.CONRpt = np.repeat(SubData[1], NGen, axis=0)
 
 
 
@@ -684,14 +684,14 @@ class Evaluator ():
             '''
             ## Binding the samples together, generate signals through the model 
             Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
-            Set_PSERpt = np.concatenate([self.PSERpt,  self.PSERpt])
+            Set_CONRpt = np.concatenate([self.CONRpt,  self.CONRpt])
 
             # Choosing GPU or CPU and generating signals 
             if self.GPU==False:
                 with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict( [Set_Zs, Set_PSERpt], batch_size=self.GenBatchSize, verbose=1)
+                    Set_Pred = self.GenModel.predict( [Set_Zs, Set_CONRpt], batch_size=self.GenBatchSize, verbose=1)
             else:
-                Set_Pred = self.GenModel.predict( [Set_Zs, Set_PSERpt], batch_size=self.GenBatchSize, verbose=1)
+                Set_Pred = self.GenModel.predict( [Set_Zs, Set_CONRpt], batch_size=self.GenBatchSize, verbose=1)
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
