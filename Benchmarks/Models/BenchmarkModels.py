@@ -69,15 +69,11 @@ def BaseVAE (SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Rep
 
 
 
-def ConVAE (TrData, ValData,  SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
+def ConVAE (SigDim, CondDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    ## Identifying conditions based on cumulative Power Spectral Entropy (PSE) over each frequency
-    Tr_Cond = FFT_PSD(TrData, 'None')[:, 0]
-    Val_Cond = FFT_PSD(ValData, 'None')[:, 0]
-    
-    EncModel = Encoder(SigDim=SigDim,CondDim=Tr_Cond.shape[-1], SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
-    ReconModel = Decoder(SigDim=SigDim,CondDim=Tr_Cond.shape[-1], SlidingSize = SlidingSize, LatDim= LatDim)
+    EncModel = Encoder(SigDim=SigDim,CondDim=CondDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
+    ReconModel = Decoder(SigDim=SigDim,CondDim=CondDim, SlidingSize = SlidingSize, LatDim= LatDim)
 
     ## Model core parts
     ReconOut =ReconModel([EncModel.output, EncModel.input[-1]])
@@ -115,7 +111,7 @@ def ConVAE (TrData, ValData,  SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, R
     CVAEModel.summary()
 
    
-    return CVAEModel, Tr_Cond, Val_Cond
+    return CVAEModel
 
 
 

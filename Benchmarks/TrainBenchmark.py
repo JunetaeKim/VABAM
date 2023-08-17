@@ -112,14 +112,18 @@ if __name__ == "__main__":
         TrInp, ValInp = TrData, ValData
     
     elif 'FACVAE' in ConfigName:
-        BenchModel = FACVAE( SigDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
+        BenchModel = FACVAE(SigDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
         TrInp, ValInp = TrData, ValData
     
     elif 'ConVAE' in ConfigName:
-        BenchModel, Tr_Cond, Val_Cond = ConVAE(TrData, ValData,  SigDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
-        TrInp = [TrData, Tr_Cond]
-        ValInp = [ValData, Val_Cond]
-        
+        ## Identifying conditions based on cumulative Power Spectral Entropy (PSE) over each frequency
+        Tr_Cond = FFT_PSD(TrData, 'None')[:, 0]
+        Val_Cond = FFT_PSD(ValData, 'None')[:, 0]
+        TrInp, ValInp = [TrData, Tr_Cond], [ValData, Val_Cond]
+    
+        CondDim = Tr_Cond.shape[-1]
+        BenchModel= ConVAE(SigDim, CondDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
+         
     else:
         assert False, "Please verify if the model name is right or not."    
     
