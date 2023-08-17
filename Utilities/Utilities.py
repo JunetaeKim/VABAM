@@ -10,6 +10,17 @@ def ReName (layer, name):
     return Lambda(lambda x: x, name=name)(layer)
 
 
+def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
+
+    if GPU==False:
+        with tf.device('/CPU:0'):
+            PredVal = PredModel.predict(Data, batch_size=BatchSize, verbose=1)
+    else:
+        PredVal = PredModel.predict(Data, batch_size=BatchSize, verbose=1)
+
+    return PredVal
+
+
 
 class Lossweight(tf.keras.layers.Layer):
     
@@ -73,6 +84,7 @@ class Anneal(tf.keras.callbacks.Callback):
             
           
 
+        
 class RelLossWeight(tf.keras.callbacks.Callback):
     def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True, SavePath=None, CheckPoint=False):
             
@@ -186,21 +198,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             print('------------------------------------')
             print()
             
-         
-        
-class RandFCs(tf.keras.layers.Layer):
-    
-    def __init__(self, ):
-        super(RandFCs, self).__init__(name='FCs')
-        pass
-    
-    def build(self, input_shape):
-        self.GenVec = tf.Variable(tf.random.uniform(shape=(1,6)), trainable=False)
-    
-    def call(self, input):
-        return tf.tile(self.GenVec , (tf.shape(input)[0],1))
-    
-    
+  
     
 def log_importance_weight_matrix(batch_size, dataset_size):
     """

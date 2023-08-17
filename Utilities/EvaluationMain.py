@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj
-
+from Utilities.Utilities import CompResource
 
        
 class Evaluator ():
@@ -158,18 +158,6 @@ class Evaluator ():
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
     def KLD_TrueGen (self, RepeatSize=1, PostSamp_Zj=None, FcLimit=None, PlotDist=True, SecDataType=None):
     
-        # GPU vs CPU
-        def CompResource (Data): 
-
-            if self.GPU==False:
-                with tf.device('/CPU:0'):
-                    PredVal = self.GenModel.predict(Data, batch_size=self.GenBatchSize, verbose=1)
-            else:
-                PredVal = self.GenModel.predict(Data, batch_size=self.GenBatchSize, verbose=1)
-
-            return PredVal
-
-
         ## Optional parameters
         # RepeatSize: The number of iterations to repetitively generate identical PostSamp_Zj; 
                     # this is to observe variations in other inputs such as FCs while PostSamp_Zj remains constant.
@@ -207,7 +195,7 @@ class Evaluator ():
             Data = Ext_Samp_Zj
 
 
-        self.GenSamp = CompResource (Data)
+        self.GenSamp = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
             
 
         # Calculating the KLD between the PSD of the true signals and the generated signals    
@@ -331,14 +319,11 @@ class Evaluator ():
             ## Binding the samples together, generate signals through the model 
             Set_FCs = np.concatenate([self.FCmu,   self.FCmu,     self.FCs,         self.FC_Arange])
             Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_Zj,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
+            Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
             # Choosing GPU or CPU and generating signals
-            if self.GPU==False:
-                with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict([Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs], batch_size=self.GenBatchSize, verbose=1)                            
-            else:
-                Set_Pred = self.GenModel.predict([Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs], batch_size=self.GenBatchSize, verbose=1)
+            Set_Pred = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
 
 
             # Re-splitting predictions for each case
@@ -529,12 +514,8 @@ class Evaluator ():
             ## Binding the samples together, generate signals through the model 
             Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
             
-            # Choosing GPU or CPU and generating signals 
-            if self.GPU==False:
-                with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1)
-            else:
-                Set_Pred = self.GenModel.predict( Set_Zs, batch_size=self.GenBatchSize, verbose=1)
+            # Choosing GPU or CPU and generating signals
+            Set_Pred  = CompResource (self.GenModel, Set_Zs, BatchSize=self.GenBatchSize, GPU=self.GPU)
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
@@ -689,13 +670,10 @@ class Evaluator ():
             ## Binding the samples together, generate signals through the model 
             Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
             Set_CONRpt = np.concatenate([self.CONRpt,  self.CONRpt])
-
-            # Choosing GPU or CPU and generating signals 
-            if self.GPU==False:
-                with tf.device('/CPU:0'):
-                    Set_Pred = self.GenModel.predict( [Set_Zs, Set_CONRpt], batch_size=self.GenBatchSize, verbose=1)
-            else:
-                Set_Pred = self.GenModel.predict( [Set_Zs, Set_CONRpt], batch_size=self.GenBatchSize, verbose=1)
+            Data = [Set_Zs, Set_CONRpt]
+            
+            # Choosing GPU or CPU and generating signals
+            Set_Pred  = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
