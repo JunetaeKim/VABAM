@@ -249,6 +249,7 @@ class Evaluator ():
         self.FC_ArangeInp = FC_ArangeInp     # The 2D matrix (N_sample, NFCs) containing FCs values that the user creates and inputs directly.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
+        assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
         
         ## Optional parameters with default values ##
@@ -471,6 +472,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
+        assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
 
         ## Optional parameters with default values ##
@@ -614,6 +616,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
+        assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
         
         ## Optional parameters with default values ##

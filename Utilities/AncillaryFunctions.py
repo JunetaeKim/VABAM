@@ -126,6 +126,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
                  It is recommended for both cases: when there are no ancillary data inputs and when there is ancillary data input.
                   
     '''
+    assert SampZType in ['ModelRptA','ModelRptB','Gauss', 'GaussRptA'], "Please verify the value of 'SampZType'. Only 'ModelRptA','ModelRptB','Gauss', 'GaussRptA' are valid."
     
     # Sampling Samp_Z
     if SampZType =='ModelRptA': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) 
