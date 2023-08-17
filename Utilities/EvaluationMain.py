@@ -229,24 +229,26 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalData, SampModel, GenModel, FC_ArangeInp, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model', SecDataType='FCA'):
+    def Eval_ZFC (self, AnalData, SampModel, GenModel, FC_ArangeInp, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='ModelRptA',  SecDataType='FCA'):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.FC_ArangeInp = FC_ArangeInp     # The 2D matrix (N_sample, NFCs) containing FCs values that the user creates and inputs directly.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
+        
         assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
         
         ## Optional parameters with default values ##
         # WindowSize: The window size when calculating permutation entropy (default: 3)
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
-        self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
-        self.FcLimit = FcLimit # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
-            
+        self.SampZType = SampZType           # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
+        self.FcLimit = FcLimit               # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
+        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
+                                             # and 'CON' for conditional inputs such as power spectral density.
+        
+        
         ## Intermediate variables
         self.Ndata = len(AnalData) # The dimension size of the data.
         self.NFCs = GenModel.get_layer('Inp_FCEach').output.shape[-1] + GenModel.get_layer('Inp_FCCommon').output.shape[-1] # The dimension size of FCs.
@@ -289,9 +291,9 @@ class Evaluator ():
 
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
-            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, Axis=1)
+            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
             ## For Samp_ZjRPT, the same j is selected in all generations within a mini-batch.
-            self.Samp_ZjRPT = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, Axis=2)
+            self.Samp_ZjRPT = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='RptBat')
 
 
 
@@ -450,7 +452,7 @@ class Evaluator ():
     
     
     ### -------------------------- Evaluating the performance of the model using only Z inputs  -------------------------- ###
-    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='Model', SecDataType=None):
+    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='ModelRptA',  SecDataType=None):
 
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
@@ -506,7 +508,7 @@ class Evaluator ():
 
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
-            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, Axis=1)
+            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
 
 
 
@@ -590,7 +592,7 @@ class Evaluator ():
         
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_Z_CON (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='Model', SecDataType=None):
+    def Eval_ZCON (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='ModelRptA', SecDataType=None):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
@@ -650,7 +652,7 @@ class Evaluator ():
 
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
-            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, Axis=1)
+            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
 
 
             # Setting CON 

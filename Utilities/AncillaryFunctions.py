@@ -152,7 +152,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
 
 
 
-def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, Axis=1):
+def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='AllRand' ):
     
     '''
      Sampling Samp_Zj 
@@ -168,12 +168,12 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, Axis=1):
     '''
     
     # Masking for selecting Samp_Zj from Samp_Z 
-    if Axis ==1: #It is strongly recommended when there is no ancillary data inputs or variations in the ancillary data.
+    if ZjType =='AllRand': #It is strongly recommended when there is no ancillary data inputs or variations in the ancillary data.
         Mask_Z = np.zeros((NMiniBat*NGen, LatDim))
         for i in range(NMiniBat*NGen):
             Mask_Z[i, np.random.choice(LatDim, NSelZ,replace=False )] = 1
             
-    elif Axis ==2: # It is strongly recommended in cases where there are variations in ancillary data inputs.
+    elif ZjType =='RptBat': # It is strongly recommended in cases where there are variations in ancillary data inputs.
         Mask_Z = np.zeros((NMiniBat, NGen, LatDim))
         for i in range(NMiniBat):
             Mask_Z[i, :, np.random.choice(LatDim, NSelZ,replace=False )] = 1
