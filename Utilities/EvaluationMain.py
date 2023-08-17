@@ -292,7 +292,8 @@ class Evaluator ():
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
             self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
-            ## For Samp_ZjRPT, the same j is selected in all generations within a mini-batch.
+            
+            ## For Samp_ZjRPT, the same j is selected NGen times in all generations within a mini-batch.
             self.Samp_ZjRPT = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='RptBat')
 
 
