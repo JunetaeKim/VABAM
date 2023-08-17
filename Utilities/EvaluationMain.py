@@ -179,6 +179,7 @@ class Evaluator ():
     
         # Setting arguments
         PostSamp_Zj = self.PostSamp_Zj if PostSamp_Zj is None else PostSamp_Zj
+        SecDataType = self.SecDataType if SecDataType is None else SecDataType
         if FcLimit is not None:
             FcLimit = self.FcLimit if FcLimit is None else FcLimit
 
