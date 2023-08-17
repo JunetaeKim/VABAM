@@ -263,12 +263,12 @@ class Evaluator ():
             self.sim, self.mini, self.iter = 0, 0, 0
         
             ## Result trackers
-            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_FcZj':[],'I_fcPE_FaZj':[]}
-            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_FcZj':[],'I_fcPE_FaZj':[], 
+            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[]}
+            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[], 
                          'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
-            self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_FcZj, self.I_fcPE_FaZj = 0,0,0,0,0,0
+            self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_ZjFc, self.I_fcPE_FaZj = 0,0,0,0,0,0
         
         
         
@@ -363,7 +363,7 @@ class Evaluator ():
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
             I_zPSD_ZjFc_ =  MeanKLD(self.Q_PSPDF_ZjRptFC, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_FaZj_ = MeanKLD(self.Q_PSPDF_ZjRptFCar, self.Q_PSPDF_ZjRptFC ) # I(zPSD;FC|Zj)
-            I_fcPE_FcZj_ = MeanKLD(self.Q_PEPDF_ZjRptFC, self.Q_PEPDF_Batch) # I(fcPE;Zj)
+            I_fcPE_ZjFc_ = MeanKLD(self.Q_PEPDF_ZjRptFC, self.Q_PEPDF_Batch) # I(fcPE;Zj)
             I_fcPE_FaZj_ = MeanKLD(self.Q_PEPDF_ZjRptFCar, self.Q_PEPDF_ZjRptFC) # I(fcPE;FC|Zj)
 
 
@@ -383,9 +383,9 @@ class Evaluator ():
             self.SubResDic['I_zPSD_FaZj'].append(I_zPSD_FaZj_)
             self.I_zPSD_FaZj += I_zPSD_FaZj_
 
-            print('I_fcPE_FcZj :', I_fcPE_FcZj_)
-            self.SubResDic['I_fcPE_FcZj'].append(I_fcPE_FcZj_)
-            self.I_fcPE_FcZj += I_fcPE_FcZj_
+            print('I_fcPE_ZjFc :', I_fcPE_ZjFc_)
+            self.SubResDic['I_fcPE_ZjFc'].append(I_fcPE_ZjFc_)
+            self.I_fcPE_ZjFc += I_fcPE_ZjFc_
 
             print('I_fcPE_FaZj :', I_fcPE_FaZj_)
             self.SubResDic['I_fcPE_FaZj'].append(I_fcPE_FaZj_)
@@ -439,11 +439,11 @@ class Evaluator ():
         self.AggResDic['CMI_zPSD_FcZj'].append(self.CMI_zPSD_FcZj)
 
         # CMI(VE;FC,Zj)
-        self.I_fcPE_FcZj /= (self.TotalIterSize)
-        self.AggResDic['I_fcPE_FcZj'].append(self.I_fcPE_FcZj)
+        self.I_fcPE_ZjFc /= (self.TotalIterSize)
+        self.AggResDic['I_fcPE_ZjFc'].append(self.I_fcPE_ZjFc)
         self.I_fcPE_FaZj /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_FaZj'].append(self.I_fcPE_FaZj)
-        self.CMI_fcPE_FaFc = self.I_fcPE_FcZj + self.I_fcPE_FaZj    
+        self.CMI_fcPE_FaFc = self.I_fcPE_ZjFc + self.I_fcPE_FaZj    
         self.AggResDic['CMI_fcPE_FaFc'].append(self.CMI_fcPE_FaFc)
 
         
