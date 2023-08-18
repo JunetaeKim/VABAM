@@ -331,6 +331,7 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
+            # Shape of each generation: NMiniBat, NGen, SigDim
             self.SigGen_Z, self.SigGen_Zj, self.SigGen_ZjRptFC, self.SigGen_ZjRptFCar = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
 
 
@@ -523,6 +524,7 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
+            # Shape of each generation: NMiniBat, NGen, SigDim
             self.SigGen_Z, self.SigGen_Zj = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 2) ]  
 
 
