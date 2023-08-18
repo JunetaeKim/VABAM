@@ -265,7 +265,7 @@ class Evaluator ():
             ## Result trackers
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[], 
-                         'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
+                              'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_ZjFc, self.I_fcPE_FaZj = 0,0,0,0,0,0
@@ -459,14 +459,15 @@ class Evaluator ():
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
+        
         assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
 
         ## Optional parameters with default values ##
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
         self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
+        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
+                                             # and 'CON' for conditional inputs such as power spectral density.
 
 
         ## Intermediate variables
