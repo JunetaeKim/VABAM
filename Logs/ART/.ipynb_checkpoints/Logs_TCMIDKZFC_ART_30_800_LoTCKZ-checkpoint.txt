@@ -1,0 +1,295 @@
+1 saved {'val_OrigRecLoss': 0.01172, 'val_FeatRecLoss': 0.00141, 'val_kl_Loss_Z': 12.4162, 'val_kl_Loss_FC': 0.09911, 'val_kl_Loss_TC': 128.07501, 'val_kl_Loss_MI': 5.6269}
+2 saved {'val_OrigRecLoss': 0.01153, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 3.74382, 'val_kl_Loss_FC': 0.01319, 'val_kl_Loss_TC': 129.11859, 'val_kl_Loss_MI': 5.85766}
+3 saved {'val_OrigRecLoss': 0.01149, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 1.8942, 'val_kl_Loss_FC': 0.013, 'val_kl_Loss_TC': 129.65229, 'val_kl_Loss_MI': 5.9468}
+4 saved {'val_OrigRecLoss': 0.01148, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 4.7916, 'val_kl_Loss_FC': 0.01359, 'val_kl_Loss_TC': 129.97344, 'val_kl_Loss_MI': 5.99447}
+5 saved {'val_OrigRecLoss': 0.01147, 'val_FeatRecLoss': 0.00174, 'val_kl_Loss_Z': 11.52083, 'val_kl_Loss_FC': 0.01454, 'val_kl_Loss_TC': 130.15279, 'val_kl_Loss_MI': 6.01811}
+6 not saved {'val_OrigRecLoss': 0.01147, 'val_FeatRecLoss': 0.00145, 'val_kl_Loss_Z': 3.66943, 'val_kl_Loss_FC': 0.01393, 'val_kl_Loss_TC': 130.32386, 'val_kl_Loss_MI': 6.03898}
+7 not saved {'val_OrigRecLoss': 0.01147, 'val_FeatRecLoss': 0.00144, 'val_kl_Loss_Z': 2.14693, 'val_kl_Loss_FC': 0.01427, 'val_kl_Loss_TC': 130.32224, 'val_kl_Loss_MI': 6.03565}
+8 saved {'val_OrigRecLoss': 0.01145, 'val_FeatRecLoss': 0.00142, 'val_kl_Loss_Z': 1.9033, 'val_kl_Loss_FC': 0.01452, 'val_kl_Loss_TC': 130.29006, 'val_kl_Loss_MI': 6.02889}
+9 saved {'val_OrigRecLoss': 0.01144, 'val_FeatRecLoss': 0.00155, 'val_kl_Loss_Z': 5.86442, 'val_kl_Loss_FC': 0.01427, 'val_kl_Loss_TC': 130.41691, 'val_kl_Loss_MI': 6.04357}
+10 saved {'val_OrigRecLoss': 0.01143, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 7.30152, 'val_kl_Loss_FC': 0.01399, 'val_kl_Loss_TC': 130.29025, 'val_kl_Loss_MI': 6.02738}
+11 saved {'val_OrigRecLoss': 0.01141, 'val_FeatRecLoss': 0.00147, 'val_kl_Loss_Z': 11.66427, 'val_kl_Loss_FC': 0.01275, 'val_kl_Loss_TC': 130.07486, 'val_kl_Loss_MI': 5.99418}
+12 saved {'val_OrigRecLoss': 0.0114, 'val_FeatRecLoss': 0.00145, 'val_kl_Loss_Z': 2.53385, 'val_kl_Loss_FC': 0.01272, 'val_kl_Loss_TC': 130.48944, 'val_kl_Loss_MI': 6.04572}
+13 saved {'val_OrigRecLoss': 0.01136, 'val_FeatRecLoss': 0.00143, 'val_kl_Loss_Z': 7.59069, 'val_kl_Loss_FC': 0.01272, 'val_kl_Loss_TC': 130.40072, 'val_kl_Loss_MI': 6.03635}
+14 saved {'val_OrigRecLoss': 0.01131, 'val_FeatRecLoss': 0.00143, 'val_kl_Loss_Z': 8.87173, 'val_kl_Loss_FC': 0.01232, 'val_kl_Loss_TC': 130.40055, 'val_kl_Loss_MI': 6.0353}
+15 saved {'val_OrigRecLoss': 0.0113, 'val_FeatRecLoss': 0.00149, 'val_kl_Loss_Z': 2.63175, 'val_kl_Loss_FC': 0.00929, 'val_kl_Loss_TC': 130.17037, 'val_kl_Loss_MI': 5.99911}
+16 saved {'val_OrigRecLoss': 0.01098, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 5.81972, 'val_kl_Loss_FC': 0.00808, 'val_kl_Loss_TC': 130.33645, 'val_kl_Loss_MI': 6.01669}
+17 saved {'val_OrigRecLoss': 0.01059, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 5.86394, 'val_kl_Loss_FC': 0.00491, 'val_kl_Loss_TC': 130.10844, 'val_kl_Loss_MI': 5.98714}
+18 saved {'val_OrigRecLoss': 0.01051, 'val_FeatRecLoss': 0.00179, 'val_kl_Loss_Z': 8.91115, 'val_kl_Loss_FC': 0.00274, 'val_kl_Loss_TC': 130.1989, 'val_kl_Loss_MI': 5.9946}
+19 saved {'val_OrigRecLoss': 0.00793, 'val_FeatRecLoss': 0.00196, 'val_kl_Loss_Z': 8.75943, 'val_kl_Loss_FC': 0.01295, 'val_kl_Loss_TC': 130.12424, 'val_kl_Loss_MI': 5.98079}
+20 saved {'val_OrigRecLoss': 0.00601, 'val_FeatRecLoss': 0.00203, 'val_kl_Loss_Z': 10.52161, 'val_kl_Loss_FC': 0.03069, 'val_kl_Loss_TC': 130.16985, 'val_kl_Loss_MI': 5.98409}
+21 saved {'val_OrigRecLoss': 0.00522, 'val_FeatRecLoss': 0.00199, 'val_kl_Loss_Z': 2.30592, 'val_kl_Loss_FC': 0.02354, 'val_kl_Loss_TC': 130.4679, 'val_kl_Loss_MI': 6.0171}
+22 saved {'val_OrigRecLoss': 0.00491, 'val_FeatRecLoss': 0.00196, 'val_kl_Loss_Z': 5.63102, 'val_kl_Loss_FC': 0.01772, 'val_kl_Loss_TC': 129.95407, 'val_kl_Loss_MI': 5.95412}
+23 saved {'val_OrigRecLoss': 0.00458, 'val_FeatRecLoss': 0.00194, 'val_kl_Loss_Z': 8.99959, 'val_kl_Loss_FC': 0.01778, 'val_kl_Loss_TC': 130.12773, 'val_kl_Loss_MI': 5.97742}
+24 saved {'val_OrigRecLoss': 0.00442, 'val_FeatRecLoss': 0.00192, 'val_kl_Loss_Z': 1.96376, 'val_kl_Loss_FC': 0.0162, 'val_kl_Loss_TC': 130.12694, 'val_kl_Loss_MI': 5.97385}
+25 saved {'val_OrigRecLoss': 0.00436, 'val_FeatRecLoss': 0.0019, 'val_kl_Loss_Z': 1.98757, 'val_kl_Loss_FC': 0.01303, 'val_kl_Loss_TC': 129.84861, 'val_kl_Loss_MI': 5.93805}
+26 saved {'val_OrigRecLoss': 0.00435, 'val_FeatRecLoss': 0.0021, 'val_kl_Loss_Z': 6.59352, 'val_kl_Loss_FC': 0.01275, 'val_kl_Loss_TC': 130.11658, 'val_kl_Loss_MI': 5.97448}
+27 saved {'val_OrigRecLoss': 0.00413, 'val_FeatRecLoss': 0.00185, 'val_kl_Loss_Z': 1.6724, 'val_kl_Loss_FC': 0.00961, 'val_kl_Loss_TC': 129.93228, 'val_kl_Loss_MI': 5.94966}
+28 saved {'val_OrigRecLoss': 0.00392, 'val_FeatRecLoss': 0.00189, 'val_kl_Loss_Z': 14.51561, 'val_kl_Loss_FC': 0.01004, 'val_kl_Loss_TC': 129.89944, 'val_kl_Loss_MI': 5.95124}
+29 saved {'val_OrigRecLoss': 0.00388, 'val_FeatRecLoss': 0.00187, 'val_kl_Loss_Z': 8.16884, 'val_kl_Loss_FC': 0.00674, 'val_kl_Loss_TC': 129.9001, 'val_kl_Loss_MI': 5.943}
+30 saved {'val_OrigRecLoss': 0.00379, 'val_FeatRecLoss': 0.0018, 'val_kl_Loss_Z': 13.88865, 'val_kl_Loss_FC': 0.00618, 'val_kl_Loss_TC': 129.90502, 'val_kl_Loss_MI': 5.95416}
+31 saved {'val_OrigRecLoss': 0.00359, 'val_FeatRecLoss': 0.00177, 'val_kl_Loss_Z': 6.9916, 'val_kl_Loss_FC': 0.00393, 'val_kl_Loss_TC': 129.97416, 'val_kl_Loss_MI': 5.96165}
+32 not saved {'val_OrigRecLoss': 0.00363, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 5.73993, 'val_kl_Loss_FC': 0.00418, 'val_kl_Loss_TC': 129.85748, 'val_kl_Loss_MI': 5.94599}
+33 saved {'val_OrigRecLoss': 0.00346, 'val_FeatRecLoss': 0.00169, 'val_kl_Loss_Z': 13.93286, 'val_kl_Loss_FC': 0.00408, 'val_kl_Loss_TC': 129.8514, 'val_kl_Loss_MI': 5.9551}
+34 not saved {'val_OrigRecLoss': 0.00366, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 2.83708, 'val_kl_Loss_FC': 0.00372, 'val_kl_Loss_TC': 129.81117, 'val_kl_Loss_MI': 5.9672}
+35 saved {'val_OrigRecLoss': 0.00332, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 7.0658, 'val_kl_Loss_FC': 0.00303, 'val_kl_Loss_TC': 129.96838, 'val_kl_Loss_MI': 6.03878}
+36 not saved {'val_OrigRecLoss': 0.00339, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 2.70713, 'val_kl_Loss_FC': 0.00306, 'val_kl_Loss_TC': 129.8263, 'val_kl_Loss_MI': 6.0844}
+37 saved {'val_OrigRecLoss': 0.0033, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 5.66638, 'val_kl_Loss_FC': 0.00469, 'val_kl_Loss_TC': 129.69149, 'val_kl_Loss_MI': 6.08297}
+38 saved {'val_OrigRecLoss': 0.00308, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 6.9024, 'val_kl_Loss_FC': 0.00289, 'val_kl_Loss_TC': 129.56109, 'val_kl_Loss_MI': 6.05026}
+39 saved {'val_OrigRecLoss': 0.003, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 1.53419, 'val_kl_Loss_FC': 0.0038, 'val_kl_Loss_TC': 129.9024, 'val_kl_Loss_MI': 6.12222}
+40 saved {'val_OrigRecLoss': 0.00299, 'val_FeatRecLoss': 0.0016, 'val_kl_Loss_Z': 3.7031, 'val_kl_Loss_FC': 0.00507, 'val_kl_Loss_TC': 130.09505, 'val_kl_Loss_MI': 6.15274}
+41 saved {'val_OrigRecLoss': 0.00295, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 3.24566, 'val_kl_Loss_FC': 0.00422, 'val_kl_Loss_TC': 129.87406, 'val_kl_Loss_MI': 6.14833}
+42 saved {'val_OrigRecLoss': 0.00294, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 3.47665, 'val_kl_Loss_FC': 0.00243, 'val_kl_Loss_TC': 130.25577, 'val_kl_Loss_MI': 6.17395}
+43 saved {'val_OrigRecLoss': 0.00291, 'val_FeatRecLoss': 0.00145, 'val_kl_Loss_Z': 10.06301, 'val_kl_Loss_FC': 0.00881, 'val_kl_Loss_TC': 129.51688, 'val_kl_Loss_MI': 6.10999}
+44 saved {'val_OrigRecLoss': 0.00284, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 1.56538, 'val_kl_Loss_FC': 0.0069, 'val_kl_Loss_TC': 129.60296, 'val_kl_Loss_MI': 6.12448}
+45 saved {'val_OrigRecLoss': 0.00278, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 5.26728, 'val_kl_Loss_FC': 0.00366, 'val_kl_Loss_TC': 129.40521, 'val_kl_Loss_MI': 6.10082}
+46 not saved {'val_OrigRecLoss': 0.00278, 'val_FeatRecLoss': 0.00148, 'val_kl_Loss_Z': 8.46298, 'val_kl_Loss_FC': 0.007, 'val_kl_Loss_TC': 129.61001, 'val_kl_Loss_MI': 6.16983}
+47 saved {'val_OrigRecLoss': 0.0027, 'val_FeatRecLoss': 0.00147, 'val_kl_Loss_Z': 2.88321, 'val_kl_Loss_FC': 0.00662, 'val_kl_Loss_TC': 129.57642, 'val_kl_Loss_MI': 6.15699}
+48 saved {'val_OrigRecLoss': 0.00265, 'val_FeatRecLoss': 0.00145, 'val_kl_Loss_Z': 8.85562, 'val_kl_Loss_FC': 0.00815, 'val_kl_Loss_TC': 129.39005, 'val_kl_Loss_MI': 6.13887}
+49 saved {'val_OrigRecLoss': 0.00256, 'val_FeatRecLoss': 0.00149, 'val_kl_Loss_Z': 8.76959, 'val_kl_Loss_FC': 0.00667, 'val_kl_Loss_TC': 129.4302, 'val_kl_Loss_MI': 6.14082}
+50 not saved {'val_OrigRecLoss': 0.00262, 'val_FeatRecLoss': 0.00152, 'val_kl_Loss_Z': 7.1913, 'val_kl_Loss_FC': 0.00566, 'val_kl_Loss_TC': 129.47007, 'val_kl_Loss_MI': 6.16976}
+51 saved {'val_OrigRecLoss': 0.00251, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 8.31407, 'val_kl_Loss_FC': 0.00831, 'val_kl_Loss_TC': 129.86545, 'val_kl_Loss_MI': 6.22233}
+52 saved {'val_OrigRecLoss': 0.00247, 'val_FeatRecLoss': 0.00148, 'val_kl_Loss_Z': 6.32865, 'val_kl_Loss_FC': 0.00563, 'val_kl_Loss_TC': 130.10144, 'val_kl_Loss_MI': 6.25422}
+53 saved {'val_OrigRecLoss': 0.00242, 'val_FeatRecLoss': 0.00141, 'val_kl_Loss_Z': 1.42363, 'val_kl_Loss_FC': 0.00934, 'val_kl_Loss_TC': 129.6395, 'val_kl_Loss_MI': 6.212}
+54 saved {'val_OrigRecLoss': 0.0024, 'val_FeatRecLoss': 0.0014, 'val_kl_Loss_Z': 3.10105, 'val_kl_Loss_FC': 0.01052, 'val_kl_Loss_TC': 129.56322, 'val_kl_Loss_MI': 6.20796}
+55 saved {'val_OrigRecLoss': 0.00238, 'val_FeatRecLoss': 0.00148, 'val_kl_Loss_Z': 3.09936, 'val_kl_Loss_FC': 0.00563, 'val_kl_Loss_TC': 129.46151, 'val_kl_Loss_MI': 6.20385}
+56 not saved {'val_OrigRecLoss': 0.00251, 'val_FeatRecLoss': 0.0014, 'val_kl_Loss_Z': 4.88607, 'val_kl_Loss_FC': 0.01365, 'val_kl_Loss_TC': 129.7246, 'val_kl_Loss_MI': 6.25621}
+57 saved {'val_OrigRecLoss': 0.00228, 'val_FeatRecLoss': 0.00141, 'val_kl_Loss_Z': 7.08066, 'val_kl_Loss_FC': 0.00915, 'val_kl_Loss_TC': 129.26024, 'val_kl_Loss_MI': 6.17328}
+58 saved {'val_OrigRecLoss': 0.00227, 'val_FeatRecLoss': 0.00139, 'val_kl_Loss_Z': 1.45022, 'val_kl_Loss_FC': 0.01131, 'val_kl_Loss_TC': 129.20056, 'val_kl_Loss_MI': 6.18401}
+59 saved {'val_OrigRecLoss': 0.00223, 'val_FeatRecLoss': 0.00139, 'val_kl_Loss_Z': 3.74116, 'val_kl_Loss_FC': 0.01013, 'val_kl_Loss_TC': 129.54059, 'val_kl_Loss_MI': 6.24309}
+60 saved {'val_OrigRecLoss': 0.00221, 'val_FeatRecLoss': 0.0014, 'val_kl_Loss_Z': 1.77717, 'val_kl_Loss_FC': 0.00874, 'val_kl_Loss_TC': 129.08647, 'val_kl_Loss_MI': 6.16574}
+61 not saved {'val_OrigRecLoss': 0.00226, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 7.46445, 'val_kl_Loss_FC': 0.01126, 'val_kl_Loss_TC': 128.96299, 'val_kl_Loss_MI': 6.15461}
+62 saved {'val_OrigRecLoss': 0.00212, 'val_FeatRecLoss': 0.0014, 'val_kl_Loss_Z': 6.22867, 'val_kl_Loss_FC': 0.00849, 'val_kl_Loss_TC': 128.9341, 'val_kl_Loss_MI': 6.16248}
+63 saved {'val_OrigRecLoss': 0.00208, 'val_FeatRecLoss': 0.00138, 'val_kl_Loss_Z': 1.29358, 'val_kl_Loss_FC': 0.00995, 'val_kl_Loss_TC': 128.871, 'val_kl_Loss_MI': 6.17008}
+64 not saved {'val_OrigRecLoss': 0.00211, 'val_FeatRecLoss': 0.00148, 'val_kl_Loss_Z': 2.39097, 'val_kl_Loss_FC': 0.00605, 'val_kl_Loss_TC': 128.85073, 'val_kl_Loss_MI': 6.11988}
+65 saved {'val_OrigRecLoss': 0.00205, 'val_FeatRecLoss': 0.00137, 'val_kl_Loss_Z': 11.47817, 'val_kl_Loss_FC': 0.01238, 'val_kl_Loss_TC': 129.08694, 'val_kl_Loss_MI': 6.22767}
+66 not saved {'val_OrigRecLoss': 0.00206, 'val_FeatRecLoss': 0.00133, 'val_kl_Loss_Z': 6.68111, 'val_kl_Loss_FC': 0.01285, 'val_kl_Loss_TC': 128.94632, 'val_kl_Loss_MI': 6.17583}
+67 saved {'val_OrigRecLoss': 0.00203, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 6.64489, 'val_kl_Loss_FC': 0.01129, 'val_kl_Loss_TC': 128.93638, 'val_kl_Loss_MI': 6.18341}
+68 not saved {'val_OrigRecLoss': 0.00213, 'val_FeatRecLoss': 0.00139, 'val_kl_Loss_Z': 3.16629, 'val_kl_Loss_FC': 0.01005, 'val_kl_Loss_TC': 128.79937, 'val_kl_Loss_MI': 6.17488}
+69 not saved {'val_OrigRecLoss': 0.00206, 'val_FeatRecLoss': 0.00134, 'val_kl_Loss_Z': 6.3853, 'val_kl_Loss_FC': 0.01225, 'val_kl_Loss_TC': 128.7632, 'val_kl_Loss_MI': 6.17133}
+70 not saved {'val_OrigRecLoss': 0.00206, 'val_FeatRecLoss': 0.0014, 'val_kl_Loss_Z': 2.4851, 'val_kl_Loss_FC': 0.0104, 'val_kl_Loss_TC': 128.84295, 'val_kl_Loss_MI': 6.19636}
+71 saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00138, 'val_kl_Loss_Z': 8.22835, 'val_kl_Loss_FC': 0.01013, 'val_kl_Loss_TC': 128.78538, 'val_kl_Loss_MI': 6.19322}
+72 saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 2.87741, 'val_kl_Loss_FC': 0.0111, 'val_kl_Loss_TC': 128.78501, 'val_kl_Loss_MI': 6.21822}
+73 saved {'val_OrigRecLoss': 0.00194, 'val_FeatRecLoss': 0.00133, 'val_kl_Loss_Z': 3.10133, 'val_kl_Loss_FC': 0.01255, 'val_kl_Loss_TC': 128.58842, 'val_kl_Loss_MI': 6.1898}
+74 not saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00135, 'val_kl_Loss_Z': 10.20968, 'val_kl_Loss_FC': 0.01148, 'val_kl_Loss_TC': 128.52755, 'val_kl_Loss_MI': 6.17613}
+75 saved {'val_OrigRecLoss': 0.00192, 'val_FeatRecLoss': 0.00138, 'val_kl_Loss_Z': 1.35882, 'val_kl_Loss_FC': 0.00932, 'val_kl_Loss_TC': 128.41881, 'val_kl_Loss_MI': 6.14241}
+76 not saved {'val_OrigRecLoss': 0.00199, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 7.5428, 'val_kl_Loss_FC': 0.01595, 'val_kl_Loss_TC': 128.48264, 'val_kl_Loss_MI': 6.18491}
+77 saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 4.46011, 'val_kl_Loss_FC': 0.01113, 'val_kl_Loss_TC': 128.55109, 'val_kl_Loss_MI': 6.2014}
+78 saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 4.21581, 'val_kl_Loss_FC': 0.01448, 'val_kl_Loss_TC': 128.5776, 'val_kl_Loss_MI': 6.23109}
+79 saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00135, 'val_kl_Loss_Z': 4.70741, 'val_kl_Loss_FC': 0.01113, 'val_kl_Loss_TC': 128.59426, 'val_kl_Loss_MI': 6.252}
+80 saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 6.79504, 'val_kl_Loss_FC': 0.01409, 'val_kl_Loss_TC': 128.3735, 'val_kl_Loss_MI': 6.21666}
+81 not saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00133, 'val_kl_Loss_Z': 8.7344, 'val_kl_Loss_FC': 0.01214, 'val_kl_Loss_TC': 128.38051, 'val_kl_Loss_MI': 6.2281}
+82 not saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 1.88845, 'val_kl_Loss_FC': 0.0126, 'val_kl_Loss_TC': 128.56094, 'val_kl_Loss_MI': 6.25248}
+83 not saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00134, 'val_kl_Loss_Z': 6.36472, 'val_kl_Loss_FC': 0.01353, 'val_kl_Loss_TC': 128.55771, 'val_kl_Loss_MI': 6.28847}
+84 not saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00137, 'val_kl_Loss_Z': 2.9829, 'val_kl_Loss_FC': 0.01099, 'val_kl_Loss_TC': 128.47252, 'val_kl_Loss_MI': 6.26652}
+85 not saved {'val_OrigRecLoss': 0.00195, 'val_FeatRecLoss': 0.00135, 'val_kl_Loss_Z': 2.66693, 'val_kl_Loss_FC': 0.01217, 'val_kl_Loss_TC': 128.54708, 'val_kl_Loss_MI': 6.29654}
+86 saved {'val_OrigRecLoss': 0.00181, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 4.25874, 'val_kl_Loss_FC': 0.01416, 'val_kl_Loss_TC': 128.42072, 'val_kl_Loss_MI': 6.28349}
+87 saved {'val_OrigRecLoss': 0.00179, 'val_FeatRecLoss': 0.00135, 'val_kl_Loss_Z': 3.15124, 'val_kl_Loss_FC': 0.0114, 'val_kl_Loss_TC': 128.28918, 'val_kl_Loss_MI': 6.28042}
+88 saved {'val_OrigRecLoss': 0.00178, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 1.28973, 'val_kl_Loss_FC': 0.01381, 'val_kl_Loss_TC': 128.35951, 'val_kl_Loss_MI': 6.29213}
+89 saved {'val_OrigRecLoss': 0.00178, 'val_FeatRecLoss': 0.00134, 'val_kl_Loss_Z': 3.88923, 'val_kl_Loss_FC': 0.01157, 'val_kl_Loss_TC': 128.20795, 'val_kl_Loss_MI': 6.28899}
+90 saved {'val_OrigRecLoss': 0.00175, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 2.92581, 'val_kl_Loss_FC': 0.01501, 'val_kl_Loss_TC': 128.05761, 'val_kl_Loss_MI': 6.2499}
+91 not saved {'val_OrigRecLoss': 0.00179, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 1.46592, 'val_kl_Loss_FC': 0.01332, 'val_kl_Loss_TC': 128.00149, 'val_kl_Loss_MI': 6.25629}
+92 saved {'val_OrigRecLoss': 0.00172, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 3.06961, 'val_kl_Loss_FC': 0.01224, 'val_kl_Loss_TC': 127.9488, 'val_kl_Loss_MI': 6.25163}
+93 not saved {'val_OrigRecLoss': 0.00173, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 5.42204, 'val_kl_Loss_FC': 0.0134, 'val_kl_Loss_TC': 128.05519, 'val_kl_Loss_MI': 6.28614}
+94 saved {'val_OrigRecLoss': 0.00172, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 5.3707, 'val_kl_Loss_FC': 0.01434, 'val_kl_Loss_TC': 128.03025, 'val_kl_Loss_MI': 6.29977}
+95 saved {'val_OrigRecLoss': 0.0017, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 2.77043, 'val_kl_Loss_FC': 0.01341, 'val_kl_Loss_TC': 128.00733, 'val_kl_Loss_MI': 6.30541}
+96 not saved {'val_OrigRecLoss': 0.00181, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 12.46012, 'val_kl_Loss_FC': 0.01758, 'val_kl_Loss_TC': 128.63359, 'val_kl_Loss_MI': 6.42398}
+97 not saved {'val_OrigRecLoss': 0.0017, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 7.45408, 'val_kl_Loss_FC': 0.0134, 'val_kl_Loss_TC': 127.927, 'val_kl_Loss_MI': 6.32601}
+98 saved {'val_OrigRecLoss': 0.00169, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 6.19977, 'val_kl_Loss_FC': 0.01457, 'val_kl_Loss_TC': 128.04532, 'val_kl_Loss_MI': 6.38389}
+99 saved {'val_OrigRecLoss': 0.00169, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 2.77069, 'val_kl_Loss_FC': 0.01369, 'val_kl_Loss_TC': 128.14236, 'val_kl_Loss_MI': 6.38876}
+100 saved {'val_OrigRecLoss': 0.00168, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 5.47693, 'val_kl_Loss_FC': 0.0137, 'val_kl_Loss_TC': 127.85033, 'val_kl_Loss_MI': 6.32088}
+101 saved {'val_OrigRecLoss': 0.00164, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 1.61116, 'val_kl_Loss_FC': 0.01267, 'val_kl_Loss_TC': 127.89954, 'val_kl_Loss_MI': 6.36279}
+102 not saved {'val_OrigRecLoss': 0.00168, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 5.65816, 'val_kl_Loss_FC': 0.01291, 'val_kl_Loss_TC': 127.87246, 'val_kl_Loss_MI': 6.37541}
+103 saved {'val_OrigRecLoss': 0.00163, 'val_FeatRecLoss': 0.00134, 'val_kl_Loss_Z': 1.8299, 'val_kl_Loss_FC': 0.01192, 'val_kl_Loss_TC': 127.79908, 'val_kl_Loss_MI': 6.37421}
+104 not saved {'val_OrigRecLoss': 0.00166, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 3.83499, 'val_kl_Loss_FC': 0.01445, 'val_kl_Loss_TC': 127.70886, 'val_kl_Loss_MI': 6.3467}
+105 not saved {'val_OrigRecLoss': 0.00164, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 4.77654, 'val_kl_Loss_FC': 0.01318, 'val_kl_Loss_TC': 127.69717, 'val_kl_Loss_MI': 6.35766}
+106 not saved {'val_OrigRecLoss': 0.00168, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 3.6085, 'val_kl_Loss_FC': 0.01277, 'val_kl_Loss_TC': 127.65771, 'val_kl_Loss_MI': 6.34997}
+107 not saved {'val_OrigRecLoss': 0.00168, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 1.27747, 'val_kl_Loss_FC': 0.01518, 'val_kl_Loss_TC': 127.61508, 'val_kl_Loss_MI': 6.33803}
+108 not saved {'val_OrigRecLoss': 0.00174, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 7.27766, 'val_kl_Loss_FC': 0.01565, 'val_kl_Loss_TC': 127.5242, 'val_kl_Loss_MI': 6.32924}
+109 not saved {'val_OrigRecLoss': 0.00169, 'val_FeatRecLoss': 0.00138, 'val_kl_Loss_Z': 2.6572, 'val_kl_Loss_FC': 0.00953, 'val_kl_Loss_TC': 127.65092, 'val_kl_Loss_MI': 6.34078}
+110 saved {'val_OrigRecLoss': 0.00159, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 3.22679, 'val_kl_Loss_FC': 0.01578, 'val_kl_Loss_TC': 127.56653, 'val_kl_Loss_MI': 6.39715}
+111 not saved {'val_OrigRecLoss': 0.00162, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 7.6936, 'val_kl_Loss_FC': 0.01122, 'val_kl_Loss_TC': 127.71729, 'val_kl_Loss_MI': 6.44123}
+112 not saved {'val_OrigRecLoss': 0.0016, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 5.43609, 'val_kl_Loss_FC': 0.01522, 'val_kl_Loss_TC': 127.55085, 'val_kl_Loss_MI': 6.4009}
+113 saved {'val_OrigRecLoss': 0.00159, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 11.05724, 'val_kl_Loss_FC': 0.01514, 'val_kl_Loss_TC': 127.51699, 'val_kl_Loss_MI': 6.40464}
+114 not saved {'val_OrigRecLoss': 0.00164, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 1.73827, 'val_kl_Loss_FC': 0.01469, 'val_kl_Loss_TC': 127.48873, 'val_kl_Loss_MI': 6.39521}
+115 saved {'val_OrigRecLoss': 0.00155, 'val_FeatRecLoss': 0.00135, 'val_kl_Loss_Z': 4.99748, 'val_kl_Loss_FC': 0.01118, 'val_kl_Loss_TC': 127.50774, 'val_kl_Loss_MI': 6.41813}
+116 not saved {'val_OrigRecLoss': 0.00158, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 4.37522, 'val_kl_Loss_FC': 0.01413, 'val_kl_Loss_TC': 127.42886, 'val_kl_Loss_MI': 6.37484}
+117 not saved {'val_OrigRecLoss': 0.00156, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 2.00778, 'val_kl_Loss_FC': 0.01707, 'val_kl_Loss_TC': 127.39277, 'val_kl_Loss_MI': 6.39063}
+118 not saved {'val_OrigRecLoss': 0.00157, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 8.15554, 'val_kl_Loss_FC': 0.01403, 'val_kl_Loss_TC': 127.33245, 'val_kl_Loss_MI': 6.3768}
+119 not saved {'val_OrigRecLoss': 0.00159, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 3.68997, 'val_kl_Loss_FC': 0.01452, 'val_kl_Loss_TC': 127.35239, 'val_kl_Loss_MI': 6.39977}
+120 not saved {'val_OrigRecLoss': 0.00158, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 3.70935, 'val_kl_Loss_FC': 0.01763, 'val_kl_Loss_TC': 127.29202, 'val_kl_Loss_MI': 6.37911}
+121 not saved {'val_OrigRecLoss': 0.00165, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 6.07785, 'val_kl_Loss_FC': 0.01667, 'val_kl_Loss_TC': 127.26169, 'val_kl_Loss_MI': 6.35708}
+122 not saved {'val_OrigRecLoss': 0.00156, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 3.68109, 'val_kl_Loss_FC': 0.013, 'val_kl_Loss_TC': 127.42284, 'val_kl_Loss_MI': 6.40769}
+123 saved {'val_OrigRecLoss': 0.00154, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 3.18726, 'val_kl_Loss_FC': 0.01444, 'val_kl_Loss_TC': 127.26679, 'val_kl_Loss_MI': 6.39462}
+124 saved {'val_OrigRecLoss': 0.00153, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 5.55142, 'val_kl_Loss_FC': 0.01529, 'val_kl_Loss_TC': 127.30247, 'val_kl_Loss_MI': 6.4202}
+125 not saved {'val_OrigRecLoss': 0.00156, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 10.64112, 'val_kl_Loss_FC': 0.01558, 'val_kl_Loss_TC': 127.2688, 'val_kl_Loss_MI': 6.42412}
+126 saved {'val_OrigRecLoss': 0.00153, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 1.58815, 'val_kl_Loss_FC': 0.01358, 'val_kl_Loss_TC': 127.29421, 'val_kl_Loss_MI': 6.40359}
+127 not saved {'val_OrigRecLoss': 0.00156, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 3.91139, 'val_kl_Loss_FC': 0.01372, 'val_kl_Loss_TC': 127.29299, 'val_kl_Loss_MI': 6.4124}
+128 not saved {'val_OrigRecLoss': 0.00155, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 4.49761, 'val_kl_Loss_FC': 0.01846, 'val_kl_Loss_TC': 127.4115, 'val_kl_Loss_MI': 6.48676}
+129 saved {'val_OrigRecLoss': 0.0015, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 2.46512, 'val_kl_Loss_FC': 0.01327, 'val_kl_Loss_TC': 127.23362, 'val_kl_Loss_MI': 6.42115}
+130 not saved {'val_OrigRecLoss': 0.00152, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 6.19896, 'val_kl_Loss_FC': 0.0151, 'val_kl_Loss_TC': 127.20037, 'val_kl_Loss_MI': 6.42297}
+131 saved {'val_OrigRecLoss': 0.00149, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 3.84252, 'val_kl_Loss_FC': 0.01423, 'val_kl_Loss_TC': 127.23431, 'val_kl_Loss_MI': 6.43144}
+132 not saved {'val_OrigRecLoss': 0.00152, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 2.02578, 'val_kl_Loss_FC': 0.01661, 'val_kl_Loss_TC': 127.15619, 'val_kl_Loss_MI': 6.42157}
+133 not saved {'val_OrigRecLoss': 0.0015, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 2.69747, 'val_kl_Loss_FC': 0.01444, 'val_kl_Loss_TC': 127.1598, 'val_kl_Loss_MI': 6.41749}
+134 saved {'val_OrigRecLoss': 0.00148, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 6.01706, 'val_kl_Loss_FC': 0.0134, 'val_kl_Loss_TC': 127.16333, 'val_kl_Loss_MI': 6.42306}
+135 saved {'val_OrigRecLoss': 0.00147, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 2.99127, 'val_kl_Loss_FC': 0.01384, 'val_kl_Loss_TC': 127.18828, 'val_kl_Loss_MI': 6.45888}
+136 not saved {'val_OrigRecLoss': 0.00152, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 2.93663, 'val_kl_Loss_FC': 0.01484, 'val_kl_Loss_TC': 127.1712, 'val_kl_Loss_MI': 6.43364}
+137 not saved {'val_OrigRecLoss': 0.00152, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 1.70216, 'val_kl_Loss_FC': 0.01416, 'val_kl_Loss_TC': 127.12232, 'val_kl_Loss_MI': 6.41018}
+138 not saved {'val_OrigRecLoss': 0.00148, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 2.90582, 'val_kl_Loss_FC': 0.01466, 'val_kl_Loss_TC': 127.11779, 'val_kl_Loss_MI': 6.44042}
+139 not saved {'val_OrigRecLoss': 0.00148, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 7.89584, 'val_kl_Loss_FC': 0.01626, 'val_kl_Loss_TC': 127.101, 'val_kl_Loss_MI': 6.44805}
+140 not saved {'val_OrigRecLoss': 0.00151, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 4.48767, 'val_kl_Loss_FC': 0.01532, 'val_kl_Loss_TC': 127.16753, 'val_kl_Loss_MI': 6.43144}
+141 saved {'val_OrigRecLoss': 0.00145, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 3.4895, 'val_kl_Loss_FC': 0.01506, 'val_kl_Loss_TC': 127.10505, 'val_kl_Loss_MI': 6.44778}
+142 saved {'val_OrigRecLoss': 0.00145, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 3.56856, 'val_kl_Loss_FC': 0.01416, 'val_kl_Loss_TC': 127.12479, 'val_kl_Loss_MI': 6.4259}
+143 not saved {'val_OrigRecLoss': 0.00157, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 6.24263, 'val_kl_Loss_FC': 0.0149, 'val_kl_Loss_TC': 127.10539, 'val_kl_Loss_MI': 6.46372}
+144 not saved {'val_OrigRecLoss': 0.00146, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 5.33743, 'val_kl_Loss_FC': 0.01689, 'val_kl_Loss_TC': 127.09254, 'val_kl_Loss_MI': 6.46578}
+145 saved {'val_OrigRecLoss': 0.00145, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 1.99053, 'val_kl_Loss_FC': 0.0108, 'val_kl_Loss_TC': 127.09239, 'val_kl_Loss_MI': 6.41817}
+146 not saved {'val_OrigRecLoss': 0.00146, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 1.85843, 'val_kl_Loss_FC': 0.01502, 'val_kl_Loss_TC': 127.11939, 'val_kl_Loss_MI': 6.45906}
+147 not saved {'val_OrigRecLoss': 0.00146, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.55026, 'val_kl_Loss_FC': 0.01545, 'val_kl_Loss_TC': 127.12942, 'val_kl_Loss_MI': 6.46827}
+148 saved {'val_OrigRecLoss': 0.00141, 'val_FeatRecLoss': 0.00133, 'val_kl_Loss_Z': 2.97649, 'val_kl_Loss_FC': 0.01308, 'val_kl_Loss_TC': 127.11028, 'val_kl_Loss_MI': 6.43566}
+149 not saved {'val_OrigRecLoss': 0.00146, 'val_FeatRecLoss': 0.00118, 'val_kl_Loss_Z': 2.5928, 'val_kl_Loss_FC': 0.02119, 'val_kl_Loss_TC': 127.08643, 'val_kl_Loss_MI': 6.48474}
+150 not saved {'val_OrigRecLoss': 0.00145, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 1.6723, 'val_kl_Loss_FC': 0.01378, 'val_kl_Loss_TC': 127.22994, 'val_kl_Loss_MI': 6.51018}
+151 saved {'val_OrigRecLoss': 0.00139, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 8.25057, 'val_kl_Loss_FC': 0.01306, 'val_kl_Loss_TC': 127.06697, 'val_kl_Loss_MI': 6.45726}
+152 not saved {'val_OrigRecLoss': 0.00141, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 2.5125, 'val_kl_Loss_FC': 0.01519, 'val_kl_Loss_TC': 127.14833, 'val_kl_Loss_MI': 6.48388}
+153 not saved {'val_OrigRecLoss': 0.00143, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 6.14038, 'val_kl_Loss_FC': 0.01478, 'val_kl_Loss_TC': 127.11241, 'val_kl_Loss_MI': 6.51505}
+154 not saved {'val_OrigRecLoss': 0.00147, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 3.29078, 'val_kl_Loss_FC': 0.01254, 'val_kl_Loss_TC': 127.10503, 'val_kl_Loss_MI': 6.4738}
+155 not saved {'val_OrigRecLoss': 0.00141, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 8.25448, 'val_kl_Loss_FC': 0.01642, 'val_kl_Loss_TC': 127.0766, 'val_kl_Loss_MI': 6.49366}
+156 not saved {'val_OrigRecLoss': 0.00141, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 3.07789, 'val_kl_Loss_FC': 0.01486, 'val_kl_Loss_TC': 127.14019, 'val_kl_Loss_MI': 6.53505}
+157 not saved {'val_OrigRecLoss': 0.00148, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 6.95116, 'val_kl_Loss_FC': 0.01526, 'val_kl_Loss_TC': 127.08874, 'val_kl_Loss_MI': 6.47861}
+158 not saved {'val_OrigRecLoss': 0.00145, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 2.25839, 'val_kl_Loss_FC': 0.01735, 'val_kl_Loss_TC': 127.04864, 'val_kl_Loss_MI': 6.45911}
+159 not saved {'val_OrigRecLoss': 0.0014, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 7.32954, 'val_kl_Loss_FC': 0.01593, 'val_kl_Loss_TC': 127.05767, 'val_kl_Loss_MI': 6.48368}
+160 not saved {'val_OrigRecLoss': 0.00144, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 5.35183, 'val_kl_Loss_FC': 0.01575, 'val_kl_Loss_TC': 127.08747, 'val_kl_Loss_MI': 6.50046}
+161 saved {'val_OrigRecLoss': 0.00137, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 5.34318, 'val_kl_Loss_FC': 0.01541, 'val_kl_Loss_TC': 127.01166, 'val_kl_Loss_MI': 6.45841}
+162 not saved {'val_OrigRecLoss': 0.00137, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 2.6275, 'val_kl_Loss_FC': 0.01419, 'val_kl_Loss_TC': 126.99928, 'val_kl_Loss_MI': 6.44724}
+163 not saved {'val_OrigRecLoss': 0.00141, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.57016, 'val_kl_Loss_FC': 0.01538, 'val_kl_Loss_TC': 127.05829, 'val_kl_Loss_MI': 6.47855}
+164 not saved {'val_OrigRecLoss': 0.00138, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 1.90074, 'val_kl_Loss_FC': 0.01415, 'val_kl_Loss_TC': 127.04924, 'val_kl_Loss_MI': 6.48378}
+165 not saved {'val_OrigRecLoss': 0.00138, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.18819, 'val_kl_Loss_FC': 0.01513, 'val_kl_Loss_TC': 127.00171, 'val_kl_Loss_MI': 6.4636}
+166 not saved {'val_OrigRecLoss': 0.00143, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 8.11292, 'val_kl_Loss_FC': 0.01288, 'val_kl_Loss_TC': 127.00283, 'val_kl_Loss_MI': 6.45223}
+167 not saved {'val_OrigRecLoss': 0.0014, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 2.1415, 'val_kl_Loss_FC': 0.01384, 'val_kl_Loss_TC': 127.02319, 'val_kl_Loss_MI': 6.46385}
+168 saved {'val_OrigRecLoss': 0.00135, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 3.48709, 'val_kl_Loss_FC': 0.01637, 'val_kl_Loss_TC': 127.02388, 'val_kl_Loss_MI': 6.49629}
+169 not saved {'val_OrigRecLoss': 0.00137, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.29836, 'val_kl_Loss_FC': 0.01502, 'val_kl_Loss_TC': 127.00085, 'val_kl_Loss_MI': 6.4678}
+170 saved {'val_OrigRecLoss': 0.00135, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 4.47815, 'val_kl_Loss_FC': 0.01448, 'val_kl_Loss_TC': 127.00383, 'val_kl_Loss_MI': 6.47932}
+171 not saved {'val_OrigRecLoss': 0.00146, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 2.7152, 'val_kl_Loss_FC': 0.01474, 'val_kl_Loss_TC': 126.98963, 'val_kl_Loss_MI': 6.46187}
+172 not saved {'val_OrigRecLoss': 0.00136, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 2.57112, 'val_kl_Loss_FC': 0.01597, 'val_kl_Loss_TC': 127.01806, 'val_kl_Loss_MI': 6.50311}
+173 saved {'val_OrigRecLoss': 0.00134, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 4.91347, 'val_kl_Loss_FC': 0.01308, 'val_kl_Loss_TC': 127.0124, 'val_kl_Loss_MI': 6.48173}
+174 not saved {'val_OrigRecLoss': 0.00135, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 3.78858, 'val_kl_Loss_FC': 0.01613, 'val_kl_Loss_TC': 126.97709, 'val_kl_Loss_MI': 6.49609}
+175 not saved {'val_OrigRecLoss': 0.00135, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 2.81132, 'val_kl_Loss_FC': 0.01338, 'val_kl_Loss_TC': 127.03399, 'val_kl_Loss_MI': 6.47612}
+176 not saved {'val_OrigRecLoss': 0.00136, 'val_FeatRecLoss': 0.00116, 'val_kl_Loss_Z': 5.33477, 'val_kl_Loss_FC': 0.0235, 'val_kl_Loss_TC': 127.13973, 'val_kl_Loss_MI': 6.57515}
+177 saved {'val_OrigRecLoss': 0.00134, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 3.13367, 'val_kl_Loss_FC': 0.01416, 'val_kl_Loss_TC': 127.03882, 'val_kl_Loss_MI': 6.52823}
+178 not saved {'val_OrigRecLoss': 0.00135, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 10.24381, 'val_kl_Loss_FC': 0.01486, 'val_kl_Loss_TC': 126.99891, 'val_kl_Loss_MI': 6.54387}
+179 not saved {'val_OrigRecLoss': 0.00139, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 1.79591, 'val_kl_Loss_FC': 0.01606, 'val_kl_Loss_TC': 126.98294, 'val_kl_Loss_MI': 6.50414}
+180 not saved {'val_OrigRecLoss': 0.00138, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 3.29981, 'val_kl_Loss_FC': 0.01448, 'val_kl_Loss_TC': 126.98177, 'val_kl_Loss_MI': 6.51676}
+181 not saved {'val_OrigRecLoss': 0.00137, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 1.87152, 'val_kl_Loss_FC': 0.01672, 'val_kl_Loss_TC': 126.99079, 'val_kl_Loss_MI': 6.52187}
+182 saved {'val_OrigRecLoss': 0.00134, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 2.87267, 'val_kl_Loss_FC': 0.01748, 'val_kl_Loss_TC': 127.00566, 'val_kl_Loss_MI': 6.53414}
+183 saved {'val_OrigRecLoss': 0.00133, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 1.429, 'val_kl_Loss_FC': 0.01408, 'val_kl_Loss_TC': 126.96464, 'val_kl_Loss_MI': 6.48499}
+184 not saved {'val_OrigRecLoss': 0.00134, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 2.83732, 'val_kl_Loss_FC': 0.01521, 'val_kl_Loss_TC': 126.97285, 'val_kl_Loss_MI': 6.5009}
+185 not saved {'val_OrigRecLoss': 0.00133, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 6.90624, 'val_kl_Loss_FC': 0.01786, 'val_kl_Loss_TC': 126.97971, 'val_kl_Loss_MI': 6.52432}
+186 not saved {'val_OrigRecLoss': 0.00136, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 1.73254, 'val_kl_Loss_FC': 0.01532, 'val_kl_Loss_TC': 126.94681, 'val_kl_Loss_MI': 6.50061}
+187 not saved {'val_OrigRecLoss': 0.00139, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.74075, 'val_kl_Loss_FC': 0.01556, 'val_kl_Loss_TC': 126.95724, 'val_kl_Loss_MI': 6.50804}
+188 saved {'val_OrigRecLoss': 0.0013, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 2.35729, 'val_kl_Loss_FC': 0.01441, 'val_kl_Loss_TC': 126.94137, 'val_kl_Loss_MI': 6.50152}
+189 saved {'val_OrigRecLoss': 0.00128, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 3.70772, 'val_kl_Loss_FC': 0.0138, 'val_kl_Loss_TC': 126.96027, 'val_kl_Loss_MI': 6.52579}
+190 saved {'val_OrigRecLoss': 0.00129, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 5.53945, 'val_kl_Loss_FC': 0.0142, 'val_kl_Loss_TC': 126.91743, 'val_kl_Loss_MI': 6.48116}
+191 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 3.788, 'val_kl_Loss_FC': 0.01443, 'val_kl_Loss_TC': 126.9927, 'val_kl_Loss_MI': 6.49593}
+192 not saved {'val_OrigRecLoss': 0.00131, 'val_FeatRecLoss': 0.00119, 'val_kl_Loss_Z': 6.22164, 'val_kl_Loss_FC': 0.02127, 'val_kl_Loss_TC': 126.94255, 'val_kl_Loss_MI': 6.48237}
+193 saved {'val_OrigRecLoss': 0.00128, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 3.98466, 'val_kl_Loss_FC': 0.01562, 'val_kl_Loss_TC': 126.99171, 'val_kl_Loss_MI': 6.52486}
+194 not saved {'val_OrigRecLoss': 0.0013, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 5.56691, 'val_kl_Loss_FC': 0.01589, 'val_kl_Loss_TC': 126.96418, 'val_kl_Loss_MI': 6.51554}
+195 not saved {'val_OrigRecLoss': 0.00129, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 3.65383, 'val_kl_Loss_FC': 0.01641, 'val_kl_Loss_TC': 126.95401, 'val_kl_Loss_MI': 6.5258}
+196 not saved {'val_OrigRecLoss': 0.00129, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 3.59412, 'val_kl_Loss_FC': 0.01338, 'val_kl_Loss_TC': 126.95982, 'val_kl_Loss_MI': 6.51631}
+197 saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 1.72435, 'val_kl_Loss_FC': 0.01538, 'val_kl_Loss_TC': 126.92598, 'val_kl_Loss_MI': 6.49693}
+198 not saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00135, 'val_kl_Loss_Z': 2.83175, 'val_kl_Loss_FC': 0.01193, 'val_kl_Loss_TC': 126.94443, 'val_kl_Loss_MI': 6.48035}
+199 not saved {'val_OrigRecLoss': 0.00131, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 1.9019, 'val_kl_Loss_FC': 0.01787, 'val_kl_Loss_TC': 126.98118, 'val_kl_Loss_MI': 6.55846}
+200 not saved {'val_OrigRecLoss': 0.0013, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 1.61535, 'val_kl_Loss_FC': 0.01766, 'val_kl_Loss_TC': 126.94275, 'val_kl_Loss_MI': 6.52964}
+201 not saved {'val_OrigRecLoss': 0.00128, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 3.11051, 'val_kl_Loss_FC': 0.01542, 'val_kl_Loss_TC': 126.91328, 'val_kl_Loss_MI': 6.49949}
+202 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 3.58018, 'val_kl_Loss_FC': 0.01521, 'val_kl_Loss_TC': 126.93393, 'val_kl_Loss_MI': 6.5025}
+203 not saved {'val_OrigRecLoss': 0.00128, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 1.59518, 'val_kl_Loss_FC': 0.01412, 'val_kl_Loss_TC': 126.9075, 'val_kl_Loss_MI': 6.4899}
+204 not saved {'val_OrigRecLoss': 0.00133, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 3.81024, 'val_kl_Loss_FC': 0.01603, 'val_kl_Loss_TC': 126.90441, 'val_kl_Loss_MI': 6.50609}
+205 not saved {'val_OrigRecLoss': 0.00125, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 1.97776, 'val_kl_Loss_FC': 0.0132, 'val_kl_Loss_TC': 126.93494, 'val_kl_Loss_MI': 6.49879}
+206 not saved {'val_OrigRecLoss': 0.00123, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 2.45758, 'val_kl_Loss_FC': 0.01516, 'val_kl_Loss_TC': 126.98522, 'val_kl_Loss_MI': 6.49449}
+207 not saved {'val_OrigRecLoss': 0.00136, 'val_FeatRecLoss': 0.00113, 'val_kl_Loss_Z': 3.1831, 'val_kl_Loss_FC': 0.02606, 'val_kl_Loss_TC': 126.96971, 'val_kl_Loss_MI': 6.53499}
+208 not saved {'val_OrigRecLoss': 0.0013, 'val_FeatRecLoss': 0.00131, 'val_kl_Loss_Z': 3.27085, 'val_kl_Loss_FC': 0.01254, 'val_kl_Loss_TC': 126.93456, 'val_kl_Loss_MI': 6.48231}
+209 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 6.49134, 'val_kl_Loss_FC': 0.01673, 'val_kl_Loss_TC': 126.91263, 'val_kl_Loss_MI': 6.4738}
+210 saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.48129, 'val_kl_Loss_FC': 0.01553, 'val_kl_Loss_TC': 126.96049, 'val_kl_Loss_MI': 6.52987}
+211 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 2.21786, 'val_kl_Loss_FC': 0.01407, 'val_kl_Loss_TC': 126.92128, 'val_kl_Loss_MI': 6.47353}
+212 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 1.54933, 'val_kl_Loss_FC': 0.01695, 'val_kl_Loss_TC': 126.90363, 'val_kl_Loss_MI': 6.51702}
+213 saved {'val_OrigRecLoss': 0.00123, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 1.23721, 'val_kl_Loss_FC': 0.01635, 'val_kl_Loss_TC': 126.91487, 'val_kl_Loss_MI': 6.49235}
+214 not saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.79614, 'val_kl_Loss_FC': 0.01585, 'val_kl_Loss_TC': 126.89522, 'val_kl_Loss_MI': 6.50021}
+215 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 1.64187, 'val_kl_Loss_FC': 0.01725, 'val_kl_Loss_TC': 126.90566, 'val_kl_Loss_MI': 6.50903}
+216 not saved {'val_OrigRecLoss': 0.00129, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 1.57958, 'val_kl_Loss_FC': 0.01575, 'val_kl_Loss_TC': 126.91214, 'val_kl_Loss_MI': 6.49185}
+217 not saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 7.36839, 'val_kl_Loss_FC': 0.01531, 'val_kl_Loss_TC': 126.95339, 'val_kl_Loss_MI': 6.55077}
+218 saved {'val_OrigRecLoss': 0.00125, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 3.55468, 'val_kl_Loss_FC': 0.01552, 'val_kl_Loss_TC': 126.88882, 'val_kl_Loss_MI': 6.49663}
+219 not saved {'val_OrigRecLoss': 0.00121, 'val_FeatRecLoss': 0.0013, 'val_kl_Loss_Z': 3.44845, 'val_kl_Loss_FC': 0.01338, 'val_kl_Loss_TC': 126.95271, 'val_kl_Loss_MI': 6.51326}
+220 not saved {'val_OrigRecLoss': 0.00124, 'val_FeatRecLoss': 0.00129, 'val_kl_Loss_Z': 1.87565, 'val_kl_Loss_FC': 0.0152, 'val_kl_Loss_TC': 126.9284, 'val_kl_Loss_MI': 6.5489}
+221 not saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00132, 'val_kl_Loss_Z': 3.0455, 'val_kl_Loss_FC': 0.013, 'val_kl_Loss_TC': 126.95226, 'val_kl_Loss_MI': 6.51883}
+222 not saved {'val_OrigRecLoss': 0.0013, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 4.23574, 'val_kl_Loss_FC': 0.01847, 'val_kl_Loss_TC': 126.95626, 'val_kl_Loss_MI': 6.56172}
+223 saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 4.74153, 'val_kl_Loss_FC': 0.01772, 'val_kl_Loss_TC': 126.9188, 'val_kl_Loss_MI': 6.53741}
+224 saved {'val_OrigRecLoss': 0.00123, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 2.24724, 'val_kl_Loss_FC': 0.01643, 'val_kl_Loss_TC': 126.90757, 'val_kl_Loss_MI': 6.54013}
+225 not saved {'val_OrigRecLoss': 0.00125, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 2.615, 'val_kl_Loss_FC': 0.01504, 'val_kl_Loss_TC': 126.8907, 'val_kl_Loss_MI': 6.50774}
+226 not saved {'val_OrigRecLoss': 0.0013, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 2.65275, 'val_kl_Loss_FC': 0.016, 'val_kl_Loss_TC': 126.89334, 'val_kl_Loss_MI': 6.52454}
+227 not saved {'val_OrigRecLoss': 0.00123, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 3.73369, 'val_kl_Loss_FC': 0.01611, 'val_kl_Loss_TC': 126.88339, 'val_kl_Loss_MI': 6.5132}
+228 not saved {'val_OrigRecLoss': 0.00125, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 3.66507, 'val_kl_Loss_FC': 0.01732, 'val_kl_Loss_TC': 127.00916, 'val_kl_Loss_MI': 6.58106}
+229 saved {'val_OrigRecLoss': 0.0012, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 1.61601, 'val_kl_Loss_FC': 0.01649, 'val_kl_Loss_TC': 126.92314, 'val_kl_Loss_MI': 6.53161}
+230 saved {'val_OrigRecLoss': 0.00123, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 3.42737, 'val_kl_Loss_FC': 0.01789, 'val_kl_Loss_TC': 126.92738, 'val_kl_Loss_MI': 6.57651}
+231 not saved {'val_OrigRecLoss': 0.00128, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 5.06555, 'val_kl_Loss_FC': 0.01709, 'val_kl_Loss_TC': 126.97456, 'val_kl_Loss_MI': 6.57116}
+232 not saved {'val_OrigRecLoss': 0.00127, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.14132, 'val_kl_Loss_FC': 0.01569, 'val_kl_Loss_TC': 126.94661, 'val_kl_Loss_MI': 6.55701}
+233 not saved {'val_OrigRecLoss': 0.00124, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 6.96106, 'val_kl_Loss_FC': 0.0177, 'val_kl_Loss_TC': 126.9518, 'val_kl_Loss_MI': 6.56999}
+234 not saved {'val_OrigRecLoss': 0.00121, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.23159, 'val_kl_Loss_FC': 0.01461, 'val_kl_Loss_TC': 126.92025, 'val_kl_Loss_MI': 6.5394}
+235 saved {'val_OrigRecLoss': 0.00122, 'val_FeatRecLoss': 0.00119, 'val_kl_Loss_Z': 1.49196, 'val_kl_Loss_FC': 0.02047, 'val_kl_Loss_TC': 126.93033, 'val_kl_Loss_MI': 6.57978}
+236 not saved {'val_OrigRecLoss': 0.00121, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 3.24656, 'val_kl_Loss_FC': 0.01695, 'val_kl_Loss_TC': 126.92361, 'val_kl_Loss_MI': 6.5114}
+237 not saved {'val_OrigRecLoss': 0.00123, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 4.5605, 'val_kl_Loss_FC': 0.01753, 'val_kl_Loss_TC': 126.92406, 'val_kl_Loss_MI': 6.54242}
+238 not saved {'val_OrigRecLoss': 0.00126, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 2.96401, 'val_kl_Loss_FC': 0.01524, 'val_kl_Loss_TC': 126.90814, 'val_kl_Loss_MI': 6.53407}
+239 not saved {'val_OrigRecLoss': 0.00121, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 3.69016, 'val_kl_Loss_FC': 0.0176, 'val_kl_Loss_TC': 126.88681, 'val_kl_Loss_MI': 6.53051}
+240 not saved {'val_OrigRecLoss': 0.00121, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 2.48791, 'val_kl_Loss_FC': 0.0168, 'val_kl_Loss_TC': 126.87964, 'val_kl_Loss_MI': 6.53791}
+241 not saved {'val_OrigRecLoss': 0.00122, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 1.21398, 'val_kl_Loss_FC': 0.01721, 'val_kl_Loss_TC': 126.86554, 'val_kl_Loss_MI': 6.49833}
+242 not saved {'val_OrigRecLoss': 0.00116, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 3.54963, 'val_kl_Loss_FC': 0.01437, 'val_kl_Loss_TC': 126.88882, 'val_kl_Loss_MI': 6.53584}
+243 not saved {'val_OrigRecLoss': 0.0012, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 3.2865, 'val_kl_Loss_FC': 0.01642, 'val_kl_Loss_TC': 126.91005, 'val_kl_Loss_MI': 6.57956}
+244 saved {'val_OrigRecLoss': 0.0012, 'val_FeatRecLoss': 0.0012, 'val_kl_Loss_Z': 4.13232, 'val_kl_Loss_FC': 0.01972, 'val_kl_Loss_TC': 126.89513, 'val_kl_Loss_MI': 6.56108}
+245 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 2.54773, 'val_kl_Loss_FC': 0.01678, 'val_kl_Loss_TC': 126.92595, 'val_kl_Loss_MI': 6.53347}
+246 not saved {'val_OrigRecLoss': 0.00117, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 4.11954, 'val_kl_Loss_FC': 0.01719, 'val_kl_Loss_TC': 126.89147, 'val_kl_Loss_MI': 6.54563}
+247 not saved {'val_OrigRecLoss': 0.00122, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 2.77726, 'val_kl_Loss_FC': 0.01807, 'val_kl_Loss_TC': 126.86742, 'val_kl_Loss_MI': 6.53589}
+248 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 1.51866, 'val_kl_Loss_FC': 0.01684, 'val_kl_Loss_TC': 126.86536, 'val_kl_Loss_MI': 6.53043}
+249 not saved {'val_OrigRecLoss': 0.00122, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 1.60965, 'val_kl_Loss_FC': 0.01829, 'val_kl_Loss_TC': 126.86622, 'val_kl_Loss_MI': 6.53146}
+250 not saved {'val_OrigRecLoss': 0.00121, 'val_FeatRecLoss': 0.00127, 'val_kl_Loss_Z': 5.34144, 'val_kl_Loss_FC': 0.01474, 'val_kl_Loss_TC': 126.86074, 'val_kl_Loss_MI': 6.5353}
+251 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 1.41278, 'val_kl_Loss_FC': 0.01676, 'val_kl_Loss_TC': 126.85877, 'val_kl_Loss_MI': 6.52006}
+252 not saved {'val_OrigRecLoss': 0.00115, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 2.07683, 'val_kl_Loss_FC': 0.01651, 'val_kl_Loss_TC': 126.85434, 'val_kl_Loss_MI': 6.50943}
+253 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.0012, 'val_kl_Loss_Z': 4.03194, 'val_kl_Loss_FC': 0.01967, 'val_kl_Loss_TC': 126.84075, 'val_kl_Loss_MI': 6.53415}
+254 not saved {'val_OrigRecLoss': 0.00116, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 2.88289, 'val_kl_Loss_FC': 0.01721, 'val_kl_Loss_TC': 126.92124, 'val_kl_Loss_MI': 6.52799}
+255 not saved {'val_OrigRecLoss': 0.00117, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 4.39994, 'val_kl_Loss_FC': 0.01907, 'val_kl_Loss_TC': 126.90313, 'val_kl_Loss_MI': 6.59674}
+256 not saved {'val_OrigRecLoss': 0.0012, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 8.1374, 'val_kl_Loss_FC': 0.01527, 'val_kl_Loss_TC': 126.91159, 'val_kl_Loss_MI': 6.55513}
+257 not saved {'val_OrigRecLoss': 0.00114, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 2.88005, 'val_kl_Loss_FC': 0.0173, 'val_kl_Loss_TC': 127.0429, 'val_kl_Loss_MI': 6.58461}
+258 not saved {'val_OrigRecLoss': 0.00119, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 1.47674, 'val_kl_Loss_FC': 0.01786, 'val_kl_Loss_TC': 126.87045, 'val_kl_Loss_MI': 6.5653}
+259 not saved {'val_OrigRecLoss': 0.00116, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 1.62328, 'val_kl_Loss_FC': 0.01741, 'val_kl_Loss_TC': 126.86351, 'val_kl_Loss_MI': 6.53839}
+260 not saved {'val_OrigRecLoss': 0.00119, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 1.92166, 'val_kl_Loss_FC': 0.01762, 'val_kl_Loss_TC': 126.91618, 'val_kl_Loss_MI': 6.53488}
+261 not saved {'val_OrigRecLoss': 0.00119, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 6.85018, 'val_kl_Loss_FC': 0.01578, 'val_kl_Loss_TC': 126.8653, 'val_kl_Loss_MI': 6.53535}
+262 not saved {'val_OrigRecLoss': 0.00117, 'val_FeatRecLoss': 0.00126, 'val_kl_Loss_Z': 1.30509, 'val_kl_Loss_FC': 0.01639, 'val_kl_Loss_TC': 126.90866, 'val_kl_Loss_MI': 6.51599}
+263 not saved {'val_OrigRecLoss': 0.00115, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 8.05235, 'val_kl_Loss_FC': 0.01982, 'val_kl_Loss_TC': 126.90705, 'val_kl_Loss_MI': 6.56771}
+264 not saved {'val_OrigRecLoss': 0.00116, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 2.96479, 'val_kl_Loss_FC': 0.01805, 'val_kl_Loss_TC': 126.88198, 'val_kl_Loss_MI': 6.54772}
+265 not saved {'val_OrigRecLoss': 0.00113, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 2.1176, 'val_kl_Loss_FC': 0.0166, 'val_kl_Loss_TC': 126.85752, 'val_kl_Loss_MI': 6.5551}
+266 not saved {'val_OrigRecLoss': 0.00117, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 4.10308, 'val_kl_Loss_FC': 0.0176, 'val_kl_Loss_TC': 126.8754, 'val_kl_Loss_MI': 6.55736}
+267 saved {'val_OrigRecLoss': 0.00116, 'val_FeatRecLoss': 0.00119, 'val_kl_Loss_Z': 5.88101, 'val_kl_Loss_FC': 0.02066, 'val_kl_Loss_TC': 126.83917, 'val_kl_Loss_MI': 6.5303}
+268 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 5.98246, 'val_kl_Loss_FC': 0.01838, 'val_kl_Loss_TC': 126.87049, 'val_kl_Loss_MI': 6.55979}
+269 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 2.08367, 'val_kl_Loss_FC': 0.01766, 'val_kl_Loss_TC': 126.84835, 'val_kl_Loss_MI': 6.51527}
+270 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 2.38603, 'val_kl_Loss_FC': 0.01849, 'val_kl_Loss_TC': 126.90017, 'val_kl_Loss_MI': 6.57367}
+271 not saved {'val_OrigRecLoss': 0.00114, 'val_FeatRecLoss': 0.0012, 'val_kl_Loss_Z': 4.31486, 'val_kl_Loss_FC': 0.01877, 'val_kl_Loss_TC': 126.84893, 'val_kl_Loss_MI': 6.54515}
+272 not saved {'val_OrigRecLoss': 0.00117, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 2.38127, 'val_kl_Loss_FC': 0.01944, 'val_kl_Loss_TC': 126.95075, 'val_kl_Loss_MI': 6.55447}
+273 not saved {'val_OrigRecLoss': 0.00111, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 4.47757, 'val_kl_Loss_FC': 0.01716, 'val_kl_Loss_TC': 126.88575, 'val_kl_Loss_MI': 6.52831}
+274 not saved {'val_OrigRecLoss': 0.00113, 'val_FeatRecLoss': 0.0012, 'val_kl_Loss_Z': 1.22807, 'val_kl_Loss_FC': 0.01958, 'val_kl_Loss_TC': 126.91099, 'val_kl_Loss_MI': 6.56481}
+275 not saved {'val_OrigRecLoss': 0.00114, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 1.70815, 'val_kl_Loss_FC': 0.01499, 'val_kl_Loss_TC': 126.95006, 'val_kl_Loss_MI': 6.56473}
+276 saved {'val_OrigRecLoss': 0.00116, 'val_FeatRecLoss': 0.00116, 'val_kl_Loss_Z': 9.09469, 'val_kl_Loss_FC': 0.02163, 'val_kl_Loss_TC': 126.91047, 'val_kl_Loss_MI': 6.56704}
+277 not saved {'val_OrigRecLoss': 0.0011, 'val_FeatRecLoss': 0.00128, 'val_kl_Loss_Z': 1.49563, 'val_kl_Loss_FC': 0.0143, 'val_kl_Loss_TC': 126.88011, 'val_kl_Loss_MI': 6.52977}
+278 not saved {'val_OrigRecLoss': 0.00115, 'val_FeatRecLoss': 0.00119, 'val_kl_Loss_Z': 5.78756, 'val_kl_Loss_FC': 0.01969, 'val_kl_Loss_TC': 126.88748, 'val_kl_Loss_MI': 6.61303}
+279 not saved {'val_OrigRecLoss': 0.00118, 'val_FeatRecLoss': 0.00125, 'val_kl_Loss_Z': 3.48664, 'val_kl_Loss_FC': 0.0164, 'val_kl_Loss_TC': 126.86551, 'val_kl_Loss_MI': 6.5227}
+280 not saved {'val_OrigRecLoss': 0.00113, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 3.91708, 'val_kl_Loss_FC': 0.0192, 'val_kl_Loss_TC': 126.92801, 'val_kl_Loss_MI': 6.57845}
+281 not saved {'val_OrigRecLoss': 0.00112, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 6.23852, 'val_kl_Loss_FC': 0.01774, 'val_kl_Loss_TC': 126.89486, 'val_kl_Loss_MI': 6.5877}
+282 not saved {'val_OrigRecLoss': 0.00111, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 3.5615, 'val_kl_Loss_FC': 0.01902, 'val_kl_Loss_TC': 126.86656, 'val_kl_Loss_MI': 6.57506}
+283 not saved {'val_OrigRecLoss': 0.00112, 'val_FeatRecLoss': 0.00123, 'val_kl_Loss_Z': 3.74209, 'val_kl_Loss_FC': 0.01786, 'val_kl_Loss_TC': 126.84908, 'val_kl_Loss_MI': 6.53905}
+284 not saved {'val_OrigRecLoss': 0.00111, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 3.23709, 'val_kl_Loss_FC': 0.02021, 'val_kl_Loss_TC': 126.88899, 'val_kl_Loss_MI': 6.59967}
+285 not saved {'val_OrigRecLoss': 0.00111, 'val_FeatRecLoss': 0.00118, 'val_kl_Loss_Z': 3.87898, 'val_kl_Loss_FC': 0.02064, 'val_kl_Loss_TC': 126.851, 'val_kl_Loss_MI': 6.55542}
+286 not saved {'val_OrigRecLoss': 0.0011, 'val_FeatRecLoss': 0.0012, 'val_kl_Loss_Z': 3.32528, 'val_kl_Loss_FC': 0.01945, 'val_kl_Loss_TC': 126.91123, 'val_kl_Loss_MI': 6.55153}
+287 not saved {'val_OrigRecLoss': 0.00111, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 3.71445, 'val_kl_Loss_FC': 0.01894, 'val_kl_Loss_TC': 126.85203, 'val_kl_Loss_MI': 6.52681}
+288 not saved {'val_OrigRecLoss': 0.0011, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 2.41454, 'val_kl_Loss_FC': 0.0187, 'val_kl_Loss_TC': 126.84021, 'val_kl_Loss_MI': 6.51163}
+289 not saved {'val_OrigRecLoss': 0.00114, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 3.5917, 'val_kl_Loss_FC': 0.01902, 'val_kl_Loss_TC': 126.86325, 'val_kl_Loss_MI': 6.5216}
+290 not saved {'val_OrigRecLoss': 0.00113, 'val_FeatRecLoss': 0.00121, 'val_kl_Loss_Z': 3.92411, 'val_kl_Loss_FC': 0.01925, 'val_kl_Loss_TC': 126.81708, 'val_kl_Loss_MI': 6.48209}
+291 not saved {'val_OrigRecLoss': 0.00108, 'val_FeatRecLoss': 0.00124, 'val_kl_Loss_Z': 3.97574, 'val_kl_Loss_FC': 0.01675, 'val_kl_Loss_TC': 126.89123, 'val_kl_Loss_MI': 6.54254}
+292 not saved {'val_OrigRecLoss': 0.00111, 'val_FeatRecLoss': 0.00117, 'val_kl_Loss_Z': 2.79038, 'val_kl_Loss_FC': 0.02185, 'val_kl_Loss_TC': 126.8463, 'val_kl_Loss_MI': 6.5378}
+293 not saved {'val_OrigRecLoss': 0.00113, 'val_FeatRecLoss': 0.00122, 'val_kl_Loss_Z': 1.85392, 'val_kl_Loss_FC': 0.01836, 'val_kl_Loss_TC': 126.90585, 'val_kl_Loss_MI': 6.54607}
+294 not saved {'val_OrigRecLoss': 0.0011, 'val_FeatRecLoss': 0.0012, 'val_kl_Loss_Z': 2.42335, 'val_kl_Loss_FC': 0.01951, 'val_kl_Loss_TC': 126.83738, 'val_kl_Loss_MI': 6.52012}
+295 not saved {'val_OrigRecLoss': 0.00114, 'val_FeatRecLoss': 0.00118, 'val_kl_Loss_Z': 3.6785, 'val_kl_Loss_FC': 0.02092, 'val_kl_Loss_TC': 126.83478, 'val_kl_Loss_MI': 6.55786}

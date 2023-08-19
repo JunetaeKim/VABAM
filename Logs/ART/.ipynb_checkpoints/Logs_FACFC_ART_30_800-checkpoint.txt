@@ -1,0 +1,1 @@
+1 saved {'val_OrigRecLoss': 0.01171, 'val_FeatRecLoss': 0.00179, 'val_kl_Loss_Z': 0.88359, 'val_kl_Loss_FC': 0.00061, 'val_kl_Loss_TC': 0.00044, 'val_kl_Loss_DTC': 0.16236}

@@ -1,0 +1,317 @@
+1 saved {'val_OrigRecLoss': 0.01172, 'val_FeatRecLoss': 0.00184, 'val_kl_Loss_Z': 0.91482, 'val_kl_Loss_FC': 0.01676}
+2 saved {'val_OrigRecLoss': 0.01152, 'val_FeatRecLoss': 0.00173, 'val_kl_Loss_Z': 0.4454, 'val_kl_Loss_FC': 0.01735}
+3 saved {'val_OrigRecLoss': 0.01149, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 0.3602, 'val_kl_Loss_FC': 0.01798}
+4 saved {'val_OrigRecLoss': 0.01148, 'val_FeatRecLoss': 0.00166, 'val_kl_Loss_Z': 0.36928, 'val_kl_Loss_FC': 0.01627}
+5 saved {'val_OrigRecLoss': 0.01147, 'val_FeatRecLoss': 0.00155, 'val_kl_Loss_Z': 0.40835, 'val_kl_Loss_FC': 0.01867}
+6 saved {'val_OrigRecLoss': 0.01147, 'val_FeatRecLoss': 0.00143, 'val_kl_Loss_Z': 0.33459, 'val_kl_Loss_FC': 0.02429}
+7 not saved {'val_OrigRecLoss': 0.01148, 'val_FeatRecLoss': 0.00151, 'val_kl_Loss_Z': 0.32515, 'val_kl_Loss_FC': 0.01957}
+8 saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.00133, 'val_kl_Loss_Z': 0.30047, 'val_kl_Loss_FC': 0.03007}
+9 saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.29554, 'val_kl_Loss_FC': 0.01357}
+10 saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.00136, 'val_kl_Loss_Z': 0.27423, 'val_kl_Loss_FC': 0.02659}
+11 not saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.0015, 'val_kl_Loss_Z': 0.25719, 'val_kl_Loss_FC': 0.01923}
+12 not saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.00145, 'val_kl_Loss_Z': 0.24398, 'val_kl_Loss_FC': 0.02188}
+13 saved {'val_OrigRecLoss': 0.01144, 'val_FeatRecLoss': 0.00144, 'val_kl_Loss_Z': 0.25238, 'val_kl_Loss_FC': 0.02222}
+14 saved {'val_OrigRecLoss': 0.01141, 'val_FeatRecLoss': 0.00139, 'val_kl_Loss_Z': 0.22283, 'val_kl_Loss_FC': 0.0247}
+15 saved {'val_OrigRecLoss': 0.01139, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.22475, 'val_kl_Loss_FC': 0.01718}
+16 saved {'val_OrigRecLoss': 0.01137, 'val_FeatRecLoss': 0.00139, 'val_kl_Loss_Z': 0.21791, 'val_kl_Loss_FC': 0.02556}
+17 saved {'val_OrigRecLoss': 0.01136, 'val_FeatRecLoss': 0.00143, 'val_kl_Loss_Z': 0.21009, 'val_kl_Loss_FC': 0.02275}
+18 saved {'val_OrigRecLoss': 0.01133, 'val_FeatRecLoss': 0.00151, 'val_kl_Loss_Z': 0.21973, 'val_kl_Loss_FC': 0.01856}
+19 not saved {'val_OrigRecLoss': 0.01133, 'val_FeatRecLoss': 0.00143, 'val_kl_Loss_Z': 0.20752, 'val_kl_Loss_FC': 0.02308}
+20 saved {'val_OrigRecLoss': 0.0113, 'val_FeatRecLoss': 0.00147, 'val_kl_Loss_Z': 0.20868, 'val_kl_Loss_FC': 0.02141}
+21 saved {'val_OrigRecLoss': 0.01128, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.19432, 'val_kl_Loss_FC': 0.0178}
+22 saved {'val_OrigRecLoss': 0.01126, 'val_FeatRecLoss': 0.00149, 'val_kl_Loss_Z': 0.19804, 'val_kl_Loss_FC': 0.01957}
+23 saved {'val_OrigRecLoss': 0.01123, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.19125, 'val_kl_Loss_FC': 0.01634}
+24 saved {'val_OrigRecLoss': 0.0112, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.19398, 'val_kl_Loss_FC': 0.01292}
+25 saved {'val_OrigRecLoss': 0.0111, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.19029, 'val_kl_Loss_FC': 0.01444}
+26 saved {'val_OrigRecLoss': 0.01105, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.18035, 'val_kl_Loss_FC': 0.01589}
+27 saved {'val_OrigRecLoss': 0.01088, 'val_FeatRecLoss': 0.0014, 'val_kl_Loss_Z': 0.18745, 'val_kl_Loss_FC': 0.02964}
+28 saved {'val_OrigRecLoss': 0.01049, 'val_FeatRecLoss': 0.00209, 'val_kl_Loss_Z': 0.25738, 'val_kl_Loss_FC': 0.01931}
+29 saved {'val_OrigRecLoss': 0.00993, 'val_FeatRecLoss': 0.00231, 'val_kl_Loss_Z': 0.22578, 'val_kl_Loss_FC': 0.0286}
+30 saved {'val_OrigRecLoss': 0.00905, 'val_FeatRecLoss': 0.00237, 'val_kl_Loss_Z': 0.21798, 'val_kl_Loss_FC': 0.03031}
+31 saved {'val_OrigRecLoss': 0.00839, 'val_FeatRecLoss': 0.00252, 'val_kl_Loss_Z': 0.2047, 'val_kl_Loss_FC': 0.03095}
+32 saved {'val_OrigRecLoss': 0.008, 'val_FeatRecLoss': 0.00243, 'val_kl_Loss_Z': 0.20616, 'val_kl_Loss_FC': 0.03825}
+33 saved {'val_OrigRecLoss': 0.00733, 'val_FeatRecLoss': 0.00258, 'val_kl_Loss_Z': 0.19638, 'val_kl_Loss_FC': 0.04592}
+34 saved {'val_OrigRecLoss': 0.00688, 'val_FeatRecLoss': 0.00264, 'val_kl_Loss_Z': 0.20612, 'val_kl_Loss_FC': 0.0455}
+35 saved {'val_OrigRecLoss': 0.00632, 'val_FeatRecLoss': 0.00275, 'val_kl_Loss_Z': 0.19279, 'val_kl_Loss_FC': 0.05572}
+36 not saved {'val_OrigRecLoss': 0.00636, 'val_FeatRecLoss': 0.00249, 'val_kl_Loss_Z': 0.18965, 'val_kl_Loss_FC': 0.03329}
+37 saved {'val_OrigRecLoss': 0.00563, 'val_FeatRecLoss': 0.00276, 'val_kl_Loss_Z': 0.18066, 'val_kl_Loss_FC': 0.05286}
+38 saved {'val_OrigRecLoss': 0.0056, 'val_FeatRecLoss': 0.00265, 'val_kl_Loss_Z': 0.18185, 'val_kl_Loss_FC': 0.04004}
+39 saved {'val_OrigRecLoss': 0.00541, 'val_FeatRecLoss': 0.00266, 'val_kl_Loss_Z': 0.17956, 'val_kl_Loss_FC': 0.03804}
+40 not saved {'val_OrigRecLoss': 0.00542, 'val_FeatRecLoss': 0.00247, 'val_kl_Loss_Z': 0.18031, 'val_kl_Loss_FC': 0.03396}
+41 saved {'val_OrigRecLoss': 0.00499, 'val_FeatRecLoss': 0.00263, 'val_kl_Loss_Z': 0.18489, 'val_kl_Loss_FC': 0.04752}
+42 not saved {'val_OrigRecLoss': 0.00499, 'val_FeatRecLoss': 0.00249, 'val_kl_Loss_Z': 0.16357, 'val_kl_Loss_FC': 0.03451}
+43 saved {'val_OrigRecLoss': 0.00472, 'val_FeatRecLoss': 0.0025, 'val_kl_Loss_Z': 0.17077, 'val_kl_Loss_FC': 0.04003}
+44 not saved {'val_OrigRecLoss': 0.00476, 'val_FeatRecLoss': 0.0026, 'val_kl_Loss_Z': 0.1527, 'val_kl_Loss_FC': 0.02591}
+45 saved {'val_OrigRecLoss': 0.00466, 'val_FeatRecLoss': 0.00249, 'val_kl_Loss_Z': 0.17554, 'val_kl_Loss_FC': 0.0293}
+46 saved {'val_OrigRecLoss': 0.00443, 'val_FeatRecLoss': 0.00246, 'val_kl_Loss_Z': 0.16267, 'val_kl_Loss_FC': 0.03574}
+47 not saved {'val_OrigRecLoss': 0.00458, 'val_FeatRecLoss': 0.00235, 'val_kl_Loss_Z': 0.16226, 'val_kl_Loss_FC': 0.02636}
+48 saved {'val_OrigRecLoss': 0.00437, 'val_FeatRecLoss': 0.00249, 'val_kl_Loss_Z': 0.17055, 'val_kl_Loss_FC': 0.02415}
+49 saved {'val_OrigRecLoss': 0.00424, 'val_FeatRecLoss': 0.00236, 'val_kl_Loss_Z': 0.18002, 'val_kl_Loss_FC': 0.03452}
+50 not saved {'val_OrigRecLoss': 0.00428, 'val_FeatRecLoss': 0.00233, 'val_kl_Loss_Z': 0.1615, 'val_kl_Loss_FC': 0.02308}
+51 not saved {'val_OrigRecLoss': 0.0045, 'val_FeatRecLoss': 0.00229, 'val_kl_Loss_Z': 0.1456, 'val_kl_Loss_FC': 0.01701}
+52 saved {'val_OrigRecLoss': 0.0042, 'val_FeatRecLoss': 0.00228, 'val_kl_Loss_Z': 0.15133, 'val_kl_Loss_FC': 0.02402}
+53 saved {'val_OrigRecLoss': 0.00415, 'val_FeatRecLoss': 0.00221, 'val_kl_Loss_Z': 0.16571, 'val_kl_Loss_FC': 0.02451}
+54 saved {'val_OrigRecLoss': 0.00388, 'val_FeatRecLoss': 0.00244, 'val_kl_Loss_Z': 0.16907, 'val_kl_Loss_FC': 0.028}
+55 not saved {'val_OrigRecLoss': 0.00419, 'val_FeatRecLoss': 0.00214, 'val_kl_Loss_Z': 0.15869, 'val_kl_Loss_FC': 0.01632}
+56 saved {'val_OrigRecLoss': 0.00386, 'val_FeatRecLoss': 0.00232, 'val_kl_Loss_Z': 0.1522, 'val_kl_Loss_FC': 0.02499}
+57 not saved {'val_OrigRecLoss': 0.00396, 'val_FeatRecLoss': 0.00221, 'val_kl_Loss_Z': 0.16597, 'val_kl_Loss_FC': 0.01748}
+58 not saved {'val_OrigRecLoss': 0.00401, 'val_FeatRecLoss': 0.0022, 'val_kl_Loss_Z': 0.14151, 'val_kl_Loss_FC': 0.01424}
+59 saved {'val_OrigRecLoss': 0.00385, 'val_FeatRecLoss': 0.00218, 'val_kl_Loss_Z': 0.15788, 'val_kl_Loss_FC': 0.01865}
+60 not saved {'val_OrigRecLoss': 0.00389, 'val_FeatRecLoss': 0.00213, 'val_kl_Loss_Z': 0.16334, 'val_kl_Loss_FC': 0.01848}
+61 saved {'val_OrigRecLoss': 0.0038, 'val_FeatRecLoss': 0.00215, 'val_kl_Loss_Z': 0.15097, 'val_kl_Loss_FC': 0.01771}
+62 saved {'val_OrigRecLoss': 0.00373, 'val_FeatRecLoss': 0.0021, 'val_kl_Loss_Z': 0.16614, 'val_kl_Loss_FC': 0.01924}
+63 saved {'val_OrigRecLoss': 0.00368, 'val_FeatRecLoss': 0.00223, 'val_kl_Loss_Z': 0.13903, 'val_kl_Loss_FC': 0.01342}
+64 not saved {'val_OrigRecLoss': 0.00374, 'val_FeatRecLoss': 0.00206, 'val_kl_Loss_Z': 0.16351, 'val_kl_Loss_FC': 0.01569}
+65 saved {'val_OrigRecLoss': 0.00367, 'val_FeatRecLoss': 0.00213, 'val_kl_Loss_Z': 0.1511, 'val_kl_Loss_FC': 0.01537}
+66 not saved {'val_OrigRecLoss': 0.00388, 'val_FeatRecLoss': 0.00205, 'val_kl_Loss_Z': 0.14861, 'val_kl_Loss_FC': 0.00542}
+67 not saved {'val_OrigRecLoss': 0.00369, 'val_FeatRecLoss': 0.00218, 'val_kl_Loss_Z': 0.13712, 'val_kl_Loss_FC': 0.00644}
+68 not saved {'val_OrigRecLoss': 0.00367, 'val_FeatRecLoss': 0.002, 'val_kl_Loss_Z': 0.15029, 'val_kl_Loss_FC': 0.00818}
+69 saved {'val_OrigRecLoss': 0.00361, 'val_FeatRecLoss': 0.00206, 'val_kl_Loss_Z': 0.14376, 'val_kl_Loss_FC': 0.00644}
+70 not saved {'val_OrigRecLoss': 0.00368, 'val_FeatRecLoss': 0.00202, 'val_kl_Loss_Z': 0.13032, 'val_kl_Loss_FC': 0.00475}
+71 not saved {'val_OrigRecLoss': 0.00372, 'val_FeatRecLoss': 0.00206, 'val_kl_Loss_Z': 0.14955, 'val_kl_Loss_FC': 0.00719}
+72 saved {'val_OrigRecLoss': 0.00352, 'val_FeatRecLoss': 0.00201, 'val_kl_Loss_Z': 0.1421, 'val_kl_Loss_FC': 0.00631}
+73 saved {'val_OrigRecLoss': 0.00341, 'val_FeatRecLoss': 0.00202, 'val_kl_Loss_Z': 0.14299, 'val_kl_Loss_FC': 0.00818}
+74 not saved {'val_OrigRecLoss': 0.00347, 'val_FeatRecLoss': 0.0019, 'val_kl_Loss_Z': 0.1475, 'val_kl_Loss_FC': 0.00692}
+75 saved {'val_OrigRecLoss': 0.0034, 'val_FeatRecLoss': 0.00206, 'val_kl_Loss_Z': 0.12784, 'val_kl_Loss_FC': 0.00292}
+76 saved {'val_OrigRecLoss': 0.0033, 'val_FeatRecLoss': 0.00209, 'val_kl_Loss_Z': 0.13027, 'val_kl_Loss_FC': 0.00165}
+77 not saved {'val_OrigRecLoss': 0.00344, 'val_FeatRecLoss': 0.00183, 'val_kl_Loss_Z': 0.14867, 'val_kl_Loss_FC': 0.0097}
+78 saved {'val_OrigRecLoss': 0.00326, 'val_FeatRecLoss': 0.00201, 'val_kl_Loss_Z': 0.15053, 'val_kl_Loss_FC': 0.00388}
+79 saved {'val_OrigRecLoss': 0.00322, 'val_FeatRecLoss': 0.00195, 'val_kl_Loss_Z': 0.14036, 'val_kl_Loss_FC': 0.00491}
+80 not saved {'val_OrigRecLoss': 0.00323, 'val_FeatRecLoss': 0.00187, 'val_kl_Loss_Z': 0.1438, 'val_kl_Loss_FC': 0.00658}
+81 saved {'val_OrigRecLoss': 0.00321, 'val_FeatRecLoss': 0.00185, 'val_kl_Loss_Z': 0.13485, 'val_kl_Loss_FC': 0.0085}
+82 saved {'val_OrigRecLoss': 0.00313, 'val_FeatRecLoss': 0.00194, 'val_kl_Loss_Z': 0.13845, 'val_kl_Loss_FC': 0.00471}
+83 not saved {'val_OrigRecLoss': 0.0032, 'val_FeatRecLoss': 0.00189, 'val_kl_Loss_Z': 0.15736, 'val_kl_Loss_FC': 0.00579}
+84 saved {'val_OrigRecLoss': 0.00304, 'val_FeatRecLoss': 0.00194, 'val_kl_Loss_Z': 0.12977, 'val_kl_Loss_FC': 0.00436}
+85 not saved {'val_OrigRecLoss': 0.00309, 'val_FeatRecLoss': 0.00185, 'val_kl_Loss_Z': 0.14471, 'val_kl_Loss_FC': 0.00745}
+86 not saved {'val_OrigRecLoss': 0.00307, 'val_FeatRecLoss': 0.00187, 'val_kl_Loss_Z': 0.13516, 'val_kl_Loss_FC': 0.00711}
+87 saved {'val_OrigRecLoss': 0.00299, 'val_FeatRecLoss': 0.00197, 'val_kl_Loss_Z': 0.13514, 'val_kl_Loss_FC': 0.00365}
+88 saved {'val_OrigRecLoss': 0.00296, 'val_FeatRecLoss': 0.00194, 'val_kl_Loss_Z': 0.13447, 'val_kl_Loss_FC': 0.00362}
+89 saved {'val_OrigRecLoss': 0.00293, 'val_FeatRecLoss': 0.00189, 'val_kl_Loss_Z': 0.13656, 'val_kl_Loss_FC': 0.00636}
+90 saved {'val_OrigRecLoss': 0.00289, 'val_FeatRecLoss': 0.00189, 'val_kl_Loss_Z': 0.14017, 'val_kl_Loss_FC': 0.00624}
+91 not saved {'val_OrigRecLoss': 0.00291, 'val_FeatRecLoss': 0.00181, 'val_kl_Loss_Z': 0.15559, 'val_kl_Loss_FC': 0.00824}
+92 saved {'val_OrigRecLoss': 0.00288, 'val_FeatRecLoss': 0.00193, 'val_kl_Loss_Z': 0.13375, 'val_kl_Loss_FC': 0.00467}
+93 not saved {'val_OrigRecLoss': 0.00289, 'val_FeatRecLoss': 0.00175, 'val_kl_Loss_Z': 0.13434, 'val_kl_Loss_FC': 0.01031}
+94 not saved {'val_OrigRecLoss': 0.00293, 'val_FeatRecLoss': 0.00185, 'val_kl_Loss_Z': 0.12628, 'val_kl_Loss_FC': 0.00696}
+95 saved {'val_OrigRecLoss': 0.00284, 'val_FeatRecLoss': 0.0019, 'val_kl_Loss_Z': 0.1464, 'val_kl_Loss_FC': 0.00552}
+96 saved {'val_OrigRecLoss': 0.00283, 'val_FeatRecLoss': 0.00176, 'val_kl_Loss_Z': 0.12691, 'val_kl_Loss_FC': 0.00986}
+97 saved {'val_OrigRecLoss': 0.00278, 'val_FeatRecLoss': 0.00185, 'val_kl_Loss_Z': 0.15169, 'val_kl_Loss_FC': 0.0078}
+98 saved {'val_OrigRecLoss': 0.00275, 'val_FeatRecLoss': 0.00188, 'val_kl_Loss_Z': 0.12571, 'val_kl_Loss_FC': 0.00553}
+99 not saved {'val_OrigRecLoss': 0.00275, 'val_FeatRecLoss': 0.00174, 'val_kl_Loss_Z': 0.15391, 'val_kl_Loss_FC': 0.01068}
+100 saved {'val_OrigRecLoss': 0.00271, 'val_FeatRecLoss': 0.00181, 'val_kl_Loss_Z': 0.13473, 'val_kl_Loss_FC': 0.00793}
+101 not saved {'val_OrigRecLoss': 0.00273, 'val_FeatRecLoss': 0.00173, 'val_kl_Loss_Z': 0.13058, 'val_kl_Loss_FC': 0.01038}
+102 not saved {'val_OrigRecLoss': 0.00271, 'val_FeatRecLoss': 0.00176, 'val_kl_Loss_Z': 0.14246, 'val_kl_Loss_FC': 0.01031}
+103 saved {'val_OrigRecLoss': 0.00269, 'val_FeatRecLoss': 0.00178, 'val_kl_Loss_Z': 0.12253, 'val_kl_Loss_FC': 0.00886}
+104 saved {'val_OrigRecLoss': 0.00268, 'val_FeatRecLoss': 0.00177, 'val_kl_Loss_Z': 0.12383, 'val_kl_Loss_FC': 0.00981}
+105 saved {'val_OrigRecLoss': 0.00265, 'val_FeatRecLoss': 0.0018, 'val_kl_Loss_Z': 0.12294, 'val_kl_Loss_FC': 0.00759}
+106 saved {'val_OrigRecLoss': 0.00263, 'val_FeatRecLoss': 0.00178, 'val_kl_Loss_Z': 0.12168, 'val_kl_Loss_FC': 0.00881}
+107 saved {'val_OrigRecLoss': 0.00262, 'val_FeatRecLoss': 0.00187, 'val_kl_Loss_Z': 0.12249, 'val_kl_Loss_FC': 0.00553}
+108 not saved {'val_OrigRecLoss': 0.00265, 'val_FeatRecLoss': 0.00179, 'val_kl_Loss_Z': 0.12269, 'val_kl_Loss_FC': 0.00861}
+109 not saved {'val_OrigRecLoss': 0.00263, 'val_FeatRecLoss': 0.00181, 'val_kl_Loss_Z': 0.12791, 'val_kl_Loss_FC': 0.00725}
+110 not saved {'val_OrigRecLoss': 0.00263, 'val_FeatRecLoss': 0.00179, 'val_kl_Loss_Z': 0.13391, 'val_kl_Loss_FC': 0.0083}
+111 saved {'val_OrigRecLoss': 0.00261, 'val_FeatRecLoss': 0.00175, 'val_kl_Loss_Z': 0.1306, 'val_kl_Loss_FC': 0.00983}
+112 saved {'val_OrigRecLoss': 0.00258, 'val_FeatRecLoss': 0.00178, 'val_kl_Loss_Z': 0.11703, 'val_kl_Loss_FC': 0.00825}
+113 saved {'val_OrigRecLoss': 0.00254, 'val_FeatRecLoss': 0.00175, 'val_kl_Loss_Z': 0.12771, 'val_kl_Loss_FC': 0.00969}
+114 not saved {'val_OrigRecLoss': 0.00254, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 0.12866, 'val_kl_Loss_FC': 0.01175}
+115 saved {'val_OrigRecLoss': 0.00251, 'val_FeatRecLoss': 0.00185, 'val_kl_Loss_Z': 0.1139, 'val_kl_Loss_FC': 0.00687}
+116 saved {'val_OrigRecLoss': 0.0025, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 0.12095, 'val_kl_Loss_FC': 0.01134}
+117 saved {'val_OrigRecLoss': 0.00244, 'val_FeatRecLoss': 0.00178, 'val_kl_Loss_Z': 0.13312, 'val_kl_Loss_FC': 0.00971}
+118 not saved {'val_OrigRecLoss': 0.00248, 'val_FeatRecLoss': 0.00182, 'val_kl_Loss_Z': 0.11925, 'val_kl_Loss_FC': 0.00694}
+119 not saved {'val_OrigRecLoss': 0.0025, 'val_FeatRecLoss': 0.00174, 'val_kl_Loss_Z': 0.11388, 'val_kl_Loss_FC': 0.0102}
+120 not saved {'val_OrigRecLoss': 0.00246, 'val_FeatRecLoss': 0.00173, 'val_kl_Loss_Z': 0.12567, 'val_kl_Loss_FC': 0.00956}
+121 not saved {'val_OrigRecLoss': 0.00258, 'val_FeatRecLoss': 0.00166, 'val_kl_Loss_Z': 0.13327, 'val_kl_Loss_FC': 0.01239}
+122 saved {'val_OrigRecLoss': 0.00242, 'val_FeatRecLoss': 0.0018, 'val_kl_Loss_Z': 0.11904, 'val_kl_Loss_FC': 0.0084}
+123 not saved {'val_OrigRecLoss': 0.00243, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.15708, 'val_kl_Loss_FC': 0.01137}
+124 not saved {'val_OrigRecLoss': 0.00244, 'val_FeatRecLoss': 0.00181, 'val_kl_Loss_Z': 0.12724, 'val_kl_Loss_FC': 0.00857}
+125 saved {'val_OrigRecLoss': 0.0024, 'val_FeatRecLoss': 0.0018, 'val_kl_Loss_Z': 0.11159, 'val_kl_Loss_FC': 0.00769}
+126 not saved {'val_OrigRecLoss': 0.00244, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.12315, 'val_kl_Loss_FC': 0.0135}
+127 not saved {'val_OrigRecLoss': 0.00244, 'val_FeatRecLoss': 0.00178, 'val_kl_Loss_Z': 0.13753, 'val_kl_Loss_FC': 0.01011}
+128 not saved {'val_OrigRecLoss': 0.00247, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.12696, 'val_kl_Loss_FC': 0.01126}
+129 not saved {'val_OrigRecLoss': 0.00251, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 0.1252, 'val_kl_Loss_FC': 0.01174}
+130 saved {'val_OrigRecLoss': 0.00235, 'val_FeatRecLoss': 0.00177, 'val_kl_Loss_Z': 0.12536, 'val_kl_Loss_FC': 0.00988}
+131 not saved {'val_OrigRecLoss': 0.0024, 'val_FeatRecLoss': 0.00169, 'val_kl_Loss_Z': 0.1405, 'val_kl_Loss_FC': 0.01218}
+132 not saved {'val_OrigRecLoss': 0.00238, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.13162, 'val_kl_Loss_FC': 0.01234}
+133 not saved {'val_OrigRecLoss': 0.0024, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.14295, 'val_kl_Loss_FC': 0.01188}
+134 saved {'val_OrigRecLoss': 0.00235, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.14053, 'val_kl_Loss_FC': 0.01297}
+135 saved {'val_OrigRecLoss': 0.00232, 'val_FeatRecLoss': 0.00173, 'val_kl_Loss_Z': 0.129, 'val_kl_Loss_FC': 0.00985}
+136 saved {'val_OrigRecLoss': 0.00231, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 0.12102, 'val_kl_Loss_FC': 0.01123}
+137 saved {'val_OrigRecLoss': 0.0023, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 0.11278, 'val_kl_Loss_FC': 0.01071}
+138 not saved {'val_OrigRecLoss': 0.00238, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.1128, 'val_kl_Loss_FC': 0.01417}
+139 not saved {'val_OrigRecLoss': 0.00239, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.11524, 'val_kl_Loss_FC': 0.013}
+140 saved {'val_OrigRecLoss': 0.00229, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 0.12981, 'val_kl_Loss_FC': 0.01233}
+141 not saved {'val_OrigRecLoss': 0.00231, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 0.11423, 'val_kl_Loss_FC': 0.01037}
+142 saved {'val_OrigRecLoss': 0.00228, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.13646, 'val_kl_Loss_FC': 0.01364}
+143 not saved {'val_OrigRecLoss': 0.00233, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.11981, 'val_kl_Loss_FC': 0.01441}
+144 not saved {'val_OrigRecLoss': 0.0023, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.12244, 'val_kl_Loss_FC': 0.01252}
+145 not saved {'val_OrigRecLoss': 0.00231, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.14022, 'val_kl_Loss_FC': 0.01183}
+146 not saved {'val_OrigRecLoss': 0.00231, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11101, 'val_kl_Loss_FC': 0.01249}
+147 saved {'val_OrigRecLoss': 0.00227, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.12514, 'val_kl_Loss_FC': 0.01577}
+148 saved {'val_OrigRecLoss': 0.00227, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 0.11051, 'val_kl_Loss_FC': 0.01081}
+149 saved {'val_OrigRecLoss': 0.00224, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 0.1437, 'val_kl_Loss_FC': 0.01059}
+150 not saved {'val_OrigRecLoss': 0.00224, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.14728, 'val_kl_Loss_FC': 0.01505}
+151 not saved {'val_OrigRecLoss': 0.0023, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.12092, 'val_kl_Loss_FC': 0.01434}
+152 saved {'val_OrigRecLoss': 0.00223, 'val_FeatRecLoss': 0.00166, 'val_kl_Loss_Z': 0.1179, 'val_kl_Loss_FC': 0.01282}
+153 not saved {'val_OrigRecLoss': 0.00227, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.12122, 'val_kl_Loss_FC': 0.01352}
+154 not saved {'val_OrigRecLoss': 0.00223, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 0.12201, 'val_kl_Loss_FC': 0.01086}
+155 saved {'val_OrigRecLoss': 0.00221, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.1221, 'val_kl_Loss_FC': 0.01591}
+156 saved {'val_OrigRecLoss': 0.00221, 'val_FeatRecLoss': 0.00174, 'val_kl_Loss_Z': 0.11888, 'val_kl_Loss_FC': 0.00979}
+157 saved {'val_OrigRecLoss': 0.00219, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.13378, 'val_kl_Loss_FC': 0.01167}
+158 not saved {'val_OrigRecLoss': 0.00232, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.19644, 'val_kl_Loss_FC': 0.01542}
+159 not saved {'val_OrigRecLoss': 0.00221, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.11453, 'val_kl_Loss_FC': 0.01217}
+160 not saved {'val_OrigRecLoss': 0.0022, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.11796, 'val_kl_Loss_FC': 0.01395}
+161 not saved {'val_OrigRecLoss': 0.0022, 'val_FeatRecLoss': 0.0016, 'val_kl_Loss_Z': 0.13373, 'val_kl_Loss_FC': 0.01494}
+162 saved {'val_OrigRecLoss': 0.00217, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.11841, 'val_kl_Loss_FC': 0.01206}
+163 saved {'val_OrigRecLoss': 0.00215, 'val_FeatRecLoss': 0.00169, 'val_kl_Loss_Z': 0.13618, 'val_kl_Loss_FC': 0.01135}
+164 not saved {'val_OrigRecLoss': 0.00216, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.13337, 'val_kl_Loss_FC': 0.0126}
+165 not saved {'val_OrigRecLoss': 0.00227, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.12929, 'val_kl_Loss_FC': 0.0146}
+166 not saved {'val_OrigRecLoss': 0.00217, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.11177, 'val_kl_Loss_FC': 0.01198}
+167 not saved {'val_OrigRecLoss': 0.00217, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 0.1086, 'val_kl_Loss_FC': 0.01169}
+168 not saved {'val_OrigRecLoss': 0.00217, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11926, 'val_kl_Loss_FC': 0.01234}
+169 saved {'val_OrigRecLoss': 0.00215, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.16233, 'val_kl_Loss_FC': 0.01423}
+170 saved {'val_OrigRecLoss': 0.00213, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.11542, 'val_kl_Loss_FC': 0.01157}
+171 not saved {'val_OrigRecLoss': 0.00223, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.12694, 'val_kl_Loss_FC': 0.01357}
+172 not saved {'val_OrigRecLoss': 0.00216, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 0.11541, 'val_kl_Loss_FC': 0.01045}
+173 not saved {'val_OrigRecLoss': 0.00217, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.1325, 'val_kl_Loss_FC': 0.01385}
+174 not saved {'val_OrigRecLoss': 0.00216, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11906, 'val_kl_Loss_FC': 0.01515}
+175 not saved {'val_OrigRecLoss': 0.00215, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.10643, 'val_kl_Loss_FC': 0.01486}
+176 not saved {'val_OrigRecLoss': 0.00215, 'val_FeatRecLoss': 0.00166, 'val_kl_Loss_Z': 0.10288, 'val_kl_Loss_FC': 0.01222}
+177 saved {'val_OrigRecLoss': 0.00212, 'val_FeatRecLoss': 0.00171, 'val_kl_Loss_Z': 0.10892, 'val_kl_Loss_FC': 0.01113}
+178 not saved {'val_OrigRecLoss': 0.00219, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11552, 'val_kl_Loss_FC': 0.01588}
+179 not saved {'val_OrigRecLoss': 0.00214, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.14575, 'val_kl_Loss_FC': 0.01299}
+180 not saved {'val_OrigRecLoss': 0.00213, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11738, 'val_kl_Loss_FC': 0.01256}
+181 not saved {'val_OrigRecLoss': 0.00212, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10077, 'val_kl_Loss_FC': 0.01577}
+182 saved {'val_OrigRecLoss': 0.00208, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.10945, 'val_kl_Loss_FC': 0.01485}
+183 not saved {'val_OrigRecLoss': 0.00214, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.11252, 'val_kl_Loss_FC': 0.0135}
+184 not saved {'val_OrigRecLoss': 0.00211, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.12072, 'val_kl_Loss_FC': 0.01386}
+185 not saved {'val_OrigRecLoss': 0.00211, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.11566, 'val_kl_Loss_FC': 0.01293}
+186 saved {'val_OrigRecLoss': 0.00208, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11398, 'val_kl_Loss_FC': 0.01293}
+187 not saved {'val_OrigRecLoss': 0.00212, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 0.13253, 'val_kl_Loss_FC': 0.01147}
+188 not saved {'val_OrigRecLoss': 0.00213, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.11229, 'val_kl_Loss_FC': 0.01288}
+189 not saved {'val_OrigRecLoss': 0.00213, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.11326, 'val_kl_Loss_FC': 0.0157}
+190 saved {'val_OrigRecLoss': 0.00207, 'val_FeatRecLoss': 0.00166, 'val_kl_Loss_Z': 0.13405, 'val_kl_Loss_FC': 0.01291}
+191 not saved {'val_OrigRecLoss': 0.00208, 'val_FeatRecLoss': 0.00163, 'val_kl_Loss_Z': 0.14734, 'val_kl_Loss_FC': 0.01442}
+192 not saved {'val_OrigRecLoss': 0.00212, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.12499, 'val_kl_Loss_FC': 0.01598}
+193 saved {'val_OrigRecLoss': 0.00204, 'val_FeatRecLoss': 0.00172, 'val_kl_Loss_Z': 0.13297, 'val_kl_Loss_FC': 0.01101}
+194 not saved {'val_OrigRecLoss': 0.0021, 'val_FeatRecLoss': 0.0016, 'val_kl_Loss_Z': 0.13193, 'val_kl_Loss_FC': 0.01441}
+195 saved {'val_OrigRecLoss': 0.00204, 'val_FeatRecLoss': 0.00169, 'val_kl_Loss_Z': 0.13964, 'val_kl_Loss_FC': 0.01115}
+196 saved {'val_OrigRecLoss': 0.00203, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.12494, 'val_kl_Loss_FC': 0.01252}
+197 not saved {'val_OrigRecLoss': 0.00207, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11115, 'val_kl_Loss_FC': 0.01349}
+198 not saved {'val_OrigRecLoss': 0.00208, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.10752, 'val_kl_Loss_FC': 0.0138}
+199 not saved {'val_OrigRecLoss': 0.00208, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.12241, 'val_kl_Loss_FC': 0.01531}
+200 saved {'val_OrigRecLoss': 0.00202, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.11242, 'val_kl_Loss_FC': 0.01199}
+201 not saved {'val_OrigRecLoss': 0.00209, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.12396, 'val_kl_Loss_FC': 0.01578}
+202 saved {'val_OrigRecLoss': 0.002, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 0.12165, 'val_kl_Loss_FC': 0.01178}
+203 not saved {'val_OrigRecLoss': 0.00202, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.10921, 'val_kl_Loss_FC': 0.01424}
+204 not saved {'val_OrigRecLoss': 0.00204, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.13502, 'val_kl_Loss_FC': 0.01611}
+205 not saved {'val_OrigRecLoss': 0.00206, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.10988, 'val_kl_Loss_FC': 0.01655}
+206 not saved {'val_OrigRecLoss': 0.00205, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.10609, 'val_kl_Loss_FC': 0.01466}
+207 saved {'val_OrigRecLoss': 0.00198, 'val_FeatRecLoss': 0.00173, 'val_kl_Loss_Z': 0.10598, 'val_kl_Loss_FC': 0.0104}
+208 not saved {'val_OrigRecLoss': 0.00203, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.12093, 'val_kl_Loss_FC': 0.01535}
+209 not saved {'val_OrigRecLoss': 0.00202, 'val_FeatRecLoss': 0.0017, 'val_kl_Loss_Z': 0.11372, 'val_kl_Loss_FC': 0.01103}
+210 not saved {'val_OrigRecLoss': 0.00202, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11506, 'val_kl_Loss_FC': 0.01616}
+211 not saved {'val_OrigRecLoss': 0.00207, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11675, 'val_kl_Loss_FC': 0.01476}
+212 not saved {'val_OrigRecLoss': 0.00207, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.11176, 'val_kl_Loss_FC': 0.01546}
+213 not saved {'val_OrigRecLoss': 0.00209, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.10852, 'val_kl_Loss_FC': 0.01406}
+214 not saved {'val_OrigRecLoss': 0.00203, 'val_FeatRecLoss': 0.00163, 'val_kl_Loss_Z': 0.1136, 'val_kl_Loss_FC': 0.01326}
+215 not saved {'val_OrigRecLoss': 0.00199, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.13964, 'val_kl_Loss_FC': 0.01469}
+216 not saved {'val_OrigRecLoss': 0.0021, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.10562, 'val_kl_Loss_FC': 0.0169}
+217 not saved {'val_OrigRecLoss': 0.00206, 'val_FeatRecLoss': 0.00163, 'val_kl_Loss_Z': 0.1184, 'val_kl_Loss_FC': 0.01369}
+218 not saved {'val_OrigRecLoss': 0.00204, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.1141, 'val_kl_Loss_FC': 0.01578}
+219 not saved {'val_OrigRecLoss': 0.00203, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.12417, 'val_kl_Loss_FC': 0.01569}
+220 saved {'val_OrigRecLoss': 0.00198, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11896, 'val_kl_Loss_FC': 0.01687}
+221 saved {'val_OrigRecLoss': 0.00198, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.11439, 'val_kl_Loss_FC': 0.01358}
+222 not saved {'val_OrigRecLoss': 0.002, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.1376, 'val_kl_Loss_FC': 0.01464}
+223 not saved {'val_OrigRecLoss': 0.00204, 'val_FeatRecLoss': 0.00151, 'val_kl_Loss_Z': 0.1341, 'val_kl_Loss_FC': 0.01876}
+224 not saved {'val_OrigRecLoss': 0.00201, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.10781, 'val_kl_Loss_FC': 0.01266}
+225 not saved {'val_OrigRecLoss': 0.002, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11711, 'val_kl_Loss_FC': 0.01505}
+226 saved {'val_OrigRecLoss': 0.00197, 'val_FeatRecLoss': 0.00168, 'val_kl_Loss_Z': 0.10909, 'val_kl_Loss_FC': 0.01193}
+227 not saved {'val_OrigRecLoss': 0.00198, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.13466, 'val_kl_Loss_FC': 0.01582}
+228 saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00169, 'val_kl_Loss_Z': 0.11021, 'val_kl_Loss_FC': 0.01224}
+229 saved {'val_OrigRecLoss': 0.00195, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.10262, 'val_kl_Loss_FC': 0.01445}
+230 not saved {'val_OrigRecLoss': 0.00198, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.10928, 'val_kl_Loss_FC': 0.01241}
+231 not saved {'val_OrigRecLoss': 0.00199, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.1088, 'val_kl_Loss_FC': 0.01598}
+232 not saved {'val_OrigRecLoss': 0.00204, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.10275, 'val_kl_Loss_FC': 0.01538}
+233 not saved {'val_OrigRecLoss': 0.00202, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.12537, 'val_kl_Loss_FC': 0.01226}
+234 not saved {'val_OrigRecLoss': 0.00199, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10601, 'val_kl_Loss_FC': 0.01497}
+235 not saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.11289, 'val_kl_Loss_FC': 0.01278}
+236 not saved {'val_OrigRecLoss': 0.00197, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.12003, 'val_kl_Loss_FC': 0.01718}
+237 not saved {'val_OrigRecLoss': 0.00195, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.11952, 'val_kl_Loss_FC': 0.01627}
+238 not saved {'val_OrigRecLoss': 0.00201, 'val_FeatRecLoss': 0.00149, 'val_kl_Loss_Z': 0.16773, 'val_kl_Loss_FC': 0.0189}
+239 not saved {'val_OrigRecLoss': 0.00197, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10487, 'val_kl_Loss_FC': 0.01553}
+240 not saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.1129, 'val_kl_Loss_FC': 0.01215}
+241 not saved {'val_OrigRecLoss': 0.00197, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11495, 'val_kl_Loss_FC': 0.01603}
+242 not saved {'val_OrigRecLoss': 0.00197, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10645, 'val_kl_Loss_FC': 0.01582}
+243 not saved {'val_OrigRecLoss': 0.002, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.10558, 'val_kl_Loss_FC': 0.01444}
+244 not saved {'val_OrigRecLoss': 0.00195, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.12462, 'val_kl_Loss_FC': 0.01596}
+245 saved {'val_OrigRecLoss': 0.00194, 'val_FeatRecLoss': 0.00163, 'val_kl_Loss_Z': 0.13012, 'val_kl_Loss_FC': 0.01281}
+246 not saved {'val_OrigRecLoss': 0.00197, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11533, 'val_kl_Loss_FC': 0.01586}
+247 not saved {'val_OrigRecLoss': 0.002, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.11745, 'val_kl_Loss_FC': 0.01596}
+248 saved {'val_OrigRecLoss': 0.00192, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.11055, 'val_kl_Loss_FC': 0.01417}
+249 not saved {'val_OrigRecLoss': 0.00194, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11619, 'val_kl_Loss_FC': 0.01586}
+250 not saved {'val_OrigRecLoss': 0.00195, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.12622, 'val_kl_Loss_FC': 0.01508}
+251 not saved {'val_OrigRecLoss': 0.00195, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.12073, 'val_kl_Loss_FC': 0.01377}
+252 not saved {'val_OrigRecLoss': 0.00192, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.11153, 'val_kl_Loss_FC': 0.01461}
+253 not saved {'val_OrigRecLoss': 0.00194, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.10433, 'val_kl_Loss_FC': 0.01536}
+254 saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.10561, 'val_kl_Loss_FC': 0.01438}
+255 not saved {'val_OrigRecLoss': 0.00192, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11536, 'val_kl_Loss_FC': 0.01505}
+256 not saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.12241, 'val_kl_Loss_FC': 0.01374}
+257 not saved {'val_OrigRecLoss': 0.00193, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11368, 'val_kl_Loss_FC': 0.01556}
+258 not saved {'val_OrigRecLoss': 0.00193, 'val_FeatRecLoss': 0.00149, 'val_kl_Loss_Z': 0.10581, 'val_kl_Loss_FC': 0.01928}
+259 not saved {'val_OrigRecLoss': 0.00193, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.11119, 'val_kl_Loss_FC': 0.01373}
+260 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.0016, 'val_kl_Loss_Z': 0.15408, 'val_kl_Loss_FC': 0.01468}
+261 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.1162, 'val_kl_Loss_FC': 0.01462}
+262 not saved {'val_OrigRecLoss': 0.00196, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10042, 'val_kl_Loss_FC': 0.01505}
+263 not saved {'val_OrigRecLoss': 0.00193, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.11643, 'val_kl_Loss_FC': 0.01689}
+264 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00155, 'val_kl_Loss_Z': 0.12808, 'val_kl_Loss_FC': 0.01744}
+265 saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.09884, 'val_kl_Loss_FC': 0.01274}
+266 not saved {'val_OrigRecLoss': 0.00192, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11854, 'val_kl_Loss_FC': 0.01497}
+267 not saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 0.10913, 'val_kl_Loss_FC': 0.0128}
+268 not saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.15978, 'val_kl_Loss_FC': 0.01677}
+269 not saved {'val_OrigRecLoss': 0.00192, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.11377, 'val_kl_Loss_FC': 0.01325}
+270 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11497, 'val_kl_Loss_FC': 0.01326}
+271 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00148, 'val_kl_Loss_Z': 0.1067, 'val_kl_Loss_FC': 0.0195}
+272 not saved {'val_OrigRecLoss': 0.00194, 'val_FeatRecLoss': 0.00155, 'val_kl_Loss_Z': 0.10935, 'val_kl_Loss_FC': 0.01658}
+273 not saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00155, 'val_kl_Loss_Z': 0.12517, 'val_kl_Loss_FC': 0.01597}
+274 not saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.15759, 'val_kl_Loss_FC': 0.01681}
+275 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.12296, 'val_kl_Loss_FC': 0.01506}
+276 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.11591, 'val_kl_Loss_FC': 0.01765}
+277 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.12462, 'val_kl_Loss_FC': 0.01788}
+278 saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 0.10193, 'val_kl_Loss_FC': 0.01278}
+279 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.12478, 'val_kl_Loss_FC': 0.01778}
+280 not saved {'val_OrigRecLoss': 0.00199, 'val_FeatRecLoss': 0.00152, 'val_kl_Loss_Z': 0.11445, 'val_kl_Loss_FC': 0.01763}
+281 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.11083, 'val_kl_Loss_FC': 0.01638}
+282 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.0016, 'val_kl_Loss_Z': 0.11038, 'val_kl_Loss_FC': 0.01408}
+283 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.10347, 'val_kl_Loss_FC': 0.01518}
+284 not saved {'val_OrigRecLoss': 0.00193, 'val_FeatRecLoss': 0.00165, 'val_kl_Loss_Z': 0.11013, 'val_kl_Loss_FC': 0.01225}
+285 not saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11477, 'val_kl_Loss_FC': 0.01466}
+286 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.12184, 'val_kl_Loss_FC': 0.01421}
+287 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.0015, 'val_kl_Loss_Z': 0.11252, 'val_kl_Loss_FC': 0.0182}
+288 saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.1258, 'val_kl_Loss_FC': 0.01494}
+289 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.12086, 'val_kl_Loss_FC': 0.01704}
+290 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00152, 'val_kl_Loss_Z': 0.10825, 'val_kl_Loss_FC': 0.01713}
+291 not saved {'val_OrigRecLoss': 0.00191, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.11458, 'val_kl_Loss_FC': 0.01667}
+292 saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00166, 'val_kl_Loss_Z': 0.10703, 'val_kl_Loss_FC': 0.01268}
+293 saved {'val_OrigRecLoss': 0.00184, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.113, 'val_kl_Loss_FC': 0.015}
+294 not saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.10593, 'val_kl_Loss_FC': 0.01684}
+295 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.1046, 'val_kl_Loss_FC': 0.01422}
+296 not saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11225, 'val_kl_Loss_FC': 0.01543}
+297 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.1217, 'val_kl_Loss_FC': 0.01698}
+298 not saved {'val_OrigRecLoss': 0.0019, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.10245, 'val_kl_Loss_FC': 0.01625}
+299 saved {'val_OrigRecLoss': 0.00182, 'val_FeatRecLoss': 0.00161, 'val_kl_Loss_Z': 0.11068, 'val_kl_Loss_FC': 0.01422}
+300 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.00152, 'val_kl_Loss_Z': 0.12186, 'val_kl_Loss_FC': 0.0175}
+301 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.00162, 'val_kl_Loss_Z': 0.12187, 'val_kl_Loss_FC': 0.01397}
+302 not saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00158, 'val_kl_Loss_Z': 0.1332, 'val_kl_Loss_FC': 0.01564}
+303 not saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00154, 'val_kl_Loss_Z': 0.12832, 'val_kl_Loss_FC': 0.01675}
+304 not saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.11932, 'val_kl_Loss_FC': 0.01543}
+305 not saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00151, 'val_kl_Loss_Z': 0.10954, 'val_kl_Loss_FC': 0.01769}
+306 not saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10327, 'val_kl_Loss_FC': 0.01584}
+307 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.00151, 'val_kl_Loss_Z': 0.11482, 'val_kl_Loss_FC': 0.01786}
+308 not saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00152, 'val_kl_Loss_Z': 0.12784, 'val_kl_Loss_FC': 0.01737}
+309 not saved {'val_OrigRecLoss': 0.00189, 'val_FeatRecLoss': 0.00149, 'val_kl_Loss_Z': 0.10611, 'val_kl_Loss_FC': 0.01783}
+310 not saved {'val_OrigRecLoss': 0.00186, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.13036, 'val_kl_Loss_FC': 0.01668}
+311 saved {'val_OrigRecLoss': 0.00182, 'val_FeatRecLoss': 0.00159, 'val_kl_Loss_Z': 0.11511, 'val_kl_Loss_FC': 0.01515}
+312 not saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.10736, 'val_kl_Loss_FC': 0.01651}
+313 not saved {'val_OrigRecLoss': 0.00184, 'val_FeatRecLoss': 0.00152, 'val_kl_Loss_Z': 0.10547, 'val_kl_Loss_FC': 0.01805}
+314 not saved {'val_OrigRecLoss': 0.00188, 'val_FeatRecLoss': 0.00157, 'val_kl_Loss_Z': 0.10589, 'val_kl_Loss_FC': 0.01512}
+315 not saved {'val_OrigRecLoss': 0.00187, 'val_FeatRecLoss': 0.00156, 'val_kl_Loss_Z': 0.10563, 'val_kl_Loss_FC': 0.01605}
+316 not saved {'val_OrigRecLoss': 0.00184, 'val_FeatRecLoss': 0.00155, 'val_kl_Loss_Z': 0.10983, 'val_kl_Loss_FC': 0.01647}
+317 not saved {'val_OrigRecLoss': 0.00185, 'val_FeatRecLoss': 0.00153, 'val_kl_Loss_Z': 0.11957, 'val_kl_Loss_FC': 0.01735}

@@ -1,0 +1,6 @@
+1 saved {'val_OrigRecLoss': 0.01171, 'val_FeatRecLoss': 0.00284, 'val_kl_Loss_Z': 7.47929, 'val_kl_Loss_FC': 0.08614, 'val_kl_Loss_TC': 220.93267, 'val_kl_Loss_MI': 4.73136}
+2 saved {'val_OrigRecLoss': 0.01152, 'val_FeatRecLoss': 0.00268, 'val_kl_Loss_Z': 9.07642, 'val_kl_Loss_FC': 0.00244, 'val_kl_Loss_TC': 221.43515, 'val_kl_Loss_MI': 5.28558}
+3 saved {'val_OrigRecLoss': 0.01148, 'val_FeatRecLoss': 0.00207, 'val_kl_Loss_Z': 4.14985, 'val_kl_Loss_FC': 0.00364, 'val_kl_Loss_TC': 222.02017, 'val_kl_Loss_MI': 5.52839}
+4 saved {'val_OrigRecLoss': 0.01147, 'val_FeatRecLoss': 0.00167, 'val_kl_Loss_Z': 3.67771, 'val_kl_Loss_FC': 0.00379, 'val_kl_Loss_TC': 222.08648, 'val_kl_Loss_MI': 5.55071}
+5 saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.00164, 'val_kl_Loss_Z': 14.57303, 'val_kl_Loss_FC': 0.00403, 'val_kl_Loss_TC': 221.87846, 'val_kl_Loss_MI': 5.47658}
+6 saved {'val_OrigRecLoss': 0.01146, 'val_FeatRecLoss': 0.00169, 'val_kl_Loss_Z': 8.07712, 'val_kl_Loss_FC': 0.00435, 'val_kl_Loss_TC': 221.93112, 'val_kl_Loss_MI': 5.48734}
