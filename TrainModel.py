@@ -7,7 +7,7 @@ import re
 
 import tensorflow as tf
 from tensorflow.keras import Model
-from Utilities.Utilities import *
+from Utilities.Utilities import ReadYaml
 from Models.Caller import *
 
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
     yaml_path = './Config/'+LoadConfig+'.yml'
-    ConfigSet = read_yaml(yaml_path)
+    ConfigSet = ReadYaml(yaml_path)
 
     
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
@@ -69,26 +69,11 @@ if __name__ == "__main__":
     
     ### Loss-related parameters
     LossType = ConfigSet[ConfigName]['LossType']
+    SpecLosses = ConfigSet[ConfigName]['SpecLosses']
     
     ### Ancillary parameters
     BatSize = ConfigSet[ConfigName]['BatSize']
     NEpochs = ConfigSet[ConfigName]['NEpochs']
-    
-    ### Parameters for constant losse weights
-    WRec = ConfigSet[ConfigName]['WRec']
-    WFeat = ConfigSet[ConfigName]['WFeat']
-    WZ = ConfigSet[ConfigName]['WZ']
-    
-    ### Parameters for dynamic controller for losse weights
-    SpecLosses = ConfigSet[ConfigName]['SpecLosses']
-    MnWRec = ConfigSet[ConfigName]['MnWRec']
-    MnWFeat = ConfigSet[ConfigName]['MnWFeat']
-    MnWZ = ConfigSet[ConfigName]['MnWZ']
-    
-    MxWRec = ConfigSet[ConfigName]['MxWRec']
-    MxWFeat = ConfigSet[ConfigName]['MxWFeat']
-    MxWZ = ConfigSet[ConfigName]['MxWZ']
-    
     
     
     ### Experiment setting
@@ -97,6 +82,7 @@ if __name__ == "__main__":
     
     if not os.path.exists(SavePath+SubPath):
         os.mkdir(SavePath+SubPath)
+        
         
     ### Model checkpoint
     ModelSaveName = SavePath+SubPath+ModelName
@@ -114,46 +100,8 @@ if __name__ == "__main__":
     # Calling Modesl
     SigRepModel = ModelCall (ConfigSet[ConfigName], SigDim, DataSize, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName)
    
-
-    ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z'}
-    ScalingDic = { 'val_OrigRecLoss':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ}
-    MinLimit = {'Beta_Orig':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ}
-    MaxLimit = {'Beta_Orig':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ}
-    
-    
-    ### Dynamic controller for specific losses and betas
-    if 'FC' in SpecLosses :
-        RelLossDic['val_kl_Loss_FC'] = 'Beta_Fc'
-        ScalingDic['val_kl_Loss_FC'] = ConfigSet[ConfigName]['WFC']
-        MinLimit['Beta_Fc'] = ConfigSet[ConfigName]['MnWFC']
-        MaxLimit['Beta_Fc'] = ConfigSet[ConfigName]['MxWFC']
-        
-    if 'TC' in SpecLosses :
-        RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = ConfigSet[ConfigName]['WTC']
-        MinLimit['Beta_TC'] = ConfigSet[ConfigName]['MnWTC']
-        MaxLimit['Beta_TC'] = ConfigSet[ConfigName]['MxWTC']
-        
-    if 'MI' in SpecLosses :
-        RelLossDic['val_kl_Loss_MI'] = 'Beta_MI'
-        ScalingDic['val_kl_Loss_MI'] = ConfigSet[ConfigName]['WMI']
-        MinLimit['Beta_MI'] = ConfigSet[ConfigName]['MnWMI']
-        MaxLimit['Beta_MI'] = ConfigSet[ConfigName]['MxWMI']
-        
-    if LossType =='FACLosses':
-        RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = ConfigSet[ConfigName]['WTC']
-        MinLimit['Beta_TC'] = ConfigSet[ConfigName]['MnWTC']
-        MaxLimit['Beta_TC'] = ConfigSet[ConfigName]['MxWTC']
-        
-        RelLossDic['val_kl_Loss_DTC'] = 'Beta_DTC'
-        ScalingDic['val_kl_Loss_DTC'] = ConfigSet[ConfigName]['WDTC']
-        MinLimit['Beta_DTC'] = ConfigSet[ConfigName]['MnWDTC']
-        MaxLimit['Beta_DTC'] = ConfigSet[ConfigName]['MxWDTC']
-        
-
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_OrigRecLoss'] , SaveWay='max' , SavePath = ModelSaveName)
+    # Calling dynamic controller for losses (DCL)
+    RelLoss = DCLCall (ConfigSet[ConfigName], ModelSaveName, ToSaveLoss=None, SaveWay='max')
     
     
     # Model Training

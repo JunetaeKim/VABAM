@@ -7,7 +7,7 @@ import yaml
 
 
 
-def read_yaml(file_path):
+def ReadYaml(file_path):
     with open(file_path, 'r') as file:
         return yaml.safe_load(file)
     
@@ -92,7 +92,7 @@ class Anneal(tf.keras.callbacks.Callback):
 
         
 class RelLossWeight(tf.keras.callbacks.Callback):
-    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True, SavePath=None, CheckPoint=False):
+    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , SavePath, verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True,  CheckPoint=False):
             
         if type(ToSaveLoss) != list and ToSaveLoss is not None:
             ToSaveLoss = [ToSaveLoss]
