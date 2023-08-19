@@ -114,7 +114,7 @@ if __name__ == "__main__":
         os.mkdir(SavePath+SubPath)
         
     ### Model checkpoint
-    ModelSaveName = SavePath+ModelName
+    ModelSaveName = SavePath+SubPath+ModelName
     
 
     
