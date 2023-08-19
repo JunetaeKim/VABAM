@@ -59,10 +59,13 @@ if __name__ == "__main__":
     
     if 'ART' in ConfigName:
         LoadConfig = 'Config' + 'ART'
+        SubPath = 'ART/'
     elif 'PLETH' in ConfigName:
         LoadConfig = 'Config' + 'PLETH'
+        SubPath = 'PLETH/'
     elif 'II' in ConfigName:
         LoadConfig = 'Config' + 'II'
+        SubPath = 'II/'
     else:
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
@@ -82,14 +85,15 @@ if __name__ == "__main__":
     NEpochs = ConfigSet[ConfigName]['NEpochs']
     
     
+    ### Experiment setting
     SavePath = './Results/'
     ModelName = ConfigName+'.hdf5'
     
-    if not os.path.exists(SavePath):
-        os.mkdir(SavePath)
+    if not os.path.exists(SavePath+SubPath):
+        os.mkdir(SavePath+SubPath)
         
     ### Model checkpoint
-    ModelSaveName = SavePath+ModelName
+    ModelSaveName = SavePath+SubPath+ModelName
     
 
     
