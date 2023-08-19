@@ -100,13 +100,15 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.CheckLoss = np.inf
         self.SaveWay = SaveWay
         self.SavePath = SavePath
-        self.Logs = []
+        PathInfo = SavePath.split('/')
         self.SaveLogOnly = SaveLogOnly
-        self.LogsPath = "./Logs/Logs_" + SavePath.split('/')[-1].split('.')[0] + '.txt'
+        self.LogsPath = './Logs/'+PathInfo[2]+'/Logs_'+PathInfo[-1].split('.')[0]+ '.txt'
         self.CheckPoint = CheckPoint
+        self.Logs = []
         
-        if not os.path.exists('./Logs'):
-            os.mkdir('./Logs')
+        if not os.path.exists('./Logs/'+PathInfo[2]):
+            os.mkdir('./Logs/'+PathInfo[2])
+        
         
     def on_epoch_end(self, epoch, logs={}):
         
