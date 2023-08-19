@@ -20,11 +20,16 @@ def SKLDZ (Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z):
     return kl_Loss_Z
 
 
-def BaseVAE (SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
+def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True):
+    
+    ### Model related parameters
+    ReparaStd = ConfigSpec['ReparaStd']
+    LatDim = ConfigSpec['LatDim']
+    ReparaStd = ConfigSpec['ReparaStd']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim, Reparam = True)
-    ReconModel = Decoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim)
+    EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam)
+    ReconModel = Decoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim)
     
     ## Model core parts
     ReconOut =ReconModel(EncModel.output)
@@ -69,7 +74,12 @@ def BaseVAE (SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Rep
 
 
 
-def ConVAE (SigDim, CondDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
+def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True):
+    
+    ### Model related parameters
+    ReparaStd = ConfigSpec['ReparaStd']
+    LatDim = ConfigSpec['LatDim']
+    ReparaStd = ConfigSpec['ReparaStd']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     EncModel = Encoder(SigDim=SigDim,CondDim=CondDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
@@ -116,11 +126,16 @@ def ConVAE (SigDim, CondDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=
 
 
 
-def TCVAE (  SigDim, NData, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
+def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True):
+    
+    ### Model related parameters
+    ReparaStd = ConfigSpec['ReparaStd']
+    LatDim = ConfigSpec['LatDim']
+    ReparaStd = ConfigSpec['ReparaStd']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim, Reparam = Reparam)
-    ReconModel = Decoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim)
+    EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
+    ReconModel = Decoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim)
 
     ## Model core parts
     ReconOut =ReconModel(EncModel.output)
@@ -196,14 +211,17 @@ def TCVAE (  SigDim, NData, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0
 
 
 
-def FACVAE (  SigDim, ConfigSpec, LatDim=50, SlidingSize = 50, ReparaStd=0.1, Reparam=True):
+def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True):
     
     ### Model related parameters
+    ReparaStd = ConfigSpec['ReparaStd']
+    LatDim = ConfigSpec['LatDim']
+    ReparaStd = ConfigSpec['ReparaStd']
     DiscHiddenSize = ConfigSpec['DiscHiddenSize']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim, Reparam = True)
-    ReconModel = Decoder(SigDim=SigDim, SlidingSize = 50, LatDim= LatDim)
+    EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
+    ReconModel = Decoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim)
     FacDiscModel = FacDiscriminator(LatDim, DiscHiddenSize)
 
     ## Batch split 

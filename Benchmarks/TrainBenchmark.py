@@ -2,29 +2,18 @@ import sys
 # setting path
 sys.path.append('../')
 import os
-
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
-import yaml
-
-import tensorflow as tf
-from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
-from tensorflow.keras import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from Benchmarks.Models.BaseModels import *
 from Utilities.Utilities import *
-from Models.BenchmarkModels import *
+from Benchmarks.Models.BenchmarkCaller import *
+
 
 import warnings
 warnings.filterwarnings('ignore')
 
 
-def read_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
-    
+   
 
 if __name__ == "__main__":
 
@@ -70,14 +59,13 @@ if __name__ == "__main__":
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
     yaml_path = './Config/'+LoadConfig+'.yml'
-    ConfigSet = read_yaml(yaml_path)
+    ConfigSet = ReadYaml(yaml_path)
 
     
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
     SigType = ConfigSet[ConfigName]['SigType']
     LatDim = ConfigSet[ConfigName]['LatDim']
-    ReparaStd = ConfigSet[ConfigName]['ReparaStd']
     
     
     ### Other parameters
@@ -100,38 +88,14 @@ if __name__ == "__main__":
     #### -----------------------------------------------------   Data load and processing   --------------------------------------------------------
     TrData = np.load('../Data/ProcessedData/Tr'+str(SigType)+'.npy').astype('float32')
     ValData = np.load('../Data/ProcessedData/Val'+str(SigType)+'.npy').astype('float32')
-    SigDim = TrData.shape[1]
-    NData = TrData.shape[0]     
-        
     
     
-    #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    # ModelName selection
-    if 'BaseVAE' in ConfigName:
-        BenchModel = BaseVAE(SigDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
-        TrInp, ValInp = TrData, ValData
     
-    elif 'TCVAE' in ConfigName:
-        BenchModel = TCVAE(SigDim, NData, ConfigSet[ConfigName], LatDim=LatDim, ReparaStd=ReparaStd, Reparam=True)
-        TrInp, ValInp = TrData, ValData
+    #### -----------------------------------------------------  Defining model structure -------------------------------------------------------------------------     
+    # Calling Modesl
+    BenchModel, TrInp, ValInp = ModelCall (ConfigSet[ConfigName], ConfigName, TrData, ValData, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName) 
     
-    elif 'FACVAE' in ConfigName:
-        BenchModel = FACVAE(SigDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
-        TrInp, ValInp = TrData, ValData
-    
-    elif 'ConVAE' in ConfigName:
-        ## Identifying conditions based on cumulative Power Spectral Entropy (PSE) over each frequency
-        Tr_Cond = FFT_PSD(TrData, 'None')[:, 0]
-        Val_Cond = FFT_PSD(ValData, 'None')[:, 0]
-        TrInp, ValInp = [TrData, Tr_Cond], [ValData, Val_Cond]
-    
-        CondDim = Tr_Cond.shape[-1]
-        BenchModel= ConVAE(SigDim, CondDim, ConfigSet[ConfigName], LatDim=LatDim,  ReparaStd=ReparaStd, Reparam=True)
-         
-    else:
-        assert False, "Please verify if the model name is right or not."    
-    
-        
+       
     
     #### ------------------------------------------------ Dynamic controller for common losses and betas ------------------------------------------------ 
     #The relative size of the loss is reflected in the weight to minimize the loss.
@@ -150,7 +114,7 @@ if __name__ == "__main__":
     ScalingDic = { 'val_ReconOutLoss':WRec, 'val_kl_Loss_Z':WZ}
     MinLimit = {'Beta_Rec':MnWRec,  'Beta_Z':MnWZ}
     MaxLimit = {'Beta_Rec':MxWRec,  'Beta_Z':MxWZ}
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_ReconOutLoss'] , SaveWay='max' , SavePath = ModelSaveName)
+    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, ToSaveLoss=['val_ReconOutLoss'] , SaveWay='max' )
     
     
         
@@ -181,8 +145,6 @@ if __name__ == "__main__":
     
     
     #### Model Training
-    if Resume == True:
-        BenchModel.load_weights(ModelSaveName)
     BenchModel.fit(TrInp, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValInp, None) , callbacks=[  RelLoss]) 
 
     
