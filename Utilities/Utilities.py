@@ -3,8 +3,14 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Lambda
+import yaml
 
 
+
+def read_yaml(file_path):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
+    
 
 def ReName (layer, name):
     return Lambda(lambda x: x, name=name)(layer)

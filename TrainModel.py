@@ -3,21 +3,15 @@ import sys
 import numpy as np
 import pandas as pd
 from argparse import ArgumentParser
-import yaml
 import re
 
 import tensorflow as tf
 from tensorflow.keras import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
-from Models.MainModel import *
-from Models.Losses import *
 from Utilities.Utilities import *
-from Models.Discriminator import FacDiscriminator
+from Models.Caller import *
 
 
-def read_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
+
     
 
 if __name__ == "__main__":
@@ -68,27 +62,17 @@ if __name__ == "__main__":
     yaml_path = './Config/'+LoadConfig+'.yml'
     ConfigSet = read_yaml(yaml_path)
 
+    
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model-related parameters
     SigType = ConfigSet[ConfigName]['SigType']
-    LatDim = ConfigSet[ConfigName]['LatDim']
-    CompSize = ConfigSet[ConfigName]['CompSize']
-    assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
-    MaskingRate = ConfigSet[ConfigName]['MaskingRate']
-    NoiseStd = ConfigSet[ConfigName]['NoiseStd']
-    MaskStd = ConfigSet[ConfigName]['MaskStd']
-    ReparaStd = ConfigSet[ConfigName]['ReparaStd']
-    FcLimit = ConfigSet[ConfigName]['FcLimit']
-    DecayH = ConfigSet[ConfigName]['DecayH']
-    DecayL = ConfigSet[ConfigName]['DecayL']
-    
-    ### Other parameters
-    BatSize = ConfigSet[ConfigName]['BatSize']
-    NEpochs = ConfigSet[ConfigName]['NEpochs']
     
     ### Loss-related parameters
     LossType = ConfigSet[ConfigName]['LossType']
-    SpecLosses = ConfigSet[ConfigName]['SpecLosses']
+    
+    ### Ancillary parameters
+    BatSize = ConfigSet[ConfigName]['BatSize']
+    NEpochs = ConfigSet[ConfigName]['NEpochs']
     
     ### Parameters for constant losse weights
     WRec = ConfigSet[ConfigName]['WRec']
@@ -96,6 +80,7 @@ if __name__ == "__main__":
     WZ = ConfigSet[ConfigName]['WZ']
     
     ### Parameters for dynamic controller for losse weights
+    SpecLosses = ConfigSet[ConfigName]['SpecLosses']
     MnWRec = ConfigSet[ConfigName]['MnWRec']
     MnWFeat = ConfigSet[ConfigName]['MnWFeat']
     MnWZ = ConfigSet[ConfigName]['MnWZ']
@@ -126,32 +111,9 @@ if __name__ == "__main__":
 
     
     #### -----------------------------------------------------   Defining model structure -------------------------------------------------------------------------    
-    # Defining Modesl
-    EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=True, FcLimit=FcLimit)
-    FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(SigDim=SigDim,CompSize= CompSize, LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, CompSize= CompSize)
-
-    
-
-    # Adding losses
-    if LossType =='TCLosses':
-        Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
-        SigRepModel = TCLosses(Models, DataSize, ConfigSet[ConfigName])
-        
-    elif LossType =='FACLosses':
-        DiscHiddenSize = ConfigSet[ConfigName]['DiscHiddenSize']
-        FacDiscModel = FacDiscriminator(LatDim, DiscHiddenSize)
-        Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel, FacDiscModel] 
-        SigRepModel = FACLosses(Models, ConfigSet[ConfigName])
-
-
-    
-    ## Model Compile
-    SigRepModel.compile(optimizer='adam') 
-    SigRepModel.summary()
-
-    
+    # Calling Modesl
+    SigRepModel = ModelCall (ConfigSet[ConfigName], SigDim, DataSize, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName)
+   
 
     ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
     RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z'}
@@ -194,10 +156,7 @@ if __name__ == "__main__":
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, ToSaveLoss=['val_FeatRecLoss', 'val_OrigRecLoss'] , SaveWay='max' , SavePath = ModelSaveName)
     
     
-    
     # Model Training
-    if Resume == True:
-        SigRepModel.load_weights(ModelSaveName)
-    SigRepModel.fit(TrData, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValData, None) , callbacks=[  RelLoss]) 
+    SigRepModel.fit(TrData, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValData, None) , callbacks=[RelLoss]) 
 
 
