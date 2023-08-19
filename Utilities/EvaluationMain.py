@@ -25,7 +25,7 @@ class Evaluator ():
         self.NMiniBat = NMiniBat             # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
         self.NGen = NGen                     # The number of generations (i.e., samplings) within the mini-batch.
         self.ReparaStdZj = ReparaStdZj       # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
-        self.NSelZ = NSelZ                   # The size of js to be selected at the same time when selecting Zj (default: 1).
+        self.NSelZ = NSelZ                   # The size of js to be selected at the same time (default: 1).
         self.SampBatchSize = SampBatchSize   # The batch size during prediction of the sampling model.
         self.GenBatchSize= GenBatchSize      # The batch size during prediction of the generation model.
         self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
@@ -265,7 +265,7 @@ class Evaluator ():
             ## Result trackers
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[], 
-                              'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
+                         'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_ZjFc, self.I_fcPE_FaZj = 0,0,0,0,0,0
@@ -292,8 +292,7 @@ class Evaluator ():
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
             self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
-            
-            ## For Samp_ZjRPT, the same j is selected NGen times in all generations within a mini-batch.
+            ## For Samp_ZjRPT, the same j is selected in all generations within a mini-batch.
             self.Samp_ZjRPT = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='RptBat')
 
 
@@ -331,7 +330,6 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            # Shape of each generation: NMiniBat, NGen, SigDim
             self.SigGen_Z, self.SigGen_Zj, self.SigGen_ZjRptFC, self.SigGen_ZjRptFCar = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
 
 
@@ -460,15 +458,14 @@ class Evaluator ():
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
-        
+        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
+                                             # and 'CON' for conditional inputs such as power spectral density.
         assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
 
         ## Optional parameters with default values ##
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
         self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
 
 
         ## Intermediate variables
@@ -524,7 +521,6 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            # Shape of each generation: NMiniBat, NGen, SigDim
             self.SigGen_Z, self.SigGen_Zj = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 2) ]  
 
 
@@ -596,41 +592,49 @@ class Evaluator ():
         
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_ZCON (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True, SampZType='ModelRptA', SecDataType=None):
+    def Eval_ZCON (self, AnalData, SampModel, GenModel,  WindowSize=3, NSelCond=1, SampZType='ModelRptA', SecDataType=None, Continue=True):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
+        
         assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
         
         
+        
         ## Optional parameters with default values ##
-        # WindowSize: The window size when calculating permutation entropy (default: 3)
-        # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
-        self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
-        self.FcLimit = FcLimit # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
-            
+        # WindowSize: The window size when calculating permutation entropy (default: 3).
+        # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True).
+        # NSelCond: The size of conditional inputs to be selected at the same time (default: 1).
+        self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random').
+        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
+                                             # and 'CON' for conditional inputs such as power spectral density.
+        
+        
+
         ## Intermediate variables
         self.Ndata = len(AnalData[0]) # The dimension size of the data.
         self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
         self.SigDim = AnalData[0].shape[-1] # The dimension (i.e., length) size of the raw signal.
+        self.CondDim = AnalData[1].shape[-1] # The dimension size of the conditional inputs.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
         
+        assert self.NGen >= self.CondDim, "NGen must be greater than or equal to CondDim for the evaluation."
+
         
         # Functional trackers
         if Continue == False or not hasattr(self, 'iter'):
             self.sim, self.mini, self.iter = 0, 0, 0
         
             ## Result trackers
-            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
-            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'CMI_zPSD_ZjZ':[]}
+            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[]}
+            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[], 
+                              'CMI_zPSD_ZjZ':[], 'CMI_zPSD_CrZj':[], 'CMI_fcPE_CaCr':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
-            self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
+            self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjCr, self.I_zPSD_CaZj, self.I_fcPE_ZjCr, self.I_fcPE_CaZj = 0,0,0,0,0,0
         
         
 
@@ -653,16 +657,71 @@ class Evaluator ():
             # Sampling Samp_Z 
             self.Samp_Z = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType, SecDataType=self.SecDataType)
-
+            
             # Selecting Samp_Zj from Samp_Z 
             ## For Samp_Zj, j is selected randomly across both the j and generation axes.
             self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
-
-
-            # Setting CON 
+            
+            ## For Samp_ZjRPT, the same j is selected NGen times in all generations within a mini-batch.
+            self.Samp_ZjRPT = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='RptBat')
+  
+            
+            # Processing Conditional information 
             ## Shape of CON: (NMiniBat*NGen, CONDim) 
-            self.CONRpt = np.repeat(SubData[1], NGen, axis=0)
-
+            self.CONRpt = np.repeat(SubData[1], self.NGen, axis=0)
+                                    
+            # Generating a matrix with only one randomly selected condition ('CONRand')
+            ## Generating the masking matrix
+            self.CONRand = np.zeros((self.NMiniBat*self.NGen, self.CondDim))
+            
+            ## Assigning 1 to the masking positions in each row.
+            for i in range(len(self.CONRand)):
+                MaskCols = np.random.choice(CondDim, NSelCond, replace=False)
+                self.CONRand[i, MaskCols] = np.random.rand(NSelCond)
+                
+            
+            # Generating a matrix with only one selected condition in order ('CON_Arange').
+            ## Generating the masking matrix
+            ArMasking = np.zeros((self.NGen, self.CondDim))
+            
+            ## Populating the matrix diagonally with sequences of random numbers, 
+            ## in the ArMasking matrix (M X N), rows where i + span > N are padded with zeros, not to be used for analysis.
+            for i in range(self.NGen):
+                if i + NSelCond <= self.CondDim:  # This condition ensures the random values are within the matrix boundaries.
+                    ArMasking[i, i:i+NSelCond] = np.random.rand(NSelCond)
+            self.CON_Arange = np.tile(ArMasking[None], (self.NMiniBat,1,1)).reshape(-1, self.CondDim)
+            
+            ## Shape of SelMasking: (NMiniBat, NGen, CONDim) 
+            ## Rows that do not meet the condition 'the random values are within the matrix boundaries' will be excluded from the analysis."
+            SelMasking = np.sum(ArMasking, axis=-1) > 0
+            
+            
+            '''         Alternative ways for 'CONRand' and 'CON_Arange'
+            
+            # Generating a matrix with only one randomly selected condition ('CONRand').
+            ## Conditions representation based on the distribution of the given data.
+            P_PSPDF_Rpt = np.tile(self.P_PSPDF[None], (self.NGen * self.NMiniBat, 1))
+            ## Generating the masking matrix
+            RandMasking = np.zeros_like(P_PSPDF_Rpt)
+            ## Selecting the location in each column for masking.
+            MaskCols = np.random.randint(self.CondDim, size=RandMasking.shape[0])
+            ## Assigning 1 to the masking position in each row.
+            RandMasking[np.arange(RandMasking.shape[0]), MaskCols] = 1
+            ## Generating the matrix where only one value is considered randomly among all conditions.
+            #self.CONRand =P_PSPDF_Rpt * RandMasking
+            self.CONRand = RandMasking
+            
+            # Generating a matrix with only one selected condition in order ('CON_Arange').
+            ## Generating a 3D matrix for the arragned masking
+            ArMasking = np.zeros((self.NMiniBat, self.NGen, self.CondDim))
+            ## Generating the CondDim x CondDim identity matrix
+            DiagMat = np.eye(self.CondDim)
+            ## Applying the identity matrix to each CondDim x CondDim slice
+            ArMasking[:, :self.CondDim, :self.CondDim] = DiagMat
+            # Generating the matrix where only one value is considered in order.
+            #self.CON_Arange = P_PSPDF_Rpt * ArMasking.reshape(-1, CondDim)
+            self.CON_Arange = ArMasking.reshape(-1, CondDim)
+            '''
 
 
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
@@ -671,19 +730,25 @@ class Evaluator ():
               we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, NFCs) for FCs, respectively, 
               transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, NFCs). 
               After the computation, we then reverted them back to their original dimensions.
-
             '''
+            
             ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
-            Set_CONRpt = np.concatenate([self.CONRpt,  self.CONRpt])
-            Data = [Set_Zs, Set_CONRpt]
+            Set_CONs = np.concatenate([self.CONRpt,  self.CONRpt, self.CONRand, self.CON_Arange])
+            Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj, self.Samp_ZjRPT, self.Samp_ZjRPT ])
+            Data = [Set_Zs, Set_CONs]
+            
             
             # Choosing GPU or CPU and generating signals
             Set_Pred  = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.SigGen_Z, self.SigGen_Zj = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 2)]  
+            # Shape of each generation: NMiniBat, NGen, SigDim
+            self.SigGen_Z, self.SigGen_Zj, self.SigGen_ZjRptCONr, self.SigGen_ZjRptCONa = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
+            
+            # Rows that do not meet the condition 'the random values are within the matrix boundaries' are excluded from the analysis.
+            # Shape of the selected signal: NMiniBat, len(boundary), SigDim
+            Sel_SigGen_ZjRptCONa = self.SigGen_ZjRptCONa[SelMasking].reshape(self.NMiniBat, -1, self.SigDim)
 
 
 
@@ -691,15 +756,35 @@ class Evaluator ():
             # Return shape: (Batch_size, N_frequency)
             self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            self.Q_PSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            self.Q_PSPDF_ZjRptCONa = FFT_PSD(Sel_SigGen_ZjRptCONa, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+
+            # Return shape: (Batch_size, N_frequency, N_sample)
+            self.SubPSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
+            self.SubPSPDF_ZjRptCONa = FFT_PSD(Sel_SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
+
+            # Return shape: (Batch_size, 1, N_frequency)
+            self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq) #
+            self.SubPSPDF_Batch.sort(0)
 
 
-
-
+            
+            ### ---------------------------- Permutation Entropy given PSD over each generation -------------------------------- ###
+            # Return shape: (Batch_size, N_frequency, N_permutation_cases)
+            self.Q_PEPDF_ZjRptCONr = ProbPermutation(self.SubPSPDF_ZjRptCONr, WindowSize=WindowSize)
+            self.Q_PEPDF_ZjRptCONa = ProbPermutation(self.SubPSPDF_ZjRptCONa, WindowSize=WindowSize)
+            self.Q_PEPDF_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
+            
+            
+            
             ### ---------------------------------------- Conditional mutual information ---------------------------------------- ###
             # zPSD stands for z-wise power spectral density.
             I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
-
+            I_zPSD_ZjCr_ =  MeanKLD(self.Q_PSPDF_ZjRptCONr, self.P_PSPDF[None] ) # I(zPSD;Zj)
+            I_zPSD_CaZj_ = MeanKLD(self.Q_PSPDF_ZjRptCONa, self.Q_PSPDF_ZjRptCONr ) # I(zPSD;CON|Zj)
+            I_fcPE_ZjCr_ = MeanKLD(self.Q_PEPDF_ZjRptCONr, self.Q_PEPDF_Batch) # I(fcPE;Zj)
+            I_fcPE_CaZj_ = MeanKLD(self.Q_PEPDF_ZjRptCONa, self.Q_PEPDF_ZjRptCONr) # I(fcPE;CON|Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
@@ -709,13 +794,31 @@ class Evaluator ():
             print('I_zPSD_ZjZ :', I_zPSD_ZjZ_)
             self.SubResDic['I_zPSD_ZjZ'].append(I_zPSD_ZjZ_)
             self.I_zPSD_ZjZ += I_zPSD_ZjZ_
+            
+            print('I_zPSD_ZjCr :', I_zPSD_ZjCr_)
+            self.SubResDic['I_zPSD_ZjCr'].append(I_zPSD_ZjCr_)
+            self.I_zPSD_ZjCr += I_zPSD_ZjCr_
+
+            print('I_zPSD_CaZj :', I_zPSD_CaZj_)
+            self.SubResDic['I_zPSD_CaZj'].append(I_zPSD_CaZj_) 
+            self.I_zPSD_CaZj += I_zPSD_CaZj_
+
+            print('I_fcPE_ZjCr :', I_fcPE_ZjCr_)
+            self.SubResDic['I_fcPE_ZjCr'].append(I_fcPE_ZjCr_)
+            self.I_fcPE_ZjCr += I_fcPE_ZjCr_
+
+            print('I_fcPE_CaZj :', I_fcPE_CaZj_)
+            self.SubResDic['I_fcPE_CaZj'].append(I_fcPE_CaZj_)
+            self.I_fcPE_CaZj += I_fcPE_CaZj_
 
 
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            self.H_zPSD_Zj = -np.sum(self.Q_PSPDF_Zj * np.log(self.Q_PSPDF_Zj), axis=-1)
-
-            # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
+            self.H_zPSD_ZjCa = -np.sum(self.Q_PSPDF_ZjRptCONa * np.log(self.Q_PSPDF_ZjRptCONa), axis=-1)
+            self.H_fcPE_ZjCa = np.mean(-np.sum(self.Q_PEPDF_ZjRptCONa * np.log(self.Q_PEPDF_ZjRptCONa), axis=-1), axis=-1)
+            self.SumH_ZjCa = self.H_zPSD_ZjCa + self.H_fcPE_ZjCa
+            
+            # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRpt_CONa.
             # Return shape: (Batch_size, N_sample, N_frequency)
             self.Q_PSPDF_Zj_Local = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
 
@@ -725,7 +828,9 @@ class Evaluator ():
 
             # Return shape: (Batch_size, )
             ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
-            self.LocCandZs ( ModeMax_Freq, self.H_zPSD_Zj, self.Samp_Zj)
+            
+            UniqSamp_Zj = self.Samp_ZjRPT.reshape(self.NMiniBat, self.NGen, -1)[:, 0]
+            self.LocCandZs ( ModeMax_Freq, self.SumH_ZjCa, UniqSamp_Zj,)
 
             # Restructuring TrackerCandZ
             self.TrackerCandZ = {item[0]: {'TrackZLOC': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZLOC']), 
@@ -746,3 +851,18 @@ class Evaluator ():
         self.CMI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
         self.AggResDic['CMI_zPSD_ZjZ'].append(self.CMI_zPSD_ZjZ)
 
+        # CMI(V;Cr,Zj)
+        self.I_zPSD_ZjCr /= (self.TotalIterSize)
+        self.AggResDic['I_zPSD_ZjCr'].append(self.I_zPSD_ZjCr)
+        self.I_zPSD_CaZj /= (self.TotalIterSize)
+        self.AggResDic['I_zPSD_CaZj'].append(self.I_zPSD_CaZj)
+        self.CMI_zPSD_CrZj = self.I_zPSD_ZjCr + self.I_zPSD_CaZj       
+        self.AggResDic['CMI_zPSD_CrZj'].append(self.CMI_zPSD_CrZj)
+
+        # CMI(VE;Cr,Zj)
+        self.I_fcPE_ZjCr /= (self.TotalIterSize)
+        self.AggResDic['I_fcPE_ZjCr'].append(self.I_fcPE_ZjCr)
+        self.I_fcPE_CaZj /= (self.TotalIterSize)
+        self.AggResDic['I_fcPE_CaZj'].append(self.I_fcPE_CaZj)
+        self.CMI_fcPE_CaCr = self.I_fcPE_ZjCr + self.I_fcPE_CaZj    
+        self.AggResDic['CMI_fcPE_CaCr'].append(self.CMI_fcPE_CaCr)
