@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Lambda
 import yaml
-
+import pickle
 
 
 def ReadYaml(file_path):
@@ -27,6 +27,37 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
     return PredVal
 
 
+# Serialize the objects
+def SerializeObjects(Instance, SaveResList, Filename):
+    """
+    Serialize the objects of an Evaluator instance to a file.
+
+    Parameters:
+    - Instance: The instance of the Evaluator class.
+    - Filename: The name of the file where objects will be saved.
+    """
+
+    DataToSave = {Name: getattr(Instance, Name) for Name in SaveResList}
+
+    with open(Filename, "wb") as F:
+        pickle.dump(DataToSave, F)
+
+        
+# Deserialize the objects
+def DeserializeObjects(Instance, Filename):
+    """
+    Deserialize objects from a file and set them to the attributes of the provided Evaluator instance.
+
+    Parameters:
+    - Instance: The instance of the Evaluator class.
+    - Filename: The name of the file from where objects will be loaded.
+    """
+    with open(Filename, "rb") as F:
+        LoadedData = pickle.load(F)
+
+    for Name, Value in LoadedData.items():
+        setattr(Instance, Name, Value)
+        
 
 class Lossweight(tf.keras.layers.Layer):
     
