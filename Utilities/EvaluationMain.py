@@ -66,6 +66,17 @@ class Evaluator ():
     
     ### ------------------------  Selecting nested Z-LOC and Z values --------------------- ###
     def SubNestedZFix(self, SubTrackerCandZ , NSelZ=None):
+                
+        ''' Construct the 'Results' dictionary: {'KeyID': {'TrackZLOC': 'TrackZs'}}
+           
+           - Outer Dictionary:
+             - Key (KeyID): A unique, sequentially increasing integer from 'Cnt'
+             - Value: An inner dictionary (explained below)
+        
+           - Inner Dictionary:
+             - Key (TrackZLOC): Values from 'TrackZLOC' up to 'NSelZ'
+             - Value (TrackZs): Corresponding values from 'TrackZs' up to 'NSelZ'
+        '''
         
         # Setting arguments
         NSelZ = self.NSelZ if NSelZ is None else NSelZ
@@ -124,11 +135,28 @@ class Evaluator ():
         NSelZ = self.NSelZ if NSelZ is None else NSelZ
                 
         # Exploring FreqIDs available for signal generation  
+        ## FreqIDs such as [9, 10, 11 ..... 45]
         self.CandFreqIDs = [item[0] for item in BestZsMetrics.items() if (item[1][0] != np.inf) and (item[1][0] < self.MetricCut)]
 
+        
         # Selecting nested Z-LOC and Z values
+        '''  Dictionary Structure Description: {'FreqID' : {'SubKeys' : { 'TrackZLOC' : 'TrackZs' }}}
+        
+           - Outermost Dictionary:
+             - Key (FreqID): Represents frequency identifiers.
+             - Value: A second-level dictionary (explained below).
+        
+           - Second-level Dictionary:
+             - Key (SubKeys): Represents some sub-category or sub-key for the given 'FreqID'.
+             - Value: A third-level dictionary (explained below).
+        
+           - Third-level Dictionary:
+             - Key (TrackZLOC): Values related to the location of tracks.
+             - Value (TrackZs): Corresponding values associated with the 'TrackZLOC'. 
+        '''
         self.NestedZFix = {FreqID : self.SubNestedZFix(TrackerCandZ[FreqID], ) for FreqID in self.CandFreqIDs}
 
+        
         # Creating a tensor of Z values for signal generation
         PostSamp_Zj = []
         for SubZFix in self.NestedZFix.items():
@@ -136,7 +164,7 @@ class Evaluator ():
                 Mask_Z = np.zeros((self.LatDim))
                 Mask_Z[list(item[1].keys())] =  list(item[1].values())
                 PostSamp_Zj.append(Mask_Z[None])
-        self.PostSamp_Zj = np.concatenate(PostSamp_Zj, axis=0)
+        self.PostSamp_Zj = np.concatenate(PostSamp_Zj, axis=0) ## Dim of self.PostSamp_Zj: (ItemID, Samp_Zj)
         
         
         # Counting the number of obs in NestedZs
