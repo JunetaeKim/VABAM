@@ -4,7 +4,7 @@ from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import RelLossWeight
 
 
-def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, Reparam=True, ModelSaveName=None):
+def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, ReturnModelPart=False, Reparam=True, ModelSaveName=None):
     
     assert not (Resume or LoadWeight) or ModelSaveName is not None, "ModelSaveName must be provided to load the weights."
     
@@ -36,12 +36,14 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
     if LossType =='TCLosses':
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
         SigRepModel = TCLosses(Models, DataSize, SelConfigSet)
+        ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel]
         
     elif LossType =='FACLosses':
         DiscHiddenSize = SelConfigSet['DiscHiddenSize']
         FacDiscModel = FacDiscriminator(LatDim, DiscHiddenSize)
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel, FacDiscModel] 
         SigRepModel = FACLosses(Models, SelConfigSet)
+        ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel]
 
         
     # Model Compile
@@ -53,8 +55,12 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
     if Resume == True or LoadWeight == True:
         SigRepModel.load_weights(ModelSaveName)
         print('Model weights loaded')
-        
-    return SigRepModel
+    
+    
+    if ReturnModelPart == False:
+        return SigRepModel
+    else:
+        return SigRepModel, ModelParts
 
 
 # Dynamic controller for losses

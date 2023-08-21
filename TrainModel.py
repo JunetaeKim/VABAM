@@ -59,8 +59,8 @@ if __name__ == "__main__":
     else:
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
-    yaml_path = './Config/'+LoadConfig+'.yml'
-    ConfigSet = ReadYaml(yaml_path)
+    YamlPath = './Config/'+LoadConfig+'.yml'
+    ConfigSet = ReadYaml(YamlPath)
 
     
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
@@ -101,6 +101,7 @@ if __name__ == "__main__":
     SigRepModel = ModelCall (ConfigSet[ConfigName], SigDim, DataSize, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName)
    
     # Calling dynamic controller for losses (DCL)
+    ## The relative size of the loss is reflected in the weight to minimize the loss.
     RelLoss = DCLCall (ConfigSet[ConfigName], ModelSaveName, ToSaveLoss=None, SaveWay='max')
     
     
