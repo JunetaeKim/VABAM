@@ -184,20 +184,22 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, RepeatSize=1, PostSamp_Zj=None, FcLimit=None, PlotDist=True, SecDataType=None):
+    def KLD_TrueGen (self, RepeatSize=1, PostSamp_Zj=None, AnalData=None, FcLimit=None, PlotDist=True, SecDataType=None):
     
         ## Optional parameters
         # RepeatSize: The number of iterations to repetitively generate identical PostSamp_Zj; 
                     # this is to observe variations in other inputs such as FCs while PostSamp_Zj remains constant.
         # SecDataType: Secondary data type; Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                     # and 'CON' for conditional inputs such as power spectral density.
+        # FcLimit: The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
+        # PostSamp_Zj: The selected sampled Zj values.
+        
 
-    
         # Setting arguments
         PostSamp_Zj = self.PostSamp_Zj if PostSamp_Zj is None else PostSamp_Zj
         SecDataType = self.SecDataType if SecDataType is None else SecDataType
-        if FcLimit is not None:
-            FcLimit = self.FcLimit if FcLimit is None else FcLimit
+        FcLimit = self.FcLimit if FcLimit is None else FcLimit
+        AnalData = self.AnalData if AnalData is None else AnalData
 
         # Repeating PostSamp_Zj RepeatSize times.
         Ext_Samp_Zj = np.tile(PostSamp_Zj[:, None], (1, RepeatSize, 1))
@@ -217,7 +219,7 @@ class Evaluator ():
             
         elif SecDataType == 'CON': # Conditional inputs such as power spectral density
             RandIdx = np.random.permutation(len(Ext_Samp_Zj))
-            Data = [Ext_Samp_Zj, self.AnalData[1][RandIdx]]
+            Data = [Ext_Samp_Zj, AnalData[1][RandIdx]]
         
         else:
             Data = Ext_Samp_Zj
@@ -229,9 +231,9 @@ class Evaluator ():
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = 1, MaxFreq = 51)
         if SecDataType == 'CON': # Conditional inputs such as power spectral density
-            PSDTrueData =  FFT_PSD(self.AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
+            PSDTrueData =  FFT_PSD(AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
         else:
-            PSDTrueData =  FFT_PSD(self.AnalData, 'All', MinFreq = 1, MaxFreq = 51)
+            PSDTrueData =  FFT_PSD(AnalData, 'All', MinFreq = 1, MaxFreq = 51)
             
         self.KldPSD_GenTrue = MeanKLD(PSDGenSamp, PSDTrueData)
         self.KldPSD_TrueGen  = MeanKLD(PSDTrueData, PSDGenSamp)

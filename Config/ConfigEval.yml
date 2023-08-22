@@ -1,0 +1,50 @@
+#SKZ_ART_50_500: # SigType_LatDim_CompSize
+#    ReparaStd: 1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+ 
+#SKZFC_ART_30_500: # SigType_LatDim_CompSize
+#    ReparaStd: 1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+
+#FACFC_ART_30_500: # SigType_LatDim_CompSize
+#    ReparaStd: 1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+
+#TCMIDKZFC_ART_50_800_HiKLD:  # SigType_LatDim_CompSize
+#    ReparaStd: 1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+
+    
+SKZFC_ART_50_800_RE:  # SigType_LatDim_CompSize 
+    NSelZ: 1               # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 51            # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    MinFreqR: 0.           # The minimum value when generating FC_ArangeInp with linspace.
+    MaxFreqR: 0.05         # The maximum value when generating FC_ArangeInp with linspace.
+    FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
+    SampZType: 'ModelRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
+    
+    # The list of common objects subject to class serialization.
+    Common_Info: ['SubResDic', 'AggResDic', 'BestZsMetrics', 'TrackerCandZ', 'CandFreqIDs', 'I_zPSD_Z',  'I_zPSD_ZjZ',
+                  'CMI_zPSD_ZjZ', 'PostSamp_Zj', 'NestedZFix' , 'LatDim', 'NFCs', 'GenBatchSize', 'GPU',
+                  'KldPSD_GenTrue', 'KldPSD_TrueGen', 'MeanKld_GTTG'] 
+ 
+ # The list of specific objects subject to class serialization.
+    SpecZFC_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'CMI_zPSD_FcZj', 'CMI_fcPE_FaFc', 'FcLimit']
+    
+
+#SpecZCON_Info =[ 'I_zPSD_ZjCr', 'I_zPSD_CaZj',  'I_fcPE_ZjCr', 'I_fcPE_CaZj', 'CMI_zPSD_CrZj', 'CMI_fcPE_CaCr' ]
+
+
+    
+    
+    
+    
+
+
