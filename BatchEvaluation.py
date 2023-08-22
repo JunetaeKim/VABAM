@@ -7,34 +7,10 @@ from argparse import ArgumentParser
 
 from Models.Caller import *
 from Utilities.EvaluationMain import *
-from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects
+from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs
 
 
-def LoadModelConfigs(ConfigName):
-    
-    CompSize = re.findall(r'\d+', ConfigName)[-1]
 
-    if 'ART' in ConfigName:
-        LoadConfig = 'Config' + 'ART' + CompSize
-        SubPath = 'ART/'
-    elif 'PLETH' in ConfigName:
-        LoadConfig = 'Config' + 'PLETH' + CompSize
-        SubPath = 'PLETH/'
-    elif 'II' in ConfigName:
-        LoadConfig = 'Config' + 'II' + CompSize
-        SubPath = 'II/'
-    else:
-        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
-
-    YamlPath = './Config/'+LoadConfig+'.yml'
-    ConfigSet = ReadYaml(YamlPath)
-    
-    
-    ### Model load path
-    ModelName = ConfigName+'.hdf5'
-    ModelLoadName = './Results/'+SubPath+ModelName
-    
-    return ConfigSet[ConfigName], ModelLoadName
 
 
 
@@ -107,9 +83,20 @@ if __name__ == "__main__":
     # Create a session with the above options specified.
     tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))         
 
-
-
     
+    # Checking whether the path to save the object exists or not.
+    if not os.path.exists('./EvalResults/Instances/') :
+        os.mkdir('./EvalResults/Instances/')
+                 
+    # Checking whether the path to save the SampZj exists or not.
+    if not os.path.exists('./Data/IntermediateData/') :
+        os.mkdir('./Data/IntermediateData/')
+    
+                 
+                 
+                 
+    #### -----------------------------------------------------  Conducting batch evaluation --------------------------------------------------------------
+                 
     SigTypePrev = None
     for ConfigName in EvalConfigs:
         
@@ -119,7 +106,7 @@ if __name__ == "__main__":
 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
-        ModelConfigSet, ModelLoadName = LoadModelConfigs(ConfigName)
+        ModelConfigSet, ModelLoadPath = LoadModelConfigs(ConfigName, Training=False)
 
         # Loading parameters for the evaluation
         Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
@@ -145,7 +132,7 @@ if __name__ == "__main__":
 
         #### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
         # Calling Modesl
-        SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadName)
+        SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath)
 
         # Intermediate parameters 
         NFCs = SigRepModel.get_layer('FCs').output.shape[-1]

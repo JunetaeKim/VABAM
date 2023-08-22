@@ -5,6 +5,7 @@ from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Lambda
 import yaml
 import pickle
+import re
 
 
 def ReadYaml(file_path):
@@ -12,8 +13,10 @@ def ReadYaml(file_path):
         return yaml.safe_load(file)
     
 
+    
 def ReName (layer, name):
     return Lambda(lambda x: x, name=name)(layer)
+
 
 
 def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
@@ -25,6 +28,39 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
         PredVal = PredModel.predict(Data, batch_size=BatchSize, verbose=1)
 
     return PredVal
+
+
+
+def LoadModelConfigs(ConfigName, Training=True):
+    
+    CompSize = re.findall(r'\d+', ConfigName)[-1]
+
+    if 'ART' in ConfigName:
+        LoadConfig = 'Config' + 'ART' + CompSize
+        SubPath = 'ART/'
+    elif 'PLETH' in ConfigName:
+        LoadConfig = 'Config' + 'PLETH' + CompSize
+        SubPath = 'PLETH/'
+    elif 'II' in ConfigName:
+        LoadConfig = 'Config' + 'II' + CompSize
+        SubPath = 'II/'
+    else:
+        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
+
+    YamlPath = './Config/' + LoadConfig+'.yml'
+    ConfigSet = ReadYaml(YamlPath)
+    
+    
+    ### Model path
+    ModelName = ConfigName +'.hdf5'
+    ModelPath = './Results/' + SubPath + ModelName
+   
+    ### Checking whether the model path exists or not.
+    if not os.path.exists('./Results/' + SubPath) and Training == True:
+        os.mkdir('./Results/' + SubPath)
+    
+    return ConfigSet[ConfigName], ModelPath
+
 
 
 # Serialize the objects
@@ -43,6 +79,7 @@ def SerializeObjects(Instance, SaveResList, Filename):
         pickle.dump(DataToSave, F)
 
         
+        
 # Deserialize the objects
 def DeserializeObjects(Instance, Filename):
     """
@@ -57,6 +94,7 @@ def DeserializeObjects(Instance, Filename):
 
     for Name, Value in LoadedData.items():
         setattr(Instance, Name, Value)
+        
         
 
 class Lossweight(tf.keras.layers.Layer):
