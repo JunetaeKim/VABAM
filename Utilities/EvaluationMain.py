@@ -240,9 +240,9 @@ class Evaluator ():
         self.MeanKld_GTTG = (self.KldPSD_GenTrue + self.KldPSD_TrueGen) / 2
         
 
-        print(self.KldPSD_GenTrue)
-        print(self.KldPSD_TrueGen)
-        print(self.MeanKld_GTTG)
+        print('KldPSD_GenTrue: ', self.KldPSD_GenTrue)
+        print('KldPSD_TrueGen: ', self.KldPSD_TrueGen)
+        print('MeanKld_GTTG: ', self.MeanKld_GTTG)
 
         if PlotDist==True:
             plt.plot(PSDGenSamp, c='green', label='Generated')

@@ -70,7 +70,6 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
     Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
     Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-    Params['Common_Info'] = EvalConfigSet['Common_Info']      # The list of common objects subject to class serialization.
     Params['SpecZFC_Info'] = EvalConfigSet['SpecZFC_Info']    # The list of specific objects subject to class serialization.
     
     
@@ -113,6 +112,10 @@ if __name__ == "__main__":
     
     SigTypePrev = None
     for ConfigName in EvalConfigs:
+        
+        if ConfigName == 'Common_Info':
+            continue
+            
 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
@@ -120,6 +123,7 @@ if __name__ == "__main__":
 
         # Loading parameters for the evaluation
         Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
+        Params['Common_Info'] = EvalConfigs['Common_Info']
 
         # Object save path
         ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'.pkl'
