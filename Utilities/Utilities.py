@@ -31,10 +31,11 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
 
 
 
-def LoadModelConfigs(ConfigName, Training=True):
+def LoadModelConfigs(ConfigName, Training=True, Comp=True):
     
-    CompSize = re.findall(r'\d+', ConfigName)[-1]
-
+    # Whether the model performs signal compression (i.e., the main model) or not.
+    CompSize = re.findall(r'\d+', ConfigName)[-1] if Comp else ''
+ 
     if 'ART' in ConfigName:
         LoadConfig = 'Config' + 'ART' + CompSize
         SubPath = 'ART/'
@@ -48,9 +49,8 @@ def LoadModelConfigs(ConfigName, Training=True):
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
     YamlPath = './Config/' + LoadConfig+'.yml'
-    ConfigSet = ReadYaml(YamlPath)
-    
-    
+    ConfigSet = ReadYaml(YamlPath) # The YAML file
+        
     ### Model path
     ModelName = ConfigName +'.hdf5'
     ModelPath = './Results/' + SubPath + ModelName
