@@ -41,12 +41,13 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['WindowSize'] = EvalConfigSet['WindowSize']        # The window size when calculating permutation entropy (default: 3)
     Params['SampZType'] = EvalConfigSet['SampZType']          # SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. 
                                                               # Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
+    Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
         
     ### Functional parameters
     Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
     Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
     Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-    Params['Spec_Info'] = EvalConfigSet['Spec_Info']    # The list of specific objects subject to class serialization.
+    Params['Spec_Info'] = EvalConfigSet['Spec_Info']          # The list of specific objects subject to class serialization.
     
     
     return Params
@@ -173,7 +174,7 @@ if __name__ == "__main__":
         FC_ArangeInp = np.tile(np.linspace(Params['MinFreqR'], Params['MaxFreqR'], Params['NGen'])[:, None], (1, NFCs))
 
         ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-        Eval.Eval_ZFC(AnalData[:500], SampModel, GenModel, FC_ArangeInp, FcLimit=Params['FcLimit'],  
+        Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FC_ArangeInp, FcLimit=Params['FcLimit'],  
                       WindowSize=Params['WindowSize'],  Continue=False, SampZType=Params['SampZType'])
 
 
