@@ -706,7 +706,7 @@ class Evaluator ():
             
             ## Assigning 1 to the masking positions in each row.
             for i in range(len(self.CONRand)):
-                MaskCols = np.random.choice(CondDim, NSelCond, replace=False)
+                MaskCols = np.random.choice(self.CondDim, NSelCond, replace=False)
                 self.CONRand[i, MaskCols] = np.random.rand(NSelCond)
                 
             
