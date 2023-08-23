@@ -198,7 +198,7 @@ class Evaluator ():
         # Setting arguments
         PostSamp_Zj = self.PostSamp_Zj if PostSamp_Zj is None else PostSamp_Zj
         SecDataType = self.SecDataType if SecDataType is None else SecDataType
-        FcLimit = self.FcLimit if FcLimit is None else FcLimit
+        FcLimit = self.FcLimit if FcLimit is None and self.FcLimit is not None else FcLimit
         AnalData = self.AnalData if AnalData is None else AnalData
 
         # Repeating PostSamp_Zj RepeatSize times.

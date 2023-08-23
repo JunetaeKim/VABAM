@@ -46,7 +46,7 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
     Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
     Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-    Params['SpecZFC_Info'] = EvalConfigSet['SpecZFC_Info']    # The list of specific objects subject to class serialization.
+    Params['Spec_Info'] = EvalConfigSet['Spec_Info']    # The list of specific objects subject to class serialization.
     
     
     return Params
@@ -89,11 +89,11 @@ if __name__ == "__main__":
     
     # Checking whether the path to save the object exists or not.
     if not os.path.exists('./EvalResults/Instances/') :
-        os.mkdir('./EvalResults/Instances/')
+        os.makedirs('./EvalResults/Instances/')
                  
     # Checking whether the path to save the SampZj exists or not.
     if not os.path.exists('./Data/IntermediateData/') :
-        os.mkdir('./Data/IntermediateData/')
+        os.makedirs('./Data/IntermediateData/')
     
                  
                  
@@ -173,7 +173,7 @@ if __name__ == "__main__":
         FC_ArangeInp = np.tile(np.linspace(Params['MinFreqR'], Params['MaxFreqR'], Params['NGen'])[:, None], (1, NFCs))
 
         ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-        Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FC_ArangeInp, FcLimit=Params['FcLimit'],  
+        Eval.Eval_ZFC(AnalData[:500], SampModel, GenModel, FC_ArangeInp, FcLimit=Params['FcLimit'],  
                       WindowSize=Params['WindowSize'],  Continue=False, SampZType=Params['SampZType'])
 
 
@@ -185,6 +185,6 @@ if __name__ == "__main__":
         Eval.KLD_TrueGen(SecDataType ='FCR', RepeatSize = 1, PlotDist=False) 
 
         # Saving the instance's objects to a file
-        SerializeObjects(Eval, Params['Common_Info']+Params['SpecZFC_Info'], ObjSavePath)
+        SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
 
 
