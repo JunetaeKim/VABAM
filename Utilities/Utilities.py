@@ -46,7 +46,7 @@ def LoadModelConfigs(ConfigName, Training=True, Comp=True):
         LoadConfig = 'Config' + 'II' + CompSize
         SubPath = 'II/'
     else:
-        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
+        assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type' + CompSize(optional) , such as ConfigART800."
 
     YamlPath = './Config/' + LoadConfig+'.yml'
     ConfigSet = ReadYaml(YamlPath) # The YAML file
@@ -57,7 +57,7 @@ def LoadModelConfigs(ConfigName, Training=True, Comp=True):
    
     ### Checking whether the model path exists or not.
     if not os.path.exists('./Results/' + SubPath) and Training == True:
-        os.mkdir('./Results/' + SubPath)
+        os.makedirs('./Results/' + SubPath)
     
     return ConfigSet[ConfigName], ModelPath
 
@@ -182,7 +182,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.Logs = []
         
         if not os.path.exists('./Logs/'+PathInfo[2]):
-            os.mkdir('./Logs/'+PathInfo[2])
+            os.makedirs('./Logs/'+PathInfo[2])
         
         
     def on_epoch_end(self, epoch, logs={}):
