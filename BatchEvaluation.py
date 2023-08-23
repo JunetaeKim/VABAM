@@ -61,10 +61,12 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
+    parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, default=None)
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
+    ConfigSpecName = args.ConfigSpec
     GPU_ID = args.GPUID
     
     YamlPath = './Config/'+ConfigName+'.yml'
@@ -102,7 +104,11 @@ if __name__ == "__main__":
         
         if ConfigName == 'Common_Info':
             continue
-            
+        
+        if ConfigSpecName is not None: 
+            if ConfigName not in ConfigSpecName:
+                continue
+                
 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
