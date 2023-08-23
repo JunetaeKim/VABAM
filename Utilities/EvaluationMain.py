@@ -193,12 +193,12 @@ class Evaluator ():
                     # and 'CON' for conditional inputs such as power spectral density.
         # FcLimit: The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
         # PostSamp_Zj: The selected sampled Zj values.
-        
+
 
         # Setting arguments
         PostSamp_Zj = self.PostSamp_Zj if PostSamp_Zj is None else PostSamp_Zj
         SecDataType = self.SecDataType if SecDataType is None else SecDataType
-        FcLimit = self.FcLimit if FcLimit is None and self.FcLimit is not None else FcLimit
+        FcLimit = self.FcLimit if FcLimit is None and hasattr(self, 'FcLimit') else FcLimit
         AnalData = self.AnalData if AnalData is None else AnalData
 
         # Repeating PostSamp_Zj RepeatSize times.
