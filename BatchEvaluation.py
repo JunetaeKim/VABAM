@@ -60,8 +60,9 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     
     # Add Experiment-related parameters
-    parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
-    parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, default=None)
+    parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the YAML file).')
+    parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, 
+                        default=None, help='Set the name of the specific configuration to load (the name of the model config in the YAML file).')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
