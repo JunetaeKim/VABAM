@@ -3,7 +3,7 @@ from Benchmarks.Models.BenchmarkModels import *
 from Utilities.Utilities import RelLossWeight
 
 
-def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight=False, Reparam=True, ModelSaveName=None):
+def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight=False, Reparam=True, ReparaStd=None, ModelSaveName=None):
     
     assert not (Resume or LoadWeight) or ModelSaveName is not None, "ModelSaveName must be provided to load the weights."
     DataSize = TrData.shape[0] 
@@ -12,15 +12,15 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
         
     # ModelName selection
     if 'BaseVAE' in ConfigName:
-        BenchModel = BaseVAE(SigDim, ConfigSpec, Reparam=Reparam)
+        BenchModel = BaseVAE(SigDim, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
         TrInp, ValInp = TrData, ValData
     
     elif 'TCVAE' in ConfigName:
-        BenchModel = TCVAE(SigDim, DataSize, ConfigSpec, Reparam=Reparam)
+        BenchModel = TCVAE(SigDim, DataSize, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
         TrInp, ValInp = TrData, ValData
     
     elif 'FACVAE' in ConfigName:
-        BenchModel = FACVAE(SigDim, ConfigSpec, Reparam=Reparam)
+        BenchModel = FACVAE(SigDim, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
         TrInp, ValInp = TrData, ValData
     
     elif 'ConVAE' in ConfigName:
@@ -30,7 +30,7 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
         TrInp, ValInp = [TrData, Tr_Cond], [ValData, Val_Cond]
     
         CondDim = Tr_Cond.shape[-1]
-        BenchModel= ConVAE(SigDim, CondDim, ConfigSpec, Reparam=Reparam)
+        BenchModel= ConVAE(SigDim, CondDim, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
          
     else:
         assert False, "Please verify if the model name is right or not."    
@@ -46,66 +46,52 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
 
 
 # Dynamic controller for losses
-def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max'):
+def DCLCall (ConfigSpec, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max'):
     
     if ToSaveLoss is None:
-        ToSaveLoss = ['val_FeatRecLoss', 'val_OrigRecLoss']
-    
-    ### Loss-related parameters
-    LossType = SelConfigSet['LossType']
-    SpecLosses = SelConfigSet['SpecLosses']
-    
+        ToSaveLoss = ['val_ReconOutLoss']
+
+        
     ### Parameters for constant losse weights
-    WRec = SelConfigSet['WRec']
-    WFeat = SelConfigSet['WFeat']
-    WZ = SelConfigSet['WZ']
+    WRec = ConfigSpec['WRec']
+    WZ = ConfigSpec['WZ']
     
     ### Parameters for dynamic controller for losse weights
-    MnWRec = SelConfigSet['MnWRec']
-    MnWFeat = SelConfigSet['MnWFeat']
-    MnWZ = SelConfigSet['MnWZ']
-    
-    MxWRec = SelConfigSet['MxWRec']
-    MxWFeat = SelConfigSet['MxWFeat']
-    MxWZ = SelConfigSet['MxWZ']
-    
-    
-    ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z'}
-    ScalingDic = { 'val_OrigRecLoss':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ}
-    MinLimit = {'Beta_Orig':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ}
-    MaxLimit = {'Beta_Orig':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ}
-    
-    
-    ### Dynamic controller for specific losses and betas
-    if 'FC' in SpecLosses :
-        RelLossDic['val_kl_Loss_FC'] = 'Beta_Fc'
-        ScalingDic['val_kl_Loss_FC'] = SelConfigSet['WFC']
-        MinLimit['Beta_Fc'] = SelConfigSet['MnWFC']
-        MaxLimit['Beta_Fc'] = SelConfigSet['MxWFC']
+    MnWRec = ConfigSpec['MnWRec']
+    MnWZ = ConfigSpec['MnWZ']
+    MxWRec = ConfigSpec['MxWRec']
+    MxWZ = ConfigSpec['MxWZ']
         
-    if 'TC' in SpecLosses :
+        
+    #### ------------------------------------------------ Dynamic controller for common losses and betas ------------------------------------------------ 
+    RelLossDic = { 'val_ReconOutLoss':'Beta_Rec', 'val_kl_Loss_Z':'Beta_Z' }
+    ScalingDic = { 'val_ReconOutLoss':WRec, 'val_kl_Loss_Z':WZ}
+    MinLimit = {'Beta_Rec':MnWRec,  'Beta_Z':MnWZ}
+    MaxLimit = {'Beta_Rec':MxWRec,  'Beta_Z':MxWZ}
+        
+        
+    #### ------------------------------------------------ Dynamic controller for specific losses and betas ------------------------------------------------
+    if 'TCVAE' in ConfigName :
         RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = SelConfigSet['WTC']
-        MinLimit['Beta_TC'] = SelConfigSet['MnWTC']
-        MaxLimit['Beta_TC'] = SelConfigSet['MxWTC']
+        ScalingDic['val_kl_Loss_TC'] = ConfigSpec['WTC']
+        MinLimit['Beta_TC'] = ConfigSpec['MnWTC']
+        MaxLimit['Beta_TC'] = ConfigSpec['MxWTC']
         
-    if 'MI' in SpecLosses :
         RelLossDic['val_kl_Loss_MI'] = 'Beta_MI'
-        ScalingDic['val_kl_Loss_MI'] = SelConfigSet['WMI']
-        MinLimit['Beta_MI'] = SelConfigSet['MnWMI']
-        MaxLimit['Beta_MI'] = SelConfigSet['MxWMI']
-        
-    if LossType =='FACLosses':
+        ScalingDic['val_kl_Loss_MI'] = ConfigSpec['WMI']
+        MinLimit['Beta_MI'] = ConfigSpec['MnWMI']
+        MaxLimit['Beta_MI'] = ConfigSpec['MxWMI']
+    
+    if 'FACVAE' in ConfigName :
         RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = SelConfigSet['WTC']
-        MinLimit['Beta_TC'] = SelConfigSet['MnWTC']
-        MaxLimit['Beta_TC'] = SelConfigSet['MxWTC']
+        ScalingDic['val_kl_Loss_TC'] = ConfigSpec['WTC']
+        MinLimit['Beta_TC'] = ConfigSpec['MnWTC']
+        MaxLimit['Beta_TC'] = ConfigSpec['MxWTC']
         
         RelLossDic['val_kl_Loss_DTC'] = 'Beta_DTC'
-        ScalingDic['val_kl_Loss_DTC'] = SelConfigSet['WDTC']
-        MinLimit['Beta_DTC'] = SelConfigSet['MnWDTC']
-        MaxLimit['Beta_DTC'] = SelConfigSet['MxWDTC']
+        ScalingDic['val_kl_Loss_DTC'] = ConfigSpec['WDTC']
+        MinLimit['Beta_DTC'] = ConfigSpec['MnWDTC']
+        MaxLimit['Beta_DTC'] = ConfigSpec['MxWDTC']
         
 
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, ToSaveLoss=ToSaveLoss , SaveWay=SaveWay )

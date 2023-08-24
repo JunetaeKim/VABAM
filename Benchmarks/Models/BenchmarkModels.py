@@ -20,15 +20,14 @@ def SKLDZ (Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z):
     return kl_Loss_Z
 
 
-def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True):
+def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
-    ReparaStd = ConfigSpec['ReparaStd']
+    ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
     LatDim = ConfigSpec['LatDim']
-    ReparaStd = ConfigSpec['ReparaStd']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
-    EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam)
+    EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
     ReconModel = Decoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim)
     
     ## Model core parts
@@ -74,12 +73,11 @@ def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True):
 
 
 
-def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True):
+def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
-    ReparaStd = ConfigSpec['ReparaStd']
+    ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
     LatDim = ConfigSpec['LatDim']
-    ReparaStd = ConfigSpec['ReparaStd']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     EncModel = Encoder(SigDim=SigDim,CondDim=CondDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
@@ -126,12 +124,11 @@ def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True):
 
 
 
-def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True):
+def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
-    ReparaStd = ConfigSpec['ReparaStd']
+    ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
     LatDim = ConfigSpec['LatDim']
-    ReparaStd = ConfigSpec['ReparaStd']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
     EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim, Reparam = Reparam, ReparaStd=ReparaStd)
@@ -211,12 +208,11 @@ def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True):
 
 
 
-def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True):
+def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
-    ReparaStd = ConfigSpec['ReparaStd']
+    ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
     LatDim = ConfigSpec['LatDim']
-    ReparaStd = ConfigSpec['ReparaStd']
     DiscHiddenSize = ConfigSpec['DiscHiddenSize']
     
     #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
