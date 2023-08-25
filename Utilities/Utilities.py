@@ -135,6 +135,14 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
         Params['WindowSize'] = EvalConfigSet['WindowSize']    # The window size when calculating permutation entropy (default: 3)
     if 'FcLimit' in EvalConfigSet:
         Params['FcLimit'] = EvalConfigSet['FcLimit']          # The threshold value of the max of the FC value input into the generation model.
+        
+        
+    ### Loss-specific parameters (only for main models)
+    if 'LossType' in ModelConfigSet:
+        Params['LossType'] = ModelConfigSet['LossType']
+    if 'SpecLosses' in ModelConfigSet:
+        Params['SpecLosses'] = ModelConfigSet['SpecLosses']
+
     
     return Params        
         
