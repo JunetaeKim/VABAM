@@ -186,5 +186,34 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='AllRand' ):
 
 
 
+def log_importance_weight_matrix(batch_size, dataset_size):
+    """
+    Calculates a log importance weight matrix
+
+    Parameters
+    ----------
+    batch_size: int
+        number of training images in the batch
+
+    dataset_size: int
+        number of training images in the dataset
+        
+    Reference:
+    https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54
+    """
+    
+    
+    N = dataset_size
+    M = batch_size - 1
+    strat_weight = (N - M) / (N * M)
+
+    W = tf.fill([batch_size, batch_size], 1 / M)
+    W = tf.reshape(W, [-1])
+    W = tf.tensor_scatter_nd_update( W,  tf.range(0, tf.size(W), M + 1)[:, None],  tf.fill([tf.size(W) // (M + 1)], 1 / N))
+    W = tf.tensor_scatter_nd_update( W, tf.range(1, tf.size(W), M + 1)[:, None], tf.fill([tf.size(W) // (M + 1) - 1 + 1], strat_weight))
+    W = tf.tensor_scatter_nd_update( W,  tf.constant([[M * (M + 1)]]),   tf.constant([strat_weight]))
+    W = tf.reshape(W, [batch_size, batch_size])
+
+    return tf.math.log(W)
 
         

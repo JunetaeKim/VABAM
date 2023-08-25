@@ -1,59 +1,18 @@
 import os
-import numpy as np
 import re
+import numpy as np
 import matplotlib.pyplot as plt
 import copy
 from argparse import ArgumentParser
 
 from Models.Caller import *
 from Utilities.EvaluationMain import *
-from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs
+from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs, LoadParams
 
 
 
-
-
-
-def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
-
-    Params = {}
-    
-    ### Model-related parameters
-    Params['SigType']  = ModelConfigSet['SigType']
-    Params['ReparaStd'] = EvalConfigSet['ReparaStd']          # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
-    Params['ReparaStdZj'] = EvalConfigSet['ReparaStdZj']      # The standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
-    Params['FcLimit'] = EvalConfigSet['FcLimit']              # The threshold value of the max of the FC value input into the generation model.
-
-    ### Loss-related parameters
-    Params['LossType'] = ModelConfigSet['LossType']
-    Params['SpecLosses'] = ModelConfigSet['SpecLosses']
-    
-    ### Evaluation-related parameters
-    Params['MaxFreq'] = EvalConfigSet['MaxFreq']              # The maximum frequency value within the analysis range (default = 51).
-    Params['MinFreq'] = EvalConfigSet['MinFreq']              # The minimum frequency value within the analysis range (default = 1).
-    Params['MinFreqR'] = EvalConfigSet['MinFreqR']            # The minimum value when generating FC_ArangeInp with linspace.
-    Params['MaxFreqR'] = EvalConfigSet['MaxFreqR']            # The maximum value when generating FC_ArangeInp with linspace.
-    Params['NMiniBat'] = EvalConfigSet['NMiniBat']            # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
-    Params['SimSize'] = EvalConfigSet['SimSize']              # The number of generations (i.e., samplings) within the mini-batch.
-    Params['NGen'] = EvalConfigSet['NGen']                    # The number of generations (i.e., samplings) within the mini-batch.
-    Params['NSelZ'] = EvalConfigSet['NSelZ']                  # The size of js to be selected at the same time (default: 1).
-    Params['MetricCut'] = EvalConfigSet['MetricCut']          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    Params['WindowSize'] = EvalConfigSet['WindowSize']        # The window size when calculating permutation entropy (default: 3)
-    Params['SampZType'] = EvalConfigSet['SampZType']          # SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. 
-                                                              # Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-    Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
-        
-    ### Functional parameters
-    Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
-    Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
-    Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-    Params['Spec_Info'] = EvalConfigSet['Spec_Info']          # The list of specific objects subject to class serialization.
-    
-    
-    return Params
 
     
-
 if __name__ == "__main__":
 
     

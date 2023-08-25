@@ -78,7 +78,7 @@ if __name__ == "__main__":
     ModelName = ConfigName+'.hdf5'
     
     if not os.path.exists(SavePath+SubPath):
-        os.mkdir(SavePath+SubPath)
+        os.makedirs(SavePath+SubPath)
         
     ### Model checkpoint
     ModelSaveName = SavePath+SubPath+ModelName
@@ -95,54 +95,10 @@ if __name__ == "__main__":
     # Calling Modesl
     BenchModel, TrInp, ValInp = ModelCall (ConfigSet[ConfigName], ConfigName, TrData, ValData, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName) 
     
-       
-    
-    #### ------------------------------------------------ Dynamic controller for common losses and betas ------------------------------------------------ 
-    #The relative size of the loss is reflected in the weight to minimize the loss.
-    
-    ### Parameters for constant losse weights
-    WRec = ConfigSet[ConfigName]['WRec']
-    WZ = ConfigSet[ConfigName]['WZ']
-    
-    ### Parameters for dynamic controller for losse weights
-    MnWRec = ConfigSet[ConfigName]['MnWRec']
-    MnWZ = ConfigSet[ConfigName]['MnWZ']
-    MxWRec = ConfigSet[ConfigName]['MxWRec']
-    MxWZ = ConfigSet[ConfigName]['MxWZ']
-    
-    RelLossDic = { 'val_ReconOutLoss':'Beta_Rec', 'val_kl_Loss_Z':'Beta_Z' }
-    ScalingDic = { 'val_ReconOutLoss':WRec, 'val_kl_Loss_Z':WZ}
-    MinLimit = {'Beta_Rec':MnWRec,  'Beta_Z':MnWZ}
-    MaxLimit = {'Beta_Rec':MxWRec,  'Beta_Z':MxWZ}
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, ToSaveLoss=['val_ReconOutLoss'] , SaveWay='max' )
-    
-    
+    # Calling dynamic controller for losses (DCL)
+    ## The relative size of the loss is reflected in the weight to minimize the loss.
+    RelLoss = DCLCall (ConfigSet[ConfigName], ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max')
         
-    #### ------------------------------------------------ Dynamic controller for specific losses and betas ------------------------------------------------
-    if 'TCVAE' in ConfigName :
-        RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = ConfigSet[ConfigName]['WTC']
-        MinLimit['Beta_TC'] = ConfigSet[ConfigName]['MnWTC']
-        MaxLimit['Beta_TC'] = ConfigSet[ConfigName]['MxWTC']
-        
-        RelLossDic['val_kl_Loss_MI'] = 'Beta_MI'
-        ScalingDic['val_kl_Loss_MI'] = ConfigSet[ConfigName]['WMI']
-        MinLimit['Beta_MI'] = ConfigSet[ConfigName]['MnWMI']
-        MaxLimit['Beta_MI'] = ConfigSet[ConfigName]['MxWMI']
-    
-    if 'FACVAE' in ConfigName :
-        RelLossDic['val_kl_Loss_TC'] = 'Beta_TC'
-        ScalingDic['val_kl_Loss_TC'] = ConfigSet[ConfigName]['WTC']
-        MinLimit['Beta_TC'] = ConfigSet[ConfigName]['MnWTC']
-        MaxLimit['Beta_TC'] = ConfigSet[ConfigName]['MxWTC']
-        
-        RelLossDic['val_kl_Loss_DTC'] = 'Beta_DTC'
-        ScalingDic['val_kl_Loss_DTC'] = ConfigSet[ConfigName]['WDTC']
-        MinLimit['Beta_DTC'] = ConfigSet[ConfigName]['MnWDTC']
-        MaxLimit['Beta_DTC'] = ConfigSet[ConfigName]['MxWDTC']
-        
-    
-    
     
     #### Model Training
     BenchModel.fit(TrInp, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValInp, None) , callbacks=[  RelLoss]) 

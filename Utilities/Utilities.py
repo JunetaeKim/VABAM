@@ -95,8 +95,52 @@ def DeserializeObjects(Instance, Filename):
     for Name, Value in LoadedData.items():
         setattr(Instance, Name, Value)
         
+
+        
+def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
+
+    Params = {}
+    
+    ### Model-related parameters
+    Params['SigType']  = ModelConfigSet['SigType']
+    Params['ReparaStd'] = EvalConfigSet['ReparaStd']          # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    Params['ReparaStdZj'] = EvalConfigSet['ReparaStdZj']      # The standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+
+    
+    ### Evaluation-related parameters
+    Params['MaxFreq'] = EvalConfigSet['MaxFreq']              # The maximum frequency value within the analysis range (default = 51).
+    Params['MinFreq'] = EvalConfigSet['MinFreq']              # The minimum frequency value within the analysis range (default = 1).
+    Params['MinFreqR'] = EvalConfigSet['MinFreqR']            # The minimum value when generating FC_ArangeInp with linspace.
+    Params['MaxFreqR'] = EvalConfigSet['MaxFreqR']            # The maximum value when generating FC_ArangeInp with linspace.
+    Params['NMiniBat'] = EvalConfigSet['NMiniBat']            # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    Params['SimSize'] = EvalConfigSet['SimSize']              # The number of generations (i.e., samplings) within the mini-batch.
+    Params['NGen'] = EvalConfigSet['NGen']                    # The number of generations (i.e., samplings) within the mini-batch.
+    Params['NSelZ'] = EvalConfigSet['NSelZ']                  # The size of js to be selected at the same time (default: 1).
+    Params['MetricCut'] = EvalConfigSet['MetricCut']          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
+    Params['SampZType'] = EvalConfigSet['SampZType']          # SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. 
+                                                              # Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
+    Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
+        
+    ### Functional parameters
+    Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
+    Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
+    Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    Params['Spec_Info'] = EvalConfigSet['Spec_Info']          # The list of specific objects subject to class serialization.
+     
+    
+    ### Model-specific parameters
+    if 'NSelCond' in EvalConfigSet:
+        Params['NSelCond'] = EvalConfigSet['NSelCond']        # The size of conditional inputs to be selected at the same time (default: 1).
+    if 'WindowSize' in EvalConfigSet:
+        Params['WindowSize'] = EvalConfigSet['WindowSize']    # The window size when calculating permutation entropy (default: 3)
+    if 'FcLimit' in EvalConfigSet:
+        Params['FcLimit'] = EvalConfigSet['FcLimit']          # The threshold value of the max of the FC value input into the generation model.
+    
+    return Params        
+        
         
 
+        
 class Lossweight(tf.keras.layers.Layer):
     
     def __init__(self, InitVal = 0., name='Lossweight'):
@@ -114,6 +158,7 @@ class Lossweight(tf.keras.layers.Layer):
         config = super(Lossweight, self).get_config()
         config.update({ 'InitVal': self.InitVal })
         return config
+    
     
 
 
@@ -277,32 +322,3 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             
   
     
-def log_importance_weight_matrix(batch_size, dataset_size):
-    """
-    Calculates a log importance weight matrix
-
-    Parameters
-    ----------
-    batch_size: int
-        number of training images in the batch
-
-    dataset_size: int
-        number of training images in the dataset
-        
-    Reference:
-    https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54
-    """
-    
-    
-    N = dataset_size
-    M = batch_size - 1
-    strat_weight = (N - M) / (N * M)
-
-    W = tf.fill([batch_size, batch_size], 1 / M)
-    W = tf.reshape(W, [-1])
-    W = tf.tensor_scatter_nd_update( W,  tf.range(0, tf.size(W), M + 1)[:, None],  tf.fill([tf.size(W) // (M + 1)], 1 / N))
-    W = tf.tensor_scatter_nd_update( W, tf.range(1, tf.size(W), M + 1)[:, None], tf.fill([tf.size(W) // (M + 1) - 1 + 1], strat_weight))
-    W = tf.tensor_scatter_nd_update( W,  tf.constant([[M * (M + 1)]]),   tf.constant([strat_weight]))
-    W = tf.reshape(W, [batch_size, batch_size])
-
-    return tf.math.log(W)
