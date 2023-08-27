@@ -267,7 +267,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.FC_ArangeInp = FC_ArangeInp     # The 2D matrix (N_sample, NFCs) containing FCs values that the user creates and inputs directly.
         
-        assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
+        assert SecDataType in ['FCA','FCR','CON', None], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CON' or None are valid."
         
         
         ## Optional parameters with default values ##
@@ -423,6 +423,7 @@ class Evaluator ():
             
             
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
+            # Calculating the entropies given the probability density function of the power spectral.
             self.H_zPSD_ZjFa = -np.sum(self.Q_PSPDF_ZjRptFCar * np.log(self.Q_PSPDF_ZjRptFCar), axis=-1)
             self.H_fcPE_ZjFa = np.mean(-np.sum(self.Q_PEPDF_ZjRptFCar * np.log(self.Q_PEPDF_ZjRptFCar), axis=-1), axis=-1)
             self.SumH_ZjFa = self.H_zPSD_ZjFa + self.H_fcPE_ZjFa
@@ -490,7 +491,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
-        assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
+        assert SecDataType in ['FCA','FCR','CON', None], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CON' or None are valid."
         
 
         ## Optional parameters with default values ##
@@ -581,6 +582,7 @@ class Evaluator ():
 
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
+            # Calculating the entropies given the probability density function of the power spectral.
             self.H_zPSD_Zj = -np.sum(self.Q_PSPDF_Zj * np.log(self.Q_PSPDF_Zj), axis=-1)
 
             # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
@@ -629,7 +631,7 @@ class Evaluator ():
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         
-        assert SecDataType in ['FCA','FCR','CON'], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', or 'CON' are valid."
+        assert SecDataType in ['FCA','FCR','CON', None], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CON' or None are valid."
         
         
         
@@ -844,6 +846,7 @@ class Evaluator ():
 
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
+            # Calculating the entropies given the probability density function of the power spectral.
             self.H_zPSD_ZjCa = -np.sum(self.Q_PSPDF_ZjRptCONa * np.log(self.Q_PSPDF_ZjRptCONa), axis=-1)
             self.H_fcPE_ZjCa = np.mean(-np.sum(self.Q_PEPDF_ZjRptCONa * np.log(self.Q_PEPDF_ZjRptCONa), axis=-1), axis=-1)
             self.SumH_ZjCa = self.H_zPSD_ZjCa + self.H_fcPE_ZjCa
