@@ -424,6 +424,7 @@ class Evaluator ():
             
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
             # Calculating the entropies given the probability density function of the power spectral.
+            ## This indicates which frequency is most activated in the generated signal.
             self.H_zPSD_ZjFa = -np.sum(self.Q_PSPDF_ZjRptFCar * np.log(self.Q_PSPDF_ZjRptFCar), axis=-1)
             self.H_fcPE_ZjFa = np.mean(-np.sum(self.Q_PEPDF_ZjRptFCar * np.log(self.Q_PEPDF_ZjRptFCar), axis=-1), axis=-1)
             self.SumH_ZjFa = self.H_zPSD_ZjFa + self.H_fcPE_ZjFa
@@ -583,6 +584,7 @@ class Evaluator ():
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
             # Calculating the entropies given the probability density function of the power spectral.
+            ## This indicates which frequency is most activated in the generated signal.
             self.H_zPSD_Zj = -np.sum(self.Q_PSPDF_Zj * np.log(self.Q_PSPDF_Zj), axis=-1)
 
             # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
@@ -846,7 +848,8 @@ class Evaluator ():
 
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            # Calculating the entropies given the probability density function of the power spectral.
+            # Calculating the entropies given the probability density function of the power spectral. 
+            ## This indicates which frequency is most activated in the generated signal.
             self.H_zPSD_ZjCa = -np.sum(self.Q_PSPDF_ZjRptCONa * np.log(self.Q_PSPDF_ZjRptCONa), axis=-1)
             self.H_fcPE_ZjCa = np.mean(-np.sum(self.Q_PEPDF_ZjRptCONa * np.log(self.Q_PEPDF_ZjRptCONa), axis=-1), axis=-1)
             self.SumH_ZjCa = self.H_zPSD_ZjCa + self.H_fcPE_ZjCa
