@@ -102,7 +102,8 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params = {}
     
     ### Model-related parameters
-    Params['SigType']  = ModelConfigSet['SigType']
+    Params['SigType']  = ModelConfigSet['SigType']            # Types of signals to train on.: ART, PLETH, II. 
+    Params['LatDim']  = ModelConfigSet['LatDim']              # The dimensionality of the latent variable z.
     Params['ReparaStd'] = EvalConfigSet['ReparaStd']          # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     Params['ReparaStdZj'] = EvalConfigSet['ReparaStdZj']      # The standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
 
