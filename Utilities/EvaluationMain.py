@@ -271,7 +271,7 @@ class Evaluator ():
         
         
         ## Optional parameters with default values ##
-        # WindowSize: The window size when calculating permutation entropy (default: 3)
+        # WindowSize: The window size when calculating the permutation sets (default: 3)
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
         self.SampZType = SampZType           # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
         self.FcLimit = FcLimit               # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
@@ -380,21 +380,21 @@ class Evaluator ():
             self.SubPSPDF_Batch.sort(0)
 
 
-            ### ---------------------------- Permutation Entropy given PSD over each generation -------------------------------- ###
+            ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (Batch_size, N_frequency, N_permutation_cases)
-            self.Q_PEPDF_ZjRptFC = ProbPermutation(self.SubPSPDF_ZjRptFC, WindowSize=WindowSize)
-            self.Q_PEPDF_ZjRptFCar = ProbPermutation(self.SubPSPDF_ZjRptFCar, WindowSize=WindowSize)
-            self.Q_PEPDF_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
+            self.Q_PDPSD_ZjRptFC = ProbPermutation(self.SubPSPDF_ZjRptFC, WindowSize=WindowSize)
+            self.Q_PDPSD_ZjRptFCar = ProbPermutation(self.SubPSPDF_ZjRptFCar, WindowSize=WindowSize)
+            self.Q_PDPSD_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
 
 
             ### ---------------------------------------- Conditional mutual information ---------------------------------------- ###
-            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation entropy, respectively.
+            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
             I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
             I_zPSD_ZjFc_ =  MeanKLD(self.Q_PSPDF_ZjRptFC, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_FaZj_ = MeanKLD(self.Q_PSPDF_ZjRptFCar, self.Q_PSPDF_ZjRptFC ) # I(zPSD;FC|Zj)
-            I_fcPE_ZjFc_ = MeanKLD(self.Q_PEPDF_ZjRptFC, self.Q_PEPDF_Batch) # I(fcPE;Zj)
-            I_fcPE_FaZj_ = MeanKLD(self.Q_PEPDF_ZjRptFCar, self.Q_PEPDF_ZjRptFC) # I(fcPE;FC|Zj)
+            I_fcPE_ZjFc_ = MeanKLD(self.Q_PDPSD_ZjRptFC, self.Q_PDPSD_Batch) # I(fcPE;Zj)
+            I_fcPE_FaZj_ = MeanKLD(self.Q_PDPSD_ZjRptFCar, self.Q_PDPSD_ZjRptFC) # I(fcPE;FC|Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
@@ -426,7 +426,7 @@ class Evaluator ():
             # Calculating the entropies given the probability density function of the power spectral.
             ## This indicates which frequency is most activated in the generated signal.
             self.H_zPSD_ZjFa = -np.sum(self.Q_PSPDF_ZjRptFCar * np.log(self.Q_PSPDF_ZjRptFCar), axis=-1)
-            self.H_fcPE_ZjFa = np.mean(-np.sum(self.Q_PEPDF_ZjRptFCar * np.log(self.Q_PEPDF_ZjRptFCar), axis=-1), axis=-1)
+            self.H_fcPE_ZjFa = np.mean(-np.sum(self.Q_PDPSD_ZjRptFCar * np.log(self.Q_PDPSD_ZjRptFCar), axis=-1), axis=-1)
             self.SumH_ZjFa = self.H_zPSD_ZjFa + self.H_fcPE_ZjFa
 
             # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
@@ -638,7 +638,7 @@ class Evaluator ():
         
         
         ## Optional parameters with default values ##
-        # WindowSize: The window size when calculating permutation entropy (default: 3).
+        # WindowSize: The window size when calculating the permutation sets (default: 3).
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True).
         # NSelCond: The size of conditional inputs to be selected at the same time (default: 1).
         self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random').
@@ -807,11 +807,11 @@ class Evaluator ():
 
 
             
-            ### ---------------------------- Permutation Entropy given PSD over each generation -------------------------------- ###
+            ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (Batch_size, N_frequency, N_permutation_cases)
-            self.Q_PEPDF_ZjRptCONr = ProbPermutation(self.SubPSPDF_ZjRptCONr, WindowSize=WindowSize)
-            self.Q_PEPDF_ZjRptCONa = ProbPermutation(self.SubPSPDF_ZjRptCONa, WindowSize=WindowSize)
-            self.Q_PEPDF_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
+            self.Q_PDPSD_ZjRptCONr = ProbPermutation(self.SubPSPDF_ZjRptCONr, WindowSize=WindowSize)
+            self.Q_PDPSD_ZjRptCONa = ProbPermutation(self.SubPSPDF_ZjRptCONa, WindowSize=WindowSize)
+            self.Q_PDPSD_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
             
             
             
@@ -821,8 +821,8 @@ class Evaluator ():
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
             I_zPSD_ZjCr_ =  MeanKLD(self.Q_PSPDF_ZjRptCONr, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_CaZj_ = MeanKLD(self.Q_PSPDF_ZjRptCONa, self.Q_PSPDF_ZjRptCONr ) # I(zPSD;CON|Zj)
-            I_fcPE_ZjCr_ = MeanKLD(self.Q_PEPDF_ZjRptCONr, self.Q_PEPDF_Batch) # I(fcPE;Zj)
-            I_fcPE_CaZj_ = MeanKLD(self.Q_PEPDF_ZjRptCONa, self.Q_PEPDF_ZjRptCONr) # I(fcPE;CON|Zj)
+            I_fcPE_ZjCr_ = MeanKLD(self.Q_PDPSD_ZjRptCONr, self.Q_PDPSD_Batch) # I(fcPE;Zj)
+            I_fcPE_CaZj_ = MeanKLD(self.Q_PDPSD_ZjRptCONa, self.Q_PDPSD_ZjRptCONr) # I(fcPE;CON|Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
@@ -855,7 +855,7 @@ class Evaluator ():
             # Calculating the entropies given the probability density function of the power spectral. 
             ## This indicates which frequency is most activated in the generated signal.
             self.H_zPSD_ZjCa = -np.sum(self.Q_PSPDF_ZjRptCONa * np.log(self.Q_PSPDF_ZjRptCONa), axis=-1)
-            self.H_fcPE_ZjCa = np.mean(-np.sum(self.Q_PEPDF_ZjRptCONa * np.log(self.Q_PEPDF_ZjRptCONa), axis=-1), axis=-1)
+            self.H_fcPE_ZjCa = np.mean(-np.sum(self.Q_PDPSD_ZjRptCONa * np.log(self.Q_PDPSD_ZjRptCONa), axis=-1), axis=-1)
             self.SumH_ZjCa = self.H_zPSD_ZjCa + self.H_fcPE_ZjCa
             
             # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRpt_CONa.
