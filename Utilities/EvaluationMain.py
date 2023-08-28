@@ -701,17 +701,13 @@ class Evaluator ():
   
             
             # Processing Conditional information 
+            # Calculating CONmu
             ## Shape of CON: (NMiniBat*NGen, CONDim) 
-            self.CONRpt = np.repeat(SubData[1], self.NGen, axis=0)
-                                    
+            self.CONmu = np.tile(np.mean(self.AnalData[1], axis=0)[None], (self.NMiniBat * self.NGen,1))
+                                                
             # Generating a matrix with only one randomly selected condition ('CONRand')
             ## Generating the masking matrix
-            self.CONRand = np.zeros((self.NMiniBat*self.NGen, self.CondDim))
-            
-            ## Assigning 1 to the masking positions in each row.
-            for i in range(len(self.CONRand)):
-                MaskCols = np.random.choice(self.CondDim, NSelCond, replace=False)
-                self.CONRand[i, MaskCols] = np.random.rand(NSelCond)
+            self.CONRand = np.random.rand(self.NMiniBat * self.NGen, self.CondDim)
                 
             
             # Generating a matrix with only one selected condition in order ('CON_Arange').
@@ -732,7 +728,7 @@ class Evaluator ():
             
             '''         Alternative ways for 'CONRand' and 'CON_Arange'
             
-            # Generating a matrix with only one randomly selected condition ('CONRand').
+            # 1) Generating a matrix with only one randomly selected condition ('CONRand').
             ## Conditions representation based on the distribution of the given data.
             P_PSPDF_Rpt = np.tile(self.P_PSPDF[None], (self.NGen * self.NMiniBat, 1))
             ## Generating the masking matrix
@@ -745,7 +741,15 @@ class Evaluator ():
             #self.CONRand =P_PSPDF_Rpt * RandMasking
             self.CONRand = RandMasking
             
-            # Generating a matrix with only one selected condition in order ('CON_Arange').
+            # 2) Generating a matrix with only one randomly selected condition ('CONRand')
+            ## Generating the masking matrix
+            self.CONRand = np.zeros((self.NMiniBat*self.NGen, self.CondDim))
+            ## Assigning 1 to the masking positions in each row.
+            for i in range(len(self.CONRand)):
+                MaskCols = np.random.choice(self.CondDim, NSelCond, replace=False)
+                self.CONRand[i, MaskCols] = np.random.rand(NSelCond)
+            
+            # 1) Generating a matrix with only one selected condition in order ('CON_Arange').
             ## Generating a 3D matrix for the arragned masking
             ArMasking = np.zeros((self.NMiniBat, self.NGen, self.CondDim))
             ## Generating the CondDim x CondDim identity matrix
@@ -767,7 +771,7 @@ class Evaluator ():
             '''
             
             ## Binding the samples together, generate signals through the model 
-            Set_CONs = np.concatenate([self.CONRpt,  self.CONRpt, self.CONRand, self.CON_Arange])
+            Set_CONs = np.concatenate([self.CONmu,  self.CONmu, self.CONRand, self.CON_Arange])
             Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj, self.Samp_ZjRPT, self.Samp_ZjRPT ])
             Data = [Set_Zs, Set_CONs]
             
