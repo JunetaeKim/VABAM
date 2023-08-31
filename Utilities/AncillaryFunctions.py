@@ -64,7 +64,7 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     return AggPSPDF
 
 
-# Permutation entropy given PSD over each generation
+# Permutation given PSD over each generation
 def ProbPermutation(Data, WindowSize=3):
     # Data shape: (Batch_size, N_frequency, N_sample)
     
