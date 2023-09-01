@@ -349,7 +349,7 @@ class Evaluator ():
 
             '''
             ## Binding the samples together, generate signals through the model 
-            Set_FCs = np.concatenate([self.FCmu,   self.FCmu,     self.FCs,         self.FC_Arange])
+            Set_FCs = np.concatenate([self.FCs,   self.FCs,     self.FCs,         self.FC_Arange]) 
             Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_Zj,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
@@ -366,10 +366,10 @@ class Evaluator ():
 
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
             # Return shape: (Batch_size, N_frequency)
-            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_ZjRptFC = FFT_PSD(self.SigGen_ZjRptFC, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_ZjRptFCar = FFT_PSD(self.SigGen_ZjRptFCar, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_ZjRptFC = FFT_PSD(self.SigGen_ZjRptFC, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_ZjRptFCar = FFT_PSD(self.SigGen_ZjRptFCar, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
 
             # Return shape: (Batch_size, N_frequency, N_sample)
             self.SubPSPDF_ZjRptFC = FFT_PSD(self.SigGen_ZjRptFC, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
