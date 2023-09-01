@@ -108,9 +108,9 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
     Sampling Samp_Z 
 
     - Shape of UniqSamp_Z: (NMiniBat, LatDim)
-    - UniqSamp_Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) for Type =='Model'
-    - UniqSamp_Z ~ N(Zμ|y, cond, σ) for Type =='Model' and when there are ancillary (i.e., Conditional VAE) data inputs 
-    - RandSamp_Z ~ N(0, ReparaStdZj) for Type =='Gauss'
+    - UniqSamp_Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) for Type =='Model*'
+    - UniqSamp_Z ~ N(Zμ|y, cond, σ) for Type =='Model*' and when there are ancillary (i.e., Conditional VAE) data inputs 
+    - RandSamp_Z ~ N(0, ReparaStdZj) for Type =='Gauss*'
 
     - Samp_Z is a 3D tensor expanded by repeating the first axis (i.e., 0) of UniqSamp_Z or RandSamp_Z by NGen times.
     - Shape of Samp_Z: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
