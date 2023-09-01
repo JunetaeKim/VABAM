@@ -331,9 +331,6 @@ class Evaluator ():
             ## Shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
             self.FCs = np.random.rand(self.NMiniBat * self.NGen, self.NFCs) * FcLimit
 
-            # Generating FCμ: 
-            self.FCmu = np.zeros_like(self.FCs) + FcLimit * 0.5
-
             # Generating FC values with a fixed interval that increases at equal increments.
             self.FC_Arange = np.broadcast_to(self.FC_ArangeInp[None], (self.NMiniBat, self.NGen, self.NFCs)).reshape(-1, self.NFCs)
 
@@ -350,7 +347,7 @@ class Evaluator ():
             '''
             ## Binding the samples together, generate signals through the model 
             Set_FCs = np.concatenate([self.FCs,   self.FCs,     self.FCs,         self.FC_Arange]) 
-            Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_Zj,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
+            Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_ZjRPT,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
