@@ -347,7 +347,7 @@ class Evaluator ():
             '''
             ## Binding the samples together, generate signals through the model 
             Set_FCs = np.concatenate([self.FCs,   self.FCs,     self.FCs,         self.FC_Arange]) 
-            Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_ZjRPT,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
+            Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_Zj,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
@@ -384,7 +384,7 @@ class Evaluator ():
             self.Q_PDPSD_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
 
 
-            ### ---------------------------------------- Conditional mutual information ---------------------------------------- ###
+            ### ---------------------------------------- Mutual information ---------------------------------------- ###
             # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
             I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
@@ -562,7 +562,7 @@ class Evaluator ():
 
 
 
-            ### ---------------------------------------- Conditional mutual information ---------------------------------------- ###
+            ### ---------------------------------------- Mutual information ---------------------------------------- ###
             # zPSD stands for z-wise power spectral density.
             I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
@@ -812,7 +812,7 @@ class Evaluator ():
             
             
             
-            ### ---------------------------------------- Conditional mutual information ---------------------------------------- ###
+            ### ---------------------------------------- Mutual information ---------------------------------------- ###
             # zPSD stands for z-wise power spectral density.
             I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
