@@ -390,8 +390,8 @@ class Evaluator ():
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
             I_zPSD_ZjFc_ =  MeanKLD(self.Q_PSPDF_ZjRptFC, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_FaZj_ = MeanKLD(self.Q_PSPDF_ZjRptFCar, self.Q_PSPDF_ZjRptFC ) # I(zPSD;FC|Zj)
-            I_fcPE_ZjFc_ = MeanKLD(self.Q_PDPSD_ZjRptFC, self.Q_PDPSD_Batch) # I(fcPE;Zj)
-            I_fcPE_FaZj_ = MeanKLD(self.Q_PDPSD_ZjRptFCar, self.Q_PDPSD_ZjRptFC) # I(fcPE;FC|Zj)
+            I_fcPE_ZjFc_ = MeanKLD(self.Q_PDPSD_ZjRptFC, self.Q_PDPSD_Batch) # I(fcPE;FC,Zj)
+            I_fcPE_FaZj_ = MeanKLD(self.Q_PDPSD_ZjRptFCar, self.Q_PDPSD_Batch) # I(fcPE;FCa,Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
@@ -472,7 +472,7 @@ class Evaluator ():
         self.AggResDic['I_fcPE_ZjFc'].append(self.I_fcPE_ZjFc)
         self.I_fcPE_FaZj /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_FaZj'].append(self.I_fcPE_FaZj)
-        self.MI_fcPE_FaFc = self.I_fcPE_ZjFc + self.I_fcPE_FaZj    
+        self.MI_fcPE_FaFc = self.I_fcPE_FaZj - self.I_fcPE_ZjFc
         self.AggResDic['MI_fcPE_FaFc'].append(self.MI_fcPE_FaFc)
 
         
