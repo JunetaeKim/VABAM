@@ -295,7 +295,7 @@ class Evaluator ():
             ## Result trackers
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[], 
-                         'CMI_zPSD_ZjZ':[], 'CMI_zPSD_FcZj':[], 'CMI_fcPE_FaFc':[]}
+                         'MI_zPSD_ZjZ':[], 'MI_zPSD_FcZj':[], 'MI_fcPE_FaFc':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_ZjFc, self.I_fcPE_FaZj = 0,0,0,0,0,0
@@ -451,29 +451,29 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # CMI(V;Zj, Z)
+        # MI(V;Zj, Z)
         self.I_zPSD_Z /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
         self.I_zPSD_ZjZ /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_ZjZ'].append(self.I_zPSD_ZjZ)
-        self.CMI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
-        self.AggResDic['CMI_zPSD_ZjZ'].append(self.CMI_zPSD_ZjZ)
+        self.MI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
+        self.AggResDic['MI_zPSD_ZjZ'].append(self.MI_zPSD_ZjZ)
 
-        # CMI(V;FC,Zj)
+        # MI(V;FC,Zj)
         self.I_zPSD_ZjFc /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_ZjFc'].append(self.I_zPSD_ZjFc)
         self.I_zPSD_FaZj /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_FaZj'].append(self.I_zPSD_FaZj)
-        self.CMI_zPSD_FcZj = self.I_zPSD_ZjFc + self.I_zPSD_FaZj       
-        self.AggResDic['CMI_zPSD_FcZj'].append(self.CMI_zPSD_FcZj)
+        self.MI_zPSD_FcZj = self.I_zPSD_ZjFc + self.I_zPSD_FaZj       
+        self.AggResDic['MI_zPSD_FcZj'].append(self.MI_zPSD_FcZj)
 
-        # CMI(VE;FC,Zj)
+        # MI(VE;FC,Zj)
         self.I_fcPE_ZjFc /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_ZjFc'].append(self.I_fcPE_ZjFc)
         self.I_fcPE_FaZj /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_FaZj'].append(self.I_fcPE_FaZj)
-        self.CMI_fcPE_FaFc = self.I_fcPE_ZjFc + self.I_fcPE_FaZj    
-        self.AggResDic['CMI_fcPE_FaFc'].append(self.CMI_fcPE_FaFc)
+        self.MI_fcPE_FaFc = self.I_fcPE_ZjFc + self.I_fcPE_FaZj    
+        self.AggResDic['MI_fcPE_FaFc'].append(self.MI_fcPE_FaFc)
 
         
         
@@ -511,7 +511,7 @@ class Evaluator ():
 
             ## Result trackers
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
-            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'CMI_zPSD_ZjZ':[]}
+            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'MI_zPSD_ZjZ':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
@@ -607,13 +607,13 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # CMI(V;Zj, Z)
+        # MI(V;Zj, Z)
         self.I_zPSD_Z /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
         self.I_zPSD_ZjZ /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_ZjZ'].append(self.I_zPSD_ZjZ)
-        self.CMI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
-        self.AggResDic['CMI_zPSD_ZjZ'].append(self.CMI_zPSD_ZjZ)
+        self.MI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
+        self.AggResDic['MI_zPSD_ZjZ'].append(self.MI_zPSD_ZjZ)
         
         
         
@@ -662,7 +662,7 @@ class Evaluator ():
             ## Result trackers
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[], 
-                              'CMI_zPSD_ZjZ':[], 'CMI_zPSD_CrZj':[], 'CMI_fcPE_CaCr':[]}
+                              'MI_zPSD_ZjZ':[], 'MI_zPSD_CrZj':[], 'MI_fcPE_CaCr':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjCr, self.I_zPSD_CaZj, self.I_fcPE_ZjCr, self.I_fcPE_CaZj = 0,0,0,0,0,0
@@ -880,26 +880,26 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # CMI(V;Zj, Z)
+        # MI(V;Zj, Z)
         self.I_zPSD_Z /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
         self.I_zPSD_ZjZ /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_ZjZ'].append(self.I_zPSD_ZjZ)
-        self.CMI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
-        self.AggResDic['CMI_zPSD_ZjZ'].append(self.CMI_zPSD_ZjZ)
+        self.MI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
+        self.AggResDic['MI_zPSD_ZjZ'].append(self.MI_zPSD_ZjZ)
 
-        # CMI(V;Cr,Zj)
+        # MI(V;Cr,Zj)
         self.I_zPSD_ZjCr /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_ZjCr'].append(self.I_zPSD_ZjCr)
         self.I_zPSD_CaZj /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_CaZj'].append(self.I_zPSD_CaZj)
-        self.CMI_zPSD_CrZj = self.I_zPSD_ZjCr + self.I_zPSD_CaZj       
-        self.AggResDic['CMI_zPSD_CrZj'].append(self.CMI_zPSD_CrZj)
+        self.MI_zPSD_CrZj = self.I_zPSD_ZjCr + self.I_zPSD_CaZj       
+        self.AggResDic['MI_zPSD_CrZj'].append(self.MI_zPSD_CrZj)
 
-        # CMI(VE;Cr,Zj)
+        # MI(VE;Cr,Zj)
         self.I_fcPE_ZjCr /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_ZjCr'].append(self.I_fcPE_ZjCr)
         self.I_fcPE_CaZj /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_CaZj'].append(self.I_fcPE_CaZj)
-        self.CMI_fcPE_CaCr = self.I_fcPE_ZjCr + self.I_fcPE_CaZj    
-        self.AggResDic['CMI_fcPE_CaCr'].append(self.CMI_fcPE_CaCr)
+        self.MI_fcPE_CaCr = self.I_fcPE_ZjCr + self.I_fcPE_CaZj    
+        self.AggResDic['MI_fcPE_CaCr'].append(self.MI_fcPE_CaCr)
