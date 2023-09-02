@@ -451,7 +451,7 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # MI(V;Zj, Z)
+        # MI(V;Zj,Z)
         self.I_zPSD_Z /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
         self.I_zPSD_ZjZ /= (self.TotalIterSize)
@@ -467,7 +467,7 @@ class Evaluator ():
         self.MI_zPSD_FcZj = self.I_zPSD_ZjFc + self.I_zPSD_FaZj       
         self.AggResDic['MI_zPSD_FcZj'].append(self.MI_zPSD_FcZj)
 
-        # MI(VE;FC,Zj)
+        # I(VE;FCa,Zj) - I(VE;FCr,Zj)
         self.I_fcPE_ZjFc /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_ZjFc'].append(self.I_fcPE_ZjFc)
         self.I_fcPE_FaZj /= (self.TotalIterSize)
@@ -607,7 +607,7 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # MI(V;Zj, Z)
+        # MI(V;Zj,Z)
         self.I_zPSD_Z /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
         self.I_zPSD_ZjZ /= (self.TotalIterSize)
@@ -698,17 +698,12 @@ class Evaluator ():
   
             
             # Processing Conditional information 
-            # Calculating CONmu
-            ## Shape of CON: (NMiniBat*NGen, CONDim) 
-            self.CONmu = np.tile(np.mean(self.AnalData[1], axis=0)[None], (self.NMiniBat * self.NGen,1))
-                                                
-            # Generating a matrix with only one randomly selected condition ('CONRand')
-            ## Generating the masking matrix
+            ## Generating a matrix with only one randomly selected condition ('CONRand')
+            ### Generating the masking matrix
             self.CONRand = np.random.rand(self.NMiniBat * self.NGen, self.CondDim)
                 
-            
-            # Generating a matrix with only one selected condition in order ('CON_Arange').
-            ## Generating the masking matrix
+            ## Generating a matrix with only one selected condition in order ('CON_Arange').
+            ### Generating the masking matrix
             ArMasking = np.zeros((self.NGen, self.CondDim))
             
             ## Populating the matrix diagonally with sequences of random numbers, 
@@ -768,7 +763,7 @@ class Evaluator ():
             '''
             
             ## Binding the samples together, generate signals through the model 
-            Set_CONs = np.concatenate([self.CONmu,  self.CONmu, self.CONRand, self.CON_Arange])
+            Set_CONs = np.concatenate([self.CONRand,  self.CONRand, self.CONRand, self.CON_Arange])
             Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj, self.Samp_ZjRPT, self.Samp_ZjRPT ])
             Data = [Set_Zs, Set_CONs]
             
@@ -789,10 +784,10 @@ class Evaluator ():
 
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
             # Return shape: (Batch_size, N_frequency)
-            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_ZjRptCONa = FFT_PSD(Sel_SigGen_ZjRptCONa, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_ZjRptCONa = FFT_PSD(Sel_SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
 
             # Return shape: (Batch_size, N_frequency, N_sample)
             self.SubPSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
@@ -818,8 +813,8 @@ class Evaluator ():
             I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
             I_zPSD_ZjCr_ =  MeanKLD(self.Q_PSPDF_ZjRptCONr, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_CaZj_ = MeanKLD(self.Q_PSPDF_ZjRptCONa, self.Q_PSPDF_ZjRptCONr ) # I(zPSD;CON|Zj)
-            I_fcPE_ZjCr_ = MeanKLD(self.Q_PDPSD_ZjRptCONr, self.Q_PDPSD_Batch) # I(fcPE;Zj)
-            I_fcPE_CaZj_ = MeanKLD(self.Q_PDPSD_ZjRptCONa, self.Q_PDPSD_ZjRptCONr) # I(fcPE;CON|Zj)
+            I_fcPE_ZjCr_ = MeanKLD(self.Q_PDPSD_ZjRptCONr, self.Q_PDPSD_Batch) # I(fcPE;CONr,Zj)
+            I_fcPE_CaZj_ = MeanKLD(self.Q_PDPSD_ZjRptCONa, self.Q_PDPSD_Batch) # I(fcPE;CONa,Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
@@ -880,7 +875,7 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # MI(V;Zj, Z)
+        # MI(V;Zj,Z)
         self.I_zPSD_Z /= (self.TotalIterSize)
         self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
         self.I_zPSD_ZjZ /= (self.TotalIterSize)
@@ -896,10 +891,10 @@ class Evaluator ():
         self.MI_zPSD_CrZj = self.I_zPSD_ZjCr + self.I_zPSD_CaZj       
         self.AggResDic['MI_zPSD_CrZj'].append(self.MI_zPSD_CrZj)
 
-        # MI(VE;Cr,Zj)
+        # MI(VE;Ca,Zj) - MI(VE;Cr,Zj)
         self.I_fcPE_ZjCr /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_ZjCr'].append(self.I_fcPE_ZjCr)
         self.I_fcPE_CaZj /= (self.TotalIterSize)
         self.AggResDic['I_fcPE_CaZj'].append(self.I_fcPE_CaZj)
-        self.MI_fcPE_CaCr = self.I_fcPE_ZjCr + self.I_fcPE_CaZj    
+        self.MI_fcPE_CaCr = self.I_fcPE_CaZj - self.I_fcPE_ZjCr
         self.AggResDic['MI_fcPE_CaCr'].append(self.MI_fcPE_CaCr)
