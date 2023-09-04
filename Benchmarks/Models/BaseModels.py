@@ -23,10 +23,13 @@ def Encoder(SigDim, CondDim=None, SlidingSize = 50, LatDim= 2, Type = '',  Repar
     Encoder = Bidirectional(GRU(25, return_sequences=True))(Encoder)
     Encoder = Bidirectional(GRU(75, return_sequences=False))(Encoder)
     
-    # For Conditional VAE
+    # Conditional VAE vs other models
     if CondDim is not None:
         InpCond = Input(shape=(CondDim,), name='Inp_Cond')
         Encoder = Concatenate()([Encoder,InpCond])
+        ModelInp = [InpL, InpCond]
+    else:
+        ModelInp = InpL
         
     Encoder = Dense(100, activation='relu')(Encoder)
     Encoder = Dense(70, activation='relu')(Encoder)
@@ -45,12 +48,6 @@ def Encoder(SigDim, CondDim=None, SlidingSize = 50, LatDim= 2, Type = '',  Repar
     Zs = Z_Mu + tf.exp(0.5 * Z_Log_Sigma) * Epsilon
     Zs = ReName(Zs,'Zs'+Type)
 
-    
-    # For Conditional VAE
-    if CondDim is not None:
-        ModelInp = [InpL, InpCond]
-    else:
-        ModelInp = InpL
         
     return Model(ModelInp, Zs, name='EncModel') 
 
@@ -61,16 +58,16 @@ def Decoder(SigDim, CondDim=None, LatDim= 2, SlidingSize= 50):
 
     InpZ = Input(shape=(LatDim,), name='Inp_Z')
     
-    # For Conditional VAE
+    # Conditional VAE vs other models
     if CondDim is not None:
         InpCond = Input(shape=(CondDim,), name='Inp_Cond')
-        Decoder = Concatenate()([InpZ,InpCond])
-        #DenseCond = Dense(10, activation='relu')(InpCond)
-        #Decoder = Concatenate()([InpZ,DenseCond])
+        DecoderInp = Concatenate()([InpZ,InpCond])
+        ModelInp = [InpZ, InpCond]
     else:
-        Decoder = InpZ
+        DecoderInp = InpZ
+        ModelInp = InpZ
         
-    Decoder = Dense(50, activation='relu')(Decoder)
+    Decoder = Dense(50, activation='relu')(DecoderInp)
     Decoder = Dense(50, activation='relu')(Decoder)
     Decoder = Dense(50, activation='relu')(Decoder)
     Decoder = Dense(75, activation='relu')(Decoder)
@@ -82,12 +79,6 @@ def Decoder(SigDim, CondDim=None, LatDim= 2, SlidingSize= 50):
     DecOut = Dense(SlidingSize,'sigmoid')(Decoder)
     DecOut = Reshape((SigDim,),name='Out')(DecOut)
 
-    
-    # For Conditional VAE
-    if CondDim is not None:
-        ModelInp = [InpZ, InpCond]
-    else:
-        ModelInp = InpZ
         
     return Model(ModelInp, DecOut, name='ReconModel')
 
