@@ -698,62 +698,32 @@ class Evaluator ():
   
             
             # Processing Conditional information 
-            ## Generating a matrix with only one randomly selected condition ('CONRand')
-            ### Generating the masking matrix
-            self.CONRand = np.random.rand(self.NMiniBat * self.NGen, self.CondDim)
-                
-            ## Generating a matrix with only one selected condition in order ('CON_Arange').
-            ### Generating the masking matrix
-            ArMasking = np.zeros((self.NGen, self.CondDim))
-            
-            ## Populating the matrix diagonally with sequences of random numbers, 
-            ## in the ArMasking matrix (M X N), rows where i + span > N are padded with zeros, not to be used for analysis.
-            for i in range(self.NGen):
-                if i + NSelCond <= self.CondDim:  # This condition ensures the random values are within the matrix boundaries.
-                    ArMasking[i, i:i+NSelCond] = np.random.rand(NSelCond)
-            self.CON_Arange = np.tile(ArMasking[None], (self.NMiniBat,1,1)).reshape(-1, self.CondDim)
-            
-            ## Shape of SelMasking: (NMiniBat, NGen, CONDim) 
-            ## Rows that do not meet the condition 'the random values are within the matrix boundaries' will be excluded from the analysis."
-            SelMasking = np.sum(ArMasking, axis=-1) > 0
-            
-            
-            '''         Alternative ways for 'CONRand' and 'CON_Arange'
-            
-            # 1) Generating a matrix with only one randomly selected condition ('CONRand').
-            ## Conditions representation based on the distribution of the given data.
-            P_PSPDF_Rpt = np.tile(self.P_PSPDF[None], (self.NGen * self.NMiniBat, 1))
-            ## Generating the masking matrix
-            RandMasking = np.zeros_like(P_PSPDF_Rpt)
-            ## Selecting the location in each column for masking.
-            MaskCols = np.random.randint(self.CondDim, size=RandMasking.shape[0])
-            ## Assigning 1 to the masking position in each row.
-            RandMasking[np.arange(RandMasking.shape[0]), MaskCols] = 1
-            ## Generating the matrix where only one value is considered randomly among all conditions.
-            #self.CONRand =P_PSPDF_Rpt * RandMasking
-            self.CONRand = RandMasking
-            
-            # 2) Generating a matrix with only one randomly selected condition ('CONRand')
-            ## Generating the masking matrix
-            self.CONRand = np.zeros((self.NMiniBat*self.NGen, self.CondDim))
-            ## Assigning 1 to the masking positions in each row.
-            for i in range(len(self.CONRand)):
-                MaskCols = np.random.choice(self.CondDim, NSelCond, replace=False)
-                self.CONRand[i, MaskCols] = np.random.rand(NSelCond)
-            
-            # 1) Generating a matrix with only one selected condition in order ('CON_Arange').
-            ## Generating a 3D matrix for the arragned masking
-            ArMasking = np.zeros((self.NMiniBat, self.NGen, self.CondDim))
-            ## Generating the CondDim x CondDim identity matrix
-            DiagMat = np.eye(self.CondDim)
-            ## Applying the identity matrix to each CondDim x CondDim slice
-            ArMasking[:, :self.CondDim, :self.CondDim] = DiagMat
-            # Generating the matrix where only one value is considered in order.
-            #self.CON_Arange = P_PSPDF_Rpt * ArMasking.reshape(-1, CondDim)
-            self.CON_Arange = ArMasking.reshape(-1, CondDim)
-            '''
+            ## Finding the column index of the max value in each row of AnalData[1] and sort the indices
+            ArgMaxP_PSPDF = np.argmax(self.AnalData[1], axis=-1)
+            SortIDX = np.column_stack((np.argsort(ArgMaxP_PSPDF), ArgMaxP_PSPDF[np.argsort(ArgMaxP_PSPDF)]))
 
+            # Computing the number of iterations
+            UniqPSPDF = np.unique(ArgMaxP_PSPDF)
+            NIter = self.NGen // len(UniqPSPDF)
 
+            # Selecting one row index for each unique value, repeated for NIter times and ensure the total number of selected indices matches NGen
+            SelIDX = np.concatenate([np.random.permutation(SortIDX[SortIDX[:, 1] == psd])[:1] for psd in UniqPSPDF for _ in range(NIter)], axis=0)
+            SelIDX = np.vstack((SelIDX, np.random.permutation(SortIDX)[:self.NGen - len(SelIDX)]))
+
+            # Sorting IDX based on the max values
+            SelIDX = SelIDX[np.argsort(SelIDX[:, 1])]
+
+            ## Generating CON_Arange
+            CON_Arange = self.AnalData[1][SelIDX[:,0]]
+            self.CON_Arange = np.tile(CON_Arange[None], (self.NMiniBat, 1,1)).reshape(self.NMiniBat*self.NGen, -1)
+                        
+            ## Generating CONRand
+            #self.CONRand = np.random.rand(self.NMiniBat * self.NGen, self.CondDim)
+            CONRand = np.random.permutation(self.AnalData[1])[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
+            self.CONRand= np.random.permutation(CONRand.T).T
+            
+            
+            
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
             '''
             - To maximize the efficiency of GPU utilization, 
@@ -775,10 +745,6 @@ class Evaluator ():
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
             # Shape of each generation: NMiniBat, NGen, SigDim
             self.SigGen_Z, self.SigGen_Zj, self.SigGen_ZjRptCONr, self.SigGen_ZjRptCONa = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
-            
-            # Rows that do not meet the condition 'the random values are within the matrix boundaries' are excluded from the analysis.
-            # Shape of the selected signal: NMiniBat, len(boundary), SigDim
-            Sel_SigGen_ZjRptCONa = self.SigGen_ZjRptCONa[SelMasking].reshape(self.NMiniBat, -1, self.SigDim)
 
 
 
@@ -787,11 +753,11 @@ class Evaluator ():
             self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.Q_PSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.Q_PSPDF_ZjRptCONa = FFT_PSD(Sel_SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.Q_PSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
 
             # Return shape: (Batch_size, N_frequency, N_sample)
             self.SubPSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
-            self.SubPSPDF_ZjRptCONa = FFT_PSD(Sel_SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
+            self.SubPSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
             # Return shape: (Batch_size, 1, N_frequency)
             self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq) #
