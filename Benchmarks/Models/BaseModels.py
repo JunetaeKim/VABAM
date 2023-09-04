@@ -16,11 +16,6 @@ def ReName (layer, name):
 def Encoder(SigDim, CondDim=None, SlidingSize = 50, LatDim= 2, Type = '',  ReparaStd = 0.1 , Reparam = False):
 
     InpL = Input(shape=(SigDim,), name='Inp_Enc')
-    
-    # For Conditional VAE
-    if CondDim is not None:
-        InpCond = Input(shape=(CondDim,), name='Inp_Cond')
-        
     InpFrame = tf.signal.frame(InpL, SlidingSize, SlidingSize)
 
     #Encoder = Dense(50, activation='relu')(InpFrame)
@@ -30,6 +25,7 @@ def Encoder(SigDim, CondDim=None, SlidingSize = 50, LatDim= 2, Type = '',  Repar
     
     # For Conditional VAE
     if CondDim is not None:
+        InpCond = Input(shape=(CondDim,), name='Inp_Cond')
         Encoder = Concatenate()([Encoder,InpCond])
         
     Encoder = Dense(100, activation='relu')(Encoder)
