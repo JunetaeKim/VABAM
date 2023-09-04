@@ -68,12 +68,13 @@ def Decoder(SigDim, CondDim=None, LatDim= 2, SlidingSize= 50):
     # For Conditional VAE
     if CondDim is not None:
         InpCond = Input(shape=(CondDim,), name='Inp_Cond')
-        DenseCond = Dense(10, activation='relu')(InpCond)
-        Decoder = Concatenate()([InpZ,DenseCond])
+        Decoder = Concatenate()([InpZ,InpCond])
+        #DenseCond = Dense(10, activation='relu')(InpCond)
+        #Decoder = Concatenate()([InpZ,DenseCond])
     else:
         Decoder = InpZ
         
-    Decoder = Dense(50, activation='relu')(InpZ)
+    Decoder = Dense(50, activation='relu')(Decoder)
     Decoder = Dense(50, activation='relu')(Decoder)
     Decoder = Dense(50, activation='relu')(Decoder)
     Decoder = Dense(75, activation='relu')(Decoder)
