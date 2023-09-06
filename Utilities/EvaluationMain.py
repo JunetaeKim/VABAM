@@ -221,7 +221,7 @@ class Evaluator ():
             RandIdx = np.random.permutation(len(Ext_Samp_Zj))
             Data = [Ext_Samp_Zj, AnalData[1][RandIdx]]
         
-        else:
+        elif SecDataType == False :
             Data = Ext_Samp_Zj
 
 
@@ -329,10 +329,11 @@ class Evaluator ():
 
             # Sampling FCs
             ## Shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
-            self.FCs = np.random.rand(self.NMiniBat * self.NGen, self.NFCs) * FcLimit
+            FCs = np.random.rand(self.NMiniBat,  self.NGen, self.NFCs) * FcLimit
 
             # Generating FC values with a fixed interval that increases at equal increments.
-            self.FC_Arange = np.broadcast_to(self.FC_ArangeInp[None], (self.NMiniBat, self.NGen, self.NFCs)).reshape(-1, self.NFCs)
+            self.FC_Arange = np.sort(FCs, axis=1).reshape(self.NMiniBat*self.NGen, self.NFCs)
+            self.FCs = np.reshape(FCs, (self.NMiniBat* self.NGen, self.NFCs))
 
 
 
@@ -374,7 +375,6 @@ class Evaluator ():
 
             # Return shape: (Batch_size, 1, N_frequency)
             self.SubPSPDF_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.SubPSPDF_Batch.sort(0)
 
 
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
@@ -391,7 +391,7 @@ class Evaluator ():
             I_zPSD_ZjFc_ =  MeanKLD(self.Q_PSPDF_ZjRptFC, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_FaZj_ = MeanKLD(self.Q_PSPDF_ZjRptFCar, self.Q_PSPDF_ZjRptFC ) # I(zPSD;FC|Zj)
             I_fcPE_ZjFc_ = MeanKLD(self.Q_PDPSD_ZjRptFC, self.Q_PDPSD_Batch) # I(fcPE;FC,Zj)
-            I_fcPE_FaZj_ = MeanKLD(self.Q_PDPSD_ZjRptFCar, self.Q_PDPSD_Batch) # I(fcPE;FCa,Zj)
+            I_fcPE_FaZj_ = MeanKLD(self.Q_PDPSD_ZjRptFCar, self.Q_PDPSD_ZjRptFC) # I(fcPE;FCa,Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
@@ -761,7 +761,6 @@ class Evaluator ():
 
             # Return shape: (Batch_size, 1, N_frequency)
             self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq) #
-            self.SubPSPDF_Batch.sort(0)
 
 
             
@@ -780,7 +779,7 @@ class Evaluator ():
             I_zPSD_ZjCr_ =  MeanKLD(self.Q_PSPDF_ZjRptCONr, self.P_PSPDF[None] ) # I(zPSD;Zj)
             I_zPSD_CaZj_ = MeanKLD(self.Q_PSPDF_ZjRptCONa, self.Q_PSPDF_ZjRptCONr ) # I(zPSD;CON|Zj)
             I_fcPE_ZjCr_ = MeanKLD(self.Q_PDPSD_ZjRptCONr, self.Q_PDPSD_Batch) # I(fcPE;CONr,Zj)
-            I_fcPE_CaZj_ = MeanKLD(self.Q_PDPSD_ZjRptCONa, self.Q_PDPSD_Batch) # I(fcPE;CONa,Zj)
+            I_fcPE_CaZj_ = MeanKLD(self.Q_PDPSD_ZjRptCONa, self.Q_PDPSD_ZjRptCONr) # I(fcPE;CONa,Zj)
 
 
             print('I_zPSD_Z :', I_zPSD_Z_)
