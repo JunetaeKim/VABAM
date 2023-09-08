@@ -9,7 +9,7 @@ from tensorflow.keras import Model
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj
+from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj, GenConArange
 from Utilities.Utilities import CompResource
 
        
@@ -698,23 +698,8 @@ class Evaluator ():
   
             
             # Processing Conditional information 
-            ## Finding the column index of the max value in each row of AnalData[1] and sort the indices
-            ArgMaxP_PSPDF = np.argmax(self.AnalData[1], axis=-1)
-            SortIDX = np.column_stack((np.argsort(ArgMaxP_PSPDF), ArgMaxP_PSPDF[np.argsort(ArgMaxP_PSPDF)]))
-
-            # Computing the number of iterations
-            UniqPSPDF = np.unique(ArgMaxP_PSPDF)
-            NIter = self.NGen // len(UniqPSPDF)
-
-            # Selecting one row index for each unique value, repeated for NIter times and ensure the total number of selected indices matches NGen
-            SelIDX = np.concatenate([np.random.permutation(SortIDX[SortIDX[:, 1] == psd])[:1] for psd in UniqPSPDF for _ in range(NIter)], axis=0)
-            SelIDX = np.vstack((SelIDX, np.random.permutation(SortIDX)[:self.NGen - len(SelIDX)]))
-
-            # Sorting IDX based on the max values
-            SelIDX = SelIDX[np.argsort(SelIDX[:, 1])]
-
             ## Generating CON_Arange
-            CON_Arange = self.AnalData[1][SelIDX[:,0]]
+            CON_Arange = GenConArange(self.AnalData[1], self.NGen)
             self.CON_Arange = np.tile(CON_Arange[None], (self.NMiniBat, 1,1)).reshape(self.NMiniBat*self.NGen, -1)
                         
             ## Generating CONRand
