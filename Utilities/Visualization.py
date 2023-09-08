@@ -79,9 +79,9 @@ def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFre
     plt.show()
     
     
-def VisReconExtractZ_FC (ValData, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, N_Gen=300):
+def VisReconExtractZ_FC (Data, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, N_Gen=300):
     
-    Sample = np.tile(ValData[idx][None], (N_Gen, 1))
+    Sample = np.tile(Data[idx][None], (N_Gen, 1))
     print(Sample.shape)
     FCs = np.concatenate([FC_Comm, FC_Each], axis=-1)
     HH,HL,LH, LL = FeatExtModel([Sample, FCs])
@@ -90,7 +90,7 @@ def VisReconExtractZ_FC (ValData, idx, FeatExtModel, ReconModel, FC_Comm, FC_Eac
     plt.figure(figsize=(15, 5))
     for i in range(N_Gen):
         plt.plot(RecPred[i])
-    plt.plot(ValData[idx],linestyle='--', color='black', label='True signal')
+    plt.plot(Data[idx],linestyle='--', color='black', label='True signal')
     plt.legend()
     
     return RecPred, HH,HL,LH, LL
