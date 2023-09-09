@@ -5,6 +5,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import tensorflow as tf
 from tensorflow.keras import Model
+from Utilities.AncillaryFunctions import GenConArange
 
 
 def VisReconGivenZ (ReconModel, LatDim, ZFix,  MinFreqR=0, MaxFreqR=0.05):
@@ -273,6 +274,42 @@ def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, 
 
     fig.colorbar(im, cax=cax, orientation='vertical')
     plt.show()
+
+    
+def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
+  
+
+    zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
+    for KeyVal in ZFix.items():
+        zVal[:,KeyVal[0]] = KeyVal[1]
+
+    CON_Arange = GenConArange(ConData, N_Gen)
+    SigGen = ReconModel([zVal, CON_Arange])
+    
+    # Create a colormap and normalize it based on the number of experiments
+    cmap = cm.get_cmap('viridis')
+    norm = plt.Normalize(0, N_Gen-1)
+    norm2 = plt.Normalize(MinFreqR, MaxFreqR)
+
+
+    fig, ax = plt.subplots(figsize=(15, 7))
+    for i in range(0, N_Gen):
+        color = cmap(norm(i))
+        ax.plot(SigGen[i], color=color)
+
+
+    # Create color bar
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.1)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label('Conditions given for generating signals', size=14)
+
+    plt.show()
+    
+    return SigGen
+    
     
     
 def VisReconGivenCON_ZA (ReconModel, LatDim, CON_Given,   N_Gen=300, MinZval = -3., MaxZval = 3., CutLower=-0.1, CutUpper = 0.1):
