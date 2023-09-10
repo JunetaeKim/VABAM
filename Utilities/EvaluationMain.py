@@ -436,7 +436,8 @@ class Evaluator ():
 
             # Return shape: (Batch_size, )
             ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
-
+            
+            # Return shape: (Batch_size, N_sample, LatDim)
             UniqSamp_Zj = self.Samp_ZjRPT.reshape(self.NMiniBat, self.NGen, -1)[:, 0]
             self.LocCandZs ( ModeMax_Freq, self.SumH_ZjFa, UniqSamp_Zj,)
 
@@ -811,6 +812,7 @@ class Evaluator ():
             # Return shape: (Batch_size, )
             ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
             
+            # Return shape: (Batch_size, N_sample, LatDim)
             UniqSamp_Zj = self.Samp_ZjRPT.reshape(self.NMiniBat, self.NGen, -1)[:, 0]
             self.LocCandZs ( ModeMax_Freq, self.SumH_ZjCa, UniqSamp_Zj,)
 
