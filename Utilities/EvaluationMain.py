@@ -331,7 +331,7 @@ class Evaluator ():
             ## Shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
             FCs = np.random.rand(self.NMiniBat,  self.NGen, self.NFCs) * FcLimit
 
-            # Generating FC values with a fixed interval that increases at equal increments.
+            # Generating FC values sorted in ascending order at the NGen index.
             self.FC_Arange = np.sort(FCs, axis=1).reshape(self.NMiniBat*self.NGen, self.NFCs)
             self.FCs = np.reshape(FCs, (self.NMiniBat* self.NGen, self.NFCs))
 
