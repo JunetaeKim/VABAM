@@ -37,6 +37,9 @@ class Evaluator ():
 
     ### ----------- Searching for candidate Zj for plausible signal generation ----------- ###
     def LocCandZs (self, Mode_Value, SumH, Samp_Z,):
+        # Shape of Mode_Value: (NMiniBat, )
+        # Shape of SumH: (NMiniBat, )
+        # Shape of Samp_Z: (NMiniBat, LatDim)
         
         for Freq, _ in self.BestZsMetrics.items():
             Mode_Idx = np.where(Mode_Value == Freq)[0]
