@@ -55,12 +55,12 @@ class Evaluator ():
             CandZs = Samp_Z[[FreqIdx[MinEntHIdx]]]
             
             #tracking results
-            self.TrackerCandZ_Temp[Freq]['TrackZs'].append(CandZs[None])
-            self.TrackerCandZ_Temp[Freq]['TrackMetrics'].append(EntH[None])
+            self.TrackerCand_Temp[Freq]['TrackZs'].append(CandZs[None])
+            self.TrackerCand_Temp[Freq]['TrackMetrics'].append(EntH[None])
             
             if SecData is not None: # for processing secondary data (SecData).
                 CandSecData = SecData[[FreqIdx[MinEntHIdx]]]
-                self.TrackerCandZ_Temp[Freq]['TrackSecData'].append(CandSecData[None])
+                self.TrackerCand_Temp[Freq]['TrackSecData'].append(CandSecData[None])
             else:
                 CandSecData = None
 
@@ -72,7 +72,7 @@ class Evaluator ():
 
     
     ### ------------------------  Selecting nested Z-LOC and Z values --------------------- ###
-    def SubNestedZFix(self, SubTrackerCandZ , NSelZ=None):
+    def SubNestedZFix(self, SubTrackerCand , NSelZ=None):
                 
         ''' Construct the 'Results' dictionary: {'KeyID': {'TrackZLOC': 'TrackZs'}}
            
@@ -91,7 +91,7 @@ class Evaluator ():
         Cnt = itertools.count()
         Results = {next(Cnt):{ TrackZLOC[i] : TrackZs[i] for i in range(NSelZ)} 
                     for TrackZLOC,TrackZs, TrackMetrics 
-                    in zip(SubTrackerCandZ['TrackZLOC'], SubTrackerCandZ['TrackZs'], SubTrackerCandZ['TrackMetrics'])
+                    in zip(SubTrackerCand['TrackZLOC'], SubTrackerCand['TrackZs'], SubTrackerCand['TrackMetrics'])
                     if TrackMetrics < self.MetricCut }
         return Results
     
@@ -130,7 +130,7 @@ class Evaluator ():
     
     
     ### ------------------- Selecting post-sampled Z values for generating plausible signals ------------------- ###
-    def SelPostSamp_Zj (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCandZ=None, NSelZ=None, SavePath=None ):
+    def SelPostSamp_Zj (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, NSelZ=None, SavePath=None ):
         
         ## Optional parameters
         # MetricCut: The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut
@@ -138,7 +138,7 @@ class Evaluator ():
 
         # Setting arguments
         BestZsMetrics = self.BestZsMetrics if BestZsMetrics is None else BestZsMetrics
-        TrackerCandZ = self.TrackerCandZ if TrackerCandZ is None else TrackerCandZ
+        TrackerCand = self.TrackerCand if TrackerCand is None else TrackerCand
         NSelZ = self.NSelZ if NSelZ is None else NSelZ
                 
         # Exploring FreqIDs available for signal generation  
@@ -161,7 +161,7 @@ class Evaluator ():
              - Key (TrackZLOC): Values related to the location of tracks.
              - Value (TrackZs): Corresponding values associated with the 'TrackZLOC'. 
         '''
-        self.NestedZFix = {FreqID : self.SubNestedZFix(TrackerCandZ[FreqID], ) for FreqID in self.CandFreqIDs}
+        self.NestedZFix = {FreqID : self.SubNestedZFix(TrackerCand[FreqID], ) for FreqID in self.CandFreqIDs}
 
         
         # Creating a tensor of Z values for signal generation
@@ -304,7 +304,7 @@ class Evaluator ():
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[], 
                          'MI_zPSD_ZjZ':[], 'MI_zPSD_FcZj':[], 'MI_fcPE_FaFc':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.TrackerCand_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_ZjFc, self.I_fcPE_FaZj = 0,0,0,0,0,0
         
         
@@ -438,11 +438,13 @@ class Evaluator ():
             
             self.LocCandZs ( MaxFreq, EntH, self.Samp_ZjRPT,  self.FC_Arange)
 
-            # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackSecData': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackSecData']), 
-                                   'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
-                                   'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackSecData']) > 0} 
+            # Restructuring TrackerCand
+            ## item[0] contains frequency domains
+            ## item[1] contains tracked Z values, 2nd data, and metrics
+            self.TrackerCand = {item[0]: {'TrackZs': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackZs']), 
+                                          'TrackSecData': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackSecData']), 
+                                          'TrackMetrics': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackMetrics'])} 
+                                          for item in self.TrackerCand_Temp.items() if len(item[1]['TrackSecData']) > 0} 
             
             
         # Conducting the task iteration
@@ -511,7 +513,7 @@ class Evaluator ():
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'MI_zPSD_ZjZ':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.TrackerCand_Temp = {i:{'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
 
 
@@ -592,10 +594,12 @@ class Evaluator ():
 
             self.LocCandZs ( MaxFreq, EntH, self.Samp_Zj)
 
-            # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
-                                   'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackZs']) > 0} 
+            # Restructuring TrackerCand
+            ## item[0] contains frequency domains
+            ## item[1] contains tracked Z values and metrics
+            self.TrackerCand = {item[0]: {'TrackZs': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackZs']), 
+                                   'TrackMetrics': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackMetrics'])} 
+                                     for item in self.TrackerCand_Temp.items() if len(item[1]['TrackZs']) > 0} 
 
 
         # Conducting the task iteration
@@ -659,7 +663,7 @@ class Evaluator ():
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[], 
                               'MI_zPSD_ZjZ':[], 'MI_zPSD_CrZj':[], 'MI_fcPE_CaCr':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.TrackerCand_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjCr, self.I_zPSD_CaZj, self.I_fcPE_ZjCr, self.I_fcPE_CaZj = 0,0,0,0,0,0
         
         
@@ -800,11 +804,13 @@ class Evaluator ():
             
             self.LocCandZs ( MaxFreq, EntH, self.Samp_ZjRPT,  self.CON_Arange)
 
-            # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackSecData': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackSecData']), 
-                                   'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
-                                   'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackSecData']) > 0} 
+            # Restructuring TrackerCand
+            ## item[0] contains frequency domains
+            ## item[1] contains tracked Z values, 2nd data, and metrics
+            self.TrackerCand = {item[0]: {'TrackZs': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackZs']), 
+                                          'TrackSecData': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackSecData']), 
+                                          'TrackMetrics': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackMetrics'])} 
+                                          for item in self.TrackerCand_Temp.items() if len(item[1]['TrackSecData']) > 0} 
 
 
         # Conducting the task iteration
