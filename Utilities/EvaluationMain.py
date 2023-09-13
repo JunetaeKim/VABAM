@@ -431,7 +431,7 @@ class Evaluator ():
             ## This indicates which frequency is most activated in the generated signal.
             EntH = -np.sum(self.SubPSPDF_ZjRptFCar * np.log(self.SubPSPDF_ZjRptFCar), axis=1).ravel()
 
-            # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
+            # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptFCar.
             ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
             ## Return shape: (Batch_size, N_sample)
             MaxFreq = np.argmax(self.SubPSPDF_ZjRptFCar, axis=1).ravel() + 1
@@ -585,9 +585,10 @@ class Evaluator ():
             ## This indicates which frequency is most activated in the generated signal.
             EntH = -np.sum(self.SubPSPDF_Zj * np.log(self.SubPSPDF_Zj), axis=1).ravel()
 
+            # Getting the maximum frequency given the PSD from SigGen_Zj.
             # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
             # Return shape: (Batch_size, N_sample)
-            MaxFreq = np.argmax(self.SubPSPDF_ZjRptFCar, axis=1).ravel() + 1
+            MaxFreq = np.argmax(self.SubPSPDF_Zj, axis=1).ravel() + 1
 
             self.LocCandZs ( MaxFreq, EntH, self.Samp_Zj)
 
@@ -790,11 +791,9 @@ class Evaluator ():
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
             # Calculating the entropies given the probability density function of the power spectral. 
             ## This indicates which frequency is most activated in the generated signal.
-            self.H_zPSD_ZjCa = -np.sum(self.Q_PSPDF_ZjRptCONa * np.log(self.Q_PSPDF_ZjRptCONa), axis=-1)
-            self.H_fcPE_ZjCa = np.mean(-np.sum(self.Q_PDPSD_ZjRptCONa * np.log(self.Q_PDPSD_ZjRptCONa), axis=-1), axis=-1)
-            self.SumH_ZjCa = self.H_zPSD_ZjCa + self.H_fcPE_ZjCa
+            EntH = -np.sum(self.SubPSPDF_ZjRptCONa * np.log(self.SubPSPDF_ZjRptCONa), axis=1).ravel()
             
-            # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRpt_CONa.
+            # Getting the maximum frequency given the PSD from SigGen_ZjRpt_CONa.
             # Return shape: (Batch_size, N_sample, N_frequency)
             self.Q_PSPDF_Zj_Local = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
 
