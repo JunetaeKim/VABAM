@@ -793,20 +793,12 @@ class Evaluator ():
             ## This indicates which frequency is most activated in the generated signal.
             EntH = -np.sum(self.SubPSPDF_ZjRptCONa * np.log(self.SubPSPDF_ZjRptCONa), axis=1).ravel()
             
-            # Getting the maximum frequency given the PSD from SigGen_ZjRpt_CONa.
-            # Return shape: (Batch_size, N_sample, N_frequency)
-            self.Q_PSPDF_Zj_Local = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-            # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            # Return shape: (Batch_size, N_sample)
-            Max_Freq_Label = np.argmax(self.Q_PSPDF_Zj_Local, axis=-1) + 1
-
-            # Return shape: (Batch_size, )
-            ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
+            # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptFCar.
+            ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
+            ## Return shape: (Batch_size, N_sample)
+            MaxFreq = np.argmax(self.SubPSPDF_ZjRptCONa, axis=1).ravel() + 1
             
-            # Return shape: (Batch_size, N_sample, LatDim)
-            UniqSamp_Zj = self.Samp_ZjRPT.reshape(self.NMiniBat, self.NGen, -1)[:, 0]
-            self.LocCandZs ( ModeMax_Freq, self.SumH_ZjCa, UniqSamp_Zj,)
+            self.LocCandZs ( MaxFreq, EntH, self.Samp_ZjRPT,  self.CON_Arange)
 
             # Restructuring TrackerCandZ
             self.TrackerCandZ = {item[0]: {'TrackSecData': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackSecData']), 
