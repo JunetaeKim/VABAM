@@ -36,7 +36,7 @@ class Evaluator ():
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
 
     ### ----------- Searching for candidate Zj for plausible signal generation ----------- ###
-    def LocCandZs (self, MaxFreq, EntH, Samp_Z, SecData):
+    def LocCandZs (self, MaxFreq, EntH, Samp_Z, SecData=None):
         # Shape of MaxFreq: (NMiniBat*NGen, )
         # Shape of EntH: (NMiniBat*NGen, )
         # Shape of Samp_Z: (NMiniBat*NGen, LatDim)
@@ -49,16 +49,20 @@ class Evaluator ():
             if len(FreqIdx) <1: 
                 continue;
 
-            # Calculating the minimum of EntH (Entropy, H) and selecting candidate Z-values(CandZs) and secondary data (SecData).
+            # Calculating the minimum of EntH (Entropy, H) and selecting candidate Z-values(CandZs)
             MinEntHIdx = np.argmin(EntH[FreqIdx]) 
             MinEntH = np.min(EntH[FreqIdx]) 
             CandZs = Samp_Z[[FreqIdx[MinEntHIdx]]]
-            CandSecData = SecData[[FreqIdx[MinEntHIdx]]]
-
+            
             #tracking results
-            self.TrackerCandZ_Temp[Freq]['TrackSecData'].append(CandSecData[None])
             self.TrackerCandZ_Temp[Freq]['TrackZs'].append(CandZs[None])
             self.TrackerCandZ_Temp[Freq]['TrackMetrics'].append(EntH[None])
+            
+            if SecData is not None: # for processing secondary data (SecData).
+                CandSecData = SecData[[FreqIdx[MinEntHIdx]]]
+                self.TrackerCandZ_Temp[Freq]['TrackSecData'].append(CandSecData[None])
+            else:
+                CandSecData = None
 
             # Updating the Min_SumH value if the current iteration value is smaller.
             if MinEntH < self.BestZsMetrics[Freq][0]:
@@ -574,21 +578,18 @@ class Evaluator ():
 
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
+            # Return shape: (Batch_size, N_sample, N_frequency)
+            self.SubPSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            
             # Calculating the entropies given the probability density function of the power spectral.
             ## This indicates which frequency is most activated in the generated signal.
-            self.H_zPSD_Zj = -np.sum(self.Q_PSPDF_Zj * np.log(self.Q_PSPDF_Zj), axis=-1)
-
-            # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
-            # Return shape: (Batch_size, N_sample, N_frequency)
-            self.Q_PSPDF_Zj_Local = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            EntH = -np.sum(self.SubPSPDF_Zj * np.log(self.SubPSPDF_Zj), axis=1).ravel()
 
             # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
             # Return shape: (Batch_size, N_sample)
-            Max_Freq_Label = np.argmax(self.Q_PSPDF_Zj_Local, axis=-1) + 1
+            MaxFreq = np.argmax(self.SubPSPDF_ZjRptFCar, axis=1).ravel() + 1
 
-            # Return shape: (Batch_size, )
-            ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
-            self.LocCandZs ( ModeMax_Freq, self.H_zPSD_Zj, self.Samp_Zj)
+            self.LocCandZs ( MaxFreq, EntH, self.Samp_Zj)
 
             # Restructuring TrackerCandZ
             self.TrackerCandZ = {item[0]: {'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
