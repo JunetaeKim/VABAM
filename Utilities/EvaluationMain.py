@@ -56,7 +56,7 @@ class Evaluator ():
             
             #tracking results
             self.TrackerCand_Temp[Freq]['TrackZs'].append(CandZs[None])
-            self.TrackerCand_Temp[Freq]['TrackMetrics'].append(EntH[None])
+            self.TrackerCand_Temp[Freq]['TrackMetrics'].append(MinEntH[None])
             
             if SecData is not None: # for processing secondary data (SecData).
                 CandSecData = SecData[[FreqIdx[MinEntHIdx]]]
