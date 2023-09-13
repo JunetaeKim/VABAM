@@ -72,26 +72,24 @@ class Evaluator ():
 
     
     ### ------------------------  Selecting nested Z-LOC and Z values --------------------- ###
-    def SubNestedZFix(self, SubTrackerCand , NSelZ=None):
+    def SubNestedZFix(self, SubTrackerCand):
                 
-        ''' Construct the 'Results' dictionary: {'KeyID': {'TrackZLOC': 'TrackZs'}}
+        ''' Constructing the dictionary: {'KeyID': { 'TrackZs' : Zs, 'TrackSecData' : Secondary-data }}
            
            - Outer Dictionary:
-             - Key (KeyID): A unique, sequentially increasing integer from 'Cnt'
+             - Key (KeyID): A unique, sequentially increasing integer from 'Cnt'; That is, the sequence number in each frequency domain.
              - Value: An inner dictionary (explained below)
         
            - Inner Dictionary:
-             - Key (TrackZLOC): Values from 'TrackZLOC' up to 'NSelZ'
-             - Value (TrackZs): Corresponding values from 'TrackZs' up to 'NSelZ'
+             - Key (TrackZs) : Value (Tracked Z-value matrix)
+             - Key (TrackSecData) : Values (Tracked secondary data matrix)
         '''
         
-        # Setting arguments
-        NSelZ = self.NSelZ if NSelZ is None else NSelZ
         
         Cnt = itertools.count()
-        Results = {next(Cnt):{ TrackZLOC[i] : TrackZs[i] for i in range(NSelZ)} 
-                    for TrackZLOC,TrackZs, TrackMetrics 
-                    in zip(SubTrackerCand['TrackZLOC'], SubTrackerCand['TrackZs'], SubTrackerCand['TrackMetrics'])
+        Results = {next(Cnt):{ 'TrackZs' : TrackZs, 'TrackSecData' : TrackSecData} 
+                    for TrackZs, TrackSecData, TrackMetrics 
+                    in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackSecData'], SubTrackerCand['TrackMetrics'])
                     if TrackMetrics < self.MetricCut }
         return Results
     
@@ -130,7 +128,7 @@ class Evaluator ():
     
     
     ### ------------------- Selecting post-sampled Z values for generating plausible signals ------------------- ###
-    def SelPostSamp_Zj (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, NSelZ=None, SavePath=None ):
+    def SelPostSamp (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, NSelZ=None, SavePath=None ):
         
         ## Optional parameters
         # MetricCut: The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut
@@ -147,7 +145,7 @@ class Evaluator ():
 
         
         # Selecting nested Z-LOC and Z values
-        '''  Dictionary Structure Description: {'FreqID' : {'SubKeys' : { 'TrackZLOC' : 'TrackZs' }}}
+        '''  Constructing the dictionary : {'FreqID' : {'SubKeys' : { 'TrackZs' : Zs, 'TrackSecData' : Secondary-data }}}
         
            - Outermost Dictionary:
              - Key (FreqID): Represents frequency identifiers.
@@ -158,35 +156,23 @@ class Evaluator ():
              - Value: A third-level dictionary (explained below).
         
            - Third-level Dictionary:
-             - Key (TrackZLOC): Values related to the location of tracks.
-             - Value (TrackZs): Corresponding values associated with the 'TrackZLOC'. 
+             - Key (TrackZs) : Value (Tracked Z-value matrix)
+             - Key (TrackSecData) : Values (Tracked secondary data matrix)
+             
         '''
-        self.NestedZFix = {FreqID : self.SubNestedZFix(TrackerCand[FreqID], ) for FreqID in self.CandFreqIDs}
+        self.PostSamp = {FreqID : self.SubNestedZFix(TrackerCand[FreqID], ) for FreqID in self.CandFreqIDs}
 
-        
-        # Creating a tensor of Z values for signal generation
-        PostSamp_Zj = []
-        for SubZFix in self.NestedZFix.items():
-            for item in SubZFix[1].items():
-                Mask_Z = np.zeros((self.LatDim))
-                Mask_Z[list(item[1].keys())] =  list(item[1].values())
-                PostSamp_Zj.append(Mask_Z[None])
-        self.PostSamp_Zj = np.concatenate(PostSamp_Zj, axis=0) ## Dim of self.PostSamp_Zj: (ItemID, Samp_Zj)
         
         
         # Counting the number of obs in NestedZs
         NPostZs =0 
-        for item in self.NestedZFix.items():
+        for item in self.PostSamp.items():
             NPostZs += len(item[1])
 
         print('The total number of sets in NestedZs:', NPostZs)
 
         
-        # Saving intermedicate results into the hard disk
-        if SavePath is not None:
-            np.save(SavePath, PostSamp_Zj) # Save data
-
-        return self.PostSamp_Zj, self.NestedZFix
+        return self.PostSamp
     
     
         
