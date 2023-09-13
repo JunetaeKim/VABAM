@@ -177,47 +177,54 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, RepeatSize=1, PostSamp_Zj=None, AnalData=None, FcLimit=None, PlotDist=True, SecDataType=None):
+    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecDataType=None, FcLimit=None, PlotDist=True):
     
+        ## Required parameters
+        # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
+        # AnalData: The raw true signals for obtaining the population PSD.    
+        
         ## Optional parameters
-        # RepeatSize: The number of iterations to repetitively generate identical PostSamp_Zj; 
-                    # this is to observe variations in other inputs such as FCs while PostSamp_Zj remains constant.
-        # SecDataType: Secondary data type; Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                    # and 'CON' for conditional inputs such as power spectral density.
+        # SecDataType: Secondary data type; Use 'FCR' or 'FCA' for FCs or 'CON' for conditional inputs such as PSD. (default: False for models without secondary-data inputs).
         # FcLimit: The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-        # PostSamp_Zj: The selected sampled Zj values.
+        # PostSamp: The selected sampled data.
 
-
+        
         # Setting arguments
-        PostSamp_Zj = self.PostSamp_Zj if PostSamp_Zj is None else PostSamp_Zj
-        SecDataType = self.SecDataType if SecDataType is None else SecDataType
+        PostSamp = self.PostSamp if PostSamp is None else PostSamp
         FcLimit = self.FcLimit if FcLimit is None and hasattr(self, 'FcLimit') else FcLimit
+        SecDataType = self.SecDataType if SecDataType is None else SecDataType
         AnalData = self.AnalData if AnalData is None else AnalData
 
-        # Repeating PostSamp_Zj RepeatSize times.
-        Ext_Samp_Zj = np.tile(PostSamp_Zj[:, None], (1, RepeatSize, 1))
-        NSamp, NVar = Ext_Samp_Zj.shape[0], Ext_Samp_Zj.shape[1]
-        Ext_Samp_Zj = np.reshape(Ext_Samp_Zj, (-1, self.LatDim))
+        
+        # Converting the dictionary to the list type.
+        PostZsList = []
+        PostSecDataList = []
+
+        for Freq, Subkeys in PostSamp.items():
+            for Subkeys, Values in Subkeys.items():
+                PostZsList.append(np.array(Values['TrackZs']))
+                if 'TrackSecData' in Values.keys(): 
+                    PostSecDataList.append(np.array(Values['TrackSecData']))
+        
+        # Converting the list type to the np-data type.
+        PostZsList = np.concatenate(PostZsList)
+        if SecDataType is not None:  # it means there are secondary-data inputs
+            PostSecDataList = np.concatenate(PostSecDataList)
         
         
-        if SecDataType == 'FCR': # FC random
-            Ext_Samp_FCs = np.random.rand(NSamp, NVar, self.NFCs) * self.FcLimit
-            Ext_Samp_FCs = np.reshape(Ext_Samp_FCs, (-1, self.NFCs))
-            Data = [Ext_Samp_FCs[:, :2], Ext_Samp_FCs[:, 2:], Ext_Samp_Zj]
-            
-        elif SecDataType == 'FCA': # FC arrange
-            Ext_Samp_FCs = np.tile(np.linspace(1e-7, self.FcLimit, RepeatSize)[None, :, None], (NSamp, 1, self.NFCs))
-            Ext_Samp_FCs = np.reshape(Ext_Samp_FCs, (-1, self.NFCs))
-            Data = [Ext_Samp_FCs[:, :2], Ext_Samp_FCs[:, 2:], Ext_Samp_Zj]
-            
-        elif SecDataType == 'CON': # Conditional inputs such as power spectral density
-            RandIdx = np.random.permutation(len(Ext_Samp_Zj))
-            Data = [Ext_Samp_Zj, AnalData[1][RandIdx]]
-        
+        # Data binding for the model input
+        if SecDataType == 'FCA' : 
+            Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
+        elif SecDataType == 'FCR':
+            PostSecDataList = np.random.permutation(np.random.permutation(PostSecDataList.T).T)
+            Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
+        elif  SecDataType == 'CON': 
+            Data = [PostZsList, PostSecDataList]
         elif SecDataType == False :
-            Data = Ext_Samp_Zj
-
-
+            Data = PostZsList
+            
+          
+        # Generating signals
         self.GenSamp = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
             
 
@@ -243,7 +250,6 @@ class Evaluator ():
             plt.fill_between(np.arange(len(PSDTrueData)), PSDTrueData, color='orange', alpha=0.5)
             plt.fill_between(np.arange(len(PSDGenSamp)), PSDGenSamp, color='green', alpha=0.5)
             plt.legend()    
-    
     
         
     
