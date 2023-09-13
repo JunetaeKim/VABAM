@@ -36,35 +36,35 @@ class Evaluator ():
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
 
     ### ----------- Searching for candidate Zj for plausible signal generation ----------- ###
-    def LocCandZs (self, Mode_Value, SumH, Samp_Z,):
-        # Shape of Mode_Value: (NMiniBat, )
-        # Shape of SumH: (NMiniBat, )
-        # Shape of Samp_Z: (NMiniBat, LatDim)
-        
-        for Freq, _ in self.BestZsMetrics.items():
-            Mode_Idx = np.where(Mode_Value == Freq)[0]
+    def LocCandZs (self, MaxFreq, EntH, Samp_Z, SecData):
+        # Shape of MaxFreq: (NMiniBat*NGen, )
+        # Shape of EntH: (NMiniBat*NGen, )
+        # Shape of Samp_Z: (NMiniBat*NGen, LatDim)
+        # Shape of SecData: (NMiniBat*NGen, SecDataDim)
 
-            # Skipping the remainder of the code if there are no mode values present at the predefined frequencies.
-            if len(Mode_Idx) <1: 
+        for Freq, _ in self.BestZsMetrics.items():
+            FreqIdx = np.where(MaxFreq == Freq)[0]
+
+            # Skipping the remainder of the code if there are no FreqIdx present at the predefined frequencies.
+            if len(FreqIdx) <1: 
                 continue;
 
-            # Calculating the minimum of sum of H (Min_SumH) and Candidate Z-values(CandZs)
-            Min_SumH_Idx = np.argmin(SumH[Mode_Idx])
-            Min_SumH = np.min(SumH[Mode_Idx])
-            CandZs = Samp_Z[[Mode_Idx[Min_SumH_Idx]]][0].flatten()
-            CandZ_Idx = np.where(CandZs!=0)[0]
+            # Calculating the minimum of EntH (Entropy, H) and selecting candidate Z-values(CandZs) and secondary data (SecData).
+            MinEntHIdx = np.argmin(EntH[FreqIdx]) 
+            MinEntH = np.min(EntH[FreqIdx]) 
+            CandZs = Samp_Z[[FreqIdx[MinEntHIdx]]]
+            CandSecData = SecData[[FreqIdx[MinEntHIdx]]]
 
             #tracking results
-            self.TrackerCandZ_Temp[Freq]['TrackZLOC'].append(CandZ_Idx[None])
-            self.TrackerCandZ_Temp[Freq]['TrackZs'].append(CandZs[CandZ_Idx][None])
-            self.TrackerCandZ_Temp[Freq]['TrackMetrics'].append(Min_SumH[None])
+            self.TrackerCandZ_Temp[Freq]['TrackSecData'].append(CandSecData[None])
+            self.TrackerCandZ_Temp[Freq]['TrackZs'].append(CandZs[None])
+            self.TrackerCandZ_Temp[Freq]['TrackMetrics'].append(EntH[None])
 
             # Updating the Min_SumH value if the current iteration value is smaller.
-            if Min_SumH < self.BestZsMetrics[Freq][0]:
-                self.BestZsMetrics[Freq] = [Min_SumH, CandZ_Idx, CandZs[CandZ_Idx]]
-                print('Candidate Z updated! ', 'Freq:', Freq, ', SumH_ZjFa:', np.round(Min_SumH, 4) , 
-                      ' Z LOC:', CandZ_Idx, ' Z:', np.round(CandZs[CandZ_Idx], 4))
-        
+            if MinEntH < self.BestZsMetrics[Freq][0]:
+                self.BestZsMetrics[Freq] = [MinEntH, CandZs, CandSecData]
+                print('Candidate Z updated! ', 'Freq:', Freq, ', EntH:', np.round(MinEntH, 4))
+
 
     
     ### ------------------------  Selecting nested Z-LOC and Z values --------------------- ###
@@ -300,7 +300,7 @@ class Evaluator ():
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjFc':[],'I_zPSD_FaZj':[],'I_fcPE_ZjFc':[],'I_fcPE_FaZj':[], 
                          'MI_zPSD_ZjZ':[], 'MI_zPSD_FcZj':[], 'MI_fcPE_FaFc':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.TrackerCandZ_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjFc, self.I_zPSD_FaZj, self.I_fcPE_ZjFc, self.I_fcPE_FaZj = 0,0,0,0,0,0
         
         
@@ -425,30 +425,20 @@ class Evaluator ():
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
             # Calculating the entropies given the probability density function of the power spectral.
             ## This indicates which frequency is most activated in the generated signal.
-            self.H_zPSD_ZjFa = -np.sum(self.Q_PSPDF_ZjRptFCar * np.log(self.Q_PSPDF_ZjRptFCar), axis=-1)
-            self.H_fcPE_ZjFa = np.mean(-np.sum(self.Q_PDPSD_ZjRptFCar * np.log(self.Q_PDPSD_ZjRptFCar), axis=-1), axis=-1)
-            self.SumH_ZjFa = self.H_zPSD_ZjFa + self.H_fcPE_ZjFa
+            EntH = -np.sum(self.SubPSPDF_ZjRptFCar * np.log(self.SubPSPDF_ZjRptFCar), axis=1).ravel()
 
             # Calculating the mode-maximum frequency given the PSD from SigGen_ZjRptFCar.
-            # Return shape: (Batch_size, N_sample, N_frequency)
-            self.Q_PSPDF_ZjRptFCar_Local = FFT_PSD(self.SigGen_ZjRptFCar, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-            # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            # Return shape: (Batch_size, N_sample)
-            Max_Freq_Label = np.argmax(self.Q_PSPDF_ZjRptFCar_Local, axis=-1) + 1
-
-            # Return shape: (Batch_size, )
-            ModeMax_Freq = mode(Max_Freq_Label.T, axis=0, keepdims=False)[0]
+            ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
+            ## Return shape: (Batch_size, N_sample)
+            MaxFreq = np.argmax(self.SubPSPDF_ZjRptFCar, axis=1).ravel() + 1
             
-            # Return shape: (Batch_size, N_sample, LatDim)
-            UniqSamp_Zj = self.Samp_ZjRPT.reshape(self.NMiniBat, self.NGen, -1)[:, 0]
-            self.LocCandZs ( ModeMax_Freq, self.SumH_ZjFa, UniqSamp_Zj,)
+            self.LocCandZs ( MaxFreq, EntH, self.Samp_ZjRPT,  self.FC_Arange)
 
             # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackZLOC': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZLOC']), 
+            self.TrackerCandZ = {item[0]: {'TrackSecData': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackSecData']), 
                                    'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
                                    'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackZLOC']) > 0} 
+                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackSecData']) > 0} 
             
             
         # Conducting the task iteration
@@ -517,7 +507,7 @@ class Evaluator ():
             self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'MI_zPSD_ZjZ':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.TrackerCandZ_Temp = {i:{'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
 
 
@@ -601,10 +591,9 @@ class Evaluator ():
             self.LocCandZs ( ModeMax_Freq, self.H_zPSD_Zj, self.Samp_Zj)
 
             # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackZLOC': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZLOC']), 
-                                   'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
+            self.TrackerCandZ = {item[0]: {'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
                                    'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackZLOC']) > 0} 
+                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackZs']) > 0} 
 
 
         # Conducting the task iteration
@@ -668,7 +657,7 @@ class Evaluator ():
             self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[], 
                               'MI_zPSD_ZjZ':[], 'MI_zPSD_CrZj':[], 'MI_fcPE_CaCr':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCandZ_Temp = {i:{'TrackZLOC':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.TrackerCandZ_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
             self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjCr, self.I_zPSD_CaZj, self.I_fcPE_ZjCr, self.I_fcPE_CaZj = 0,0,0,0,0,0
         
         
@@ -820,10 +809,10 @@ class Evaluator ():
             self.LocCandZs ( ModeMax_Freq, self.SumH_ZjCa, UniqSamp_Zj,)
 
             # Restructuring TrackerCandZ
-            self.TrackerCandZ = {item[0]: {'TrackZLOC': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZLOC']), 
+            self.TrackerCandZ = {item[0]: {'TrackSecData': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackSecData']), 
                                    'TrackZs': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackZs']), 
                                    'TrackMetrics': np.concatenate(self.TrackerCandZ_Temp[item[0]]['TrackMetrics'])} 
-                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackZLOC']) > 0} 
+                                     for item in self.TrackerCandZ_Temp.items() if len(item[1]['TrackSecData']) > 0} 
 
 
         # Conducting the task iteration
