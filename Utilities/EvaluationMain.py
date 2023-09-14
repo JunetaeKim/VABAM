@@ -149,7 +149,7 @@ class Evaluator ():
         ## FreqIDs such as [9, 10, 11 ..... 45]
         ## item[0] contains frequency domains
         ## item[1][0] contains metrics
-        self.CandFreqIDs = [item[0] for item in BestZsMetrics.items() if (item[1][0] != np.inf) and (item[1][0] < self.MetricCut)]
+        self.CandFreqIDs = [item[0] for item in BestZsMetrics.items() if item[1][0] != np.inf ]
             
         
         # Selecting nested Z-LOC and Z values
