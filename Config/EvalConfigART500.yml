@@ -1,6 +1,7 @@
 # The list of common objects subject to class serialization.
-Common_Info: ['SubResDic', 'AggResDic', 'BestZsMetrics', 'TrackerCand', 'CandFreqIDs', 'I_zPSD_Z', 'I_zPSD_ZjZ', 
-              'MI_zPSD_ZjZ', 'PostSamp', 'LatDim', 'NFCs', 'GenBatchSize', 'GPU', 'KldPSD_GenTrue' ] 
+Common_Info: ['SubResDic', 'AggResDic', 'BestZsMetrics', 'TrackerCandZ', 'CandFreqIDs', 'I_zPSD_Z',  'I_zPSD_ZjZ',
+              'MI_zPSD_ZjZ', 'PostSamp_Zj', 'NestedZFix' , 'LatDim', 'NFCs', 'GenBatchSize', 'GPU',
+              'KldPSD_GenTrue', 'KldPSD_TrueGen', 'MeanKld_GTTG'] 
               
 
 FACFC_ART_30_800:          # SigType_LatDim_CompSize

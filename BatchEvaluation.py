@@ -138,11 +138,11 @@ if __name__ == "__main__":
 
 
         # Selecting post Samp_Zj for generating plausible signals
-        PostSamp_Zj, NestedZFix = Eval.SelPostSamp_Zj( Params['MetricCut'], SavePath=SampZjSavePath)
+        SelPostSamp = Eval.SelPostSamp( Params['MetricCut'], SavePath=SampZjSavePath)
 
 
         # Evaluating KLD (P || K)
-        Eval.KLD_TrueGen(SecDataType ='FCR', RepeatSize = 1, PlotDist=False) 
+        #Eval.KLD_TrueGen(SecSampType ='FCA', RepeatSize = 1, PlotDist=False) 
 
         # Saving the instance's objects to a file
         SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
