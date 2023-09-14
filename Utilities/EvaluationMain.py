@@ -86,7 +86,7 @@ class Evaluator ():
         '''
         
         Cnt = itertools.count()
-        if self.SecDataType == None:
+        if self.SecDataType == False:
             Results = {next(Cnt):{ 'TrackZs' : TrackZs} 
                         for TrackZs, TrackMetrics 
                         in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackMetrics'])
@@ -113,7 +113,7 @@ class Evaluator ():
                 self.sim = sim
 
                 # Check the types of ancillary data fed into the sampler model and define the pipeline accordingly.
-                if self.SecDataType == 'CON' : 
+                if self.SecDataType == 'CONR' or self.SecDataType == 'CONA' : 
                     SplitData = [np.array_split(sub, self.SubIterSize) for sub in self.AnalData]   
 
                 else: # For models with a single input such as VAE and TCVAE.
@@ -125,7 +125,7 @@ class Evaluator ():
                     print()
 
                     # Core part; the task logic as the function
-                    if self.SecDataType  == 'CON' : 
+                    if self.SecDataType  == 'CONR' or self.SecDataType == 'CONA' : 
                         TaskLogic([subs[mini] for subs in SplitData])
                     else:
                         TaskLogic(SplitData[mini])
@@ -185,7 +185,7 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecSampType=None, FcLimit=None, RepeatSize=1, PlotDist=True):
+    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecDataType=None, FcLimit=None, RepeatSize=1, PlotDist=True):
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
@@ -194,9 +194,9 @@ class Evaluator ():
         ## Optional parameters
         # RepeatSize: The number of iterations to repetitively generate identical PostSampZ; 
                     # this is to observe variations in other inputs such as FCs while PostSampZ remains constant.
-        # SecSampType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
-                      # or 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
-                      # Default: 'None' for models without secondary-data inputs).
+        # SecDataType: Secondary data type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                      # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                      # 'False' for models without secondary-data inputs.
         # FcLimit: The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
         # PostSamp: The selected sampled data.
 
@@ -205,7 +205,7 @@ class Evaluator ():
         PostSamp = self.PostSamp if PostSamp is None else PostSamp
         FcLimit = self.FcLimit if FcLimit is None and hasattr(self, 'FcLimit') else FcLimit
         AnalData = self.AnalData if AnalData is None else AnalData
-
+        SecDataType = self.SecDataType if SecDataType is None else SecDataType
         
         # Converting the dictionary to the list type.
         PostZsList = []
@@ -219,30 +219,30 @@ class Evaluator ():
         
         # Converting the list type to the np-data type.
         PostZsList = np.concatenate(PostZsList)
-        if SecSampType is not None:  # it means there are secondary-data inputs
+        if SecDataType is not False:  # it means there are secondary-data inputs
             PostSecDataList = np.concatenate(PostSecDataList)
         
         
         # Data binding for the model input
-        if SecSampType == 'FCA' : 
+        if SecDataType == 'FCA' : 
             Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
         
-        elif SecSampType == 'FCR':
+        elif SecDataType == 'FCR':
             PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
             PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
             PostSecDataList = np.random.permutation(np.random.permutation(PostSecDataList.T).T)
             Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
         
-        elif SecSampType == 'CONA': 
+        elif SecDataType == 'CONA': 
             Data = [PostZsList, PostSecDataList]
         
-        elif SecSampType == 'CONR':  
+        elif SecDataType == 'CONR':  
             PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
             PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
             PostSecDataList = np.random.permutation(PostSecDataList.T).T
             Data = [PostZsList, PostSecDataList]
             
-        elif SecSampType == None :
+        elif SecDataType == False :
             Data = PostZsList
             
           
@@ -252,7 +252,7 @@ class Evaluator ():
 
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = 1, MaxFreq = 51)
-        if SecSampType == 'CONA' or SecSampType == 'CONR'  : # Conditional inputs such as power spectral density
+        if SecDataType == 'CONA' or SecDataType == 'CONR'  : # Conditional inputs such as power spectral density
             PSDTrueData =  FFT_PSD(AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
         else:
             PSDTrueData =  FFT_PSD(AnalData, 'All', MinFreq = 1, MaxFreq = 51)
@@ -288,7 +288,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.FC_ArangeInp = FC_ArangeInp     # The 2D matrix (N_sample, NFCs) containing FCs values that the user creates and inputs directly.
         
-        assert SecDataType in ['FCA','FCR','CON', None], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CON' or None are valid."
+        assert SecDataType in ['FCA','FCR','CONR','CONA', False], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CONR', 'CONA'  or False are valid."
         
         
         ## Optional parameters with default values ##
@@ -495,7 +495,7 @@ class Evaluator ():
     
     
     ### -------------------------- Evaluating the performance of the model using only Z inputs  -------------------------- ###
-    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='ModelRptA',  SecDataType=None):
+    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='ModelRptA',  SecDataType=False):
 
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
@@ -503,7 +503,7 @@ class Evaluator ():
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
-        assert SecDataType in ['FCA','FCR','CON', None], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CON' or None are valid."
+        assert SecDataType in ['FCA','FCR','CONR','CONA', False], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CONR', 'CONA'  or False are valid."
         
 
         ## Optional parameters with default values ##
@@ -643,7 +643,7 @@ class Evaluator ():
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         
-        assert SecDataType in ['FCA','FCR','CON', None], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CON' or None are valid."
+        assert SecDataType in ['FCA','FCR','CONR','CONA', False], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CONR', 'CONA'  or False are valid."
         
         
         
