@@ -177,14 +177,18 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecDataType=None, FcLimit=None, PlotDist=True):
+    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecSampType=None, FcLimit=None, RepeatSize=1, PlotDist=True):
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
         # AnalData: The raw true signals for obtaining the population PSD.    
         
         ## Optional parameters
-        # SecDataType: Secondary data type; Use 'FCR' or 'FCA' for FCs or 'CON' for conditional inputs such as PSD. (default: False for models without secondary-data inputs).
+        # RepeatSize: The number of iterations to repetitively generate identical PostSamp_Zj; 
+                    # this is to observe variations in other inputs such as FCs while PostSamp_Zj remains constant.
+        # SecSampType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                      # or 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                      # Default: 'None' for models without secondary-data inputs).
         # FcLimit: The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
         # PostSamp: The selected sampled data.
 
@@ -192,7 +196,6 @@ class Evaluator ():
         # Setting arguments
         PostSamp = self.PostSamp if PostSamp is None else PostSamp
         FcLimit = self.FcLimit if FcLimit is None and hasattr(self, 'FcLimit') else FcLimit
-        SecDataType = self.SecDataType if SecDataType is None else SecDataType
         AnalData = self.AnalData if AnalData is None else AnalData
 
         
@@ -208,19 +211,30 @@ class Evaluator ():
         
         # Converting the list type to the np-data type.
         PostZsList = np.concatenate(PostZsList)
-        if SecDataType is not None:  # it means there are secondary-data inputs
+        if SecSampType is not None:  # it means there are secondary-data inputs
             PostSecDataList = np.concatenate(PostSecDataList)
         
         
         # Data binding for the model input
-        if SecDataType == 'FCA' : 
+        if SecSampType == 'FCA' : 
             Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
-        elif SecDataType == 'FCR':
+        
+        elif SecSampType == 'FCR':
+            PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
+            PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
             PostSecDataList = np.random.permutation(np.random.permutation(PostSecDataList.T).T)
             Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
-        elif  SecDataType == 'CON': 
+        
+        elif SecSampType == 'CONA': 
             Data = [PostZsList, PostSecDataList]
-        elif SecDataType == False :
+        
+        elif SecSampType == 'CONR':  
+            PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
+            PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
+            PostSecDataList = np.random.permutation(PostSecDataList.T).T
+            Data = [PostZsList, PostSecDataList]
+            
+        elif SecSampType == None :
             Data = PostZsList
             
           
@@ -230,7 +244,7 @@ class Evaluator ():
 
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = 1, MaxFreq = 51)
-        if SecDataType == 'CON': # Conditional inputs such as power spectral density
+        if SecSampType == 'CON': # Conditional inputs such as power spectral density
             PSDTrueData =  FFT_PSD(AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
         else:
             PSDTrueData =  FFT_PSD(AnalData, 'All', MinFreq = 1, MaxFreq = 51)
