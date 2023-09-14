@@ -131,8 +131,6 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
      
     
     ### Model-specific parameters
-    if 'NSelCond' in EvalConfigSet:
-        Params['NSelCond'] = EvalConfigSet['NSelCond']        # The size of conditional inputs to be selected at the same time (default: 1).
     if 'WindowSize' in EvalConfigSet:
         Params['WindowSize'] = EvalConfigSet['WindowSize']    # The window size when calculating permutation entropy (default: 3)
     if 'FcLimit' in EvalConfigSet:

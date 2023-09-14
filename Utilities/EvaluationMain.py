@@ -250,7 +250,7 @@ class Evaluator ():
 
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = 1, MaxFreq = 51)
-        if SecSampType == 'CON': # Conditional inputs such as power spectral density
+        if SecSampType == 'CONA' or SecSampType == 'CONR'  : # Conditional inputs such as power spectral density
             PSDTrueData =  FFT_PSD(AnalData[0], 'All', MinFreq = 1, MaxFreq = 51)
         else:
             PSDTrueData =  FFT_PSD(AnalData, 'All', MinFreq = 1, MaxFreq = 51)
