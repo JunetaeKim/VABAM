@@ -128,7 +128,7 @@ class Evaluator ():
     
     
     ### ------------------- Selecting post-sampled Z values for generating plausible signals ------------------- ###
-    def SelPostSamp (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, NSelZ=None, SavePath=None ):
+    def SelPostSamp (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, SavePath=None ):
         
         ## Optional parameters
         # MetricCut: The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut
@@ -137,7 +137,6 @@ class Evaluator ():
         # Setting arguments
         BestZsMetrics = self.BestZsMetrics if BestZsMetrics is None else BestZsMetrics
         TrackerCand = self.TrackerCand if TrackerCand is None else TrackerCand
-        NSelZ = self.NSelZ if NSelZ is None else NSelZ
                 
         # Exploring FreqIDs available for signal generation  
         ## FreqIDs such as [9, 10, 11 ..... 45]
@@ -184,8 +183,8 @@ class Evaluator ():
         # AnalData: The raw true signals for obtaining the population PSD.    
         
         ## Optional parameters
-        # RepeatSize: The number of iterations to repetitively generate identical PostSamp_Zj; 
-                    # this is to observe variations in other inputs such as FCs while PostSamp_Zj remains constant.
+        # RepeatSize: The number of iterations to repetitively generate identical PostSampZ; 
+                    # this is to observe variations in other inputs such as FCs while PostSampZ remains constant.
         # SecSampType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
                       # or 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
                       # Default: 'None' for models without secondary-data inputs).
@@ -628,7 +627,7 @@ class Evaluator ():
         
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_ZCON (self, AnalData, SampModel, GenModel,  WindowSize=3, NSelCond=1, SampZType='ModelRptA', SecDataType=None, Continue=True):
+    def Eval_ZCON (self, AnalData, SampModel, GenModel,  WindowSize=3, SampZType='ModelRptA', SecDataType=None, Continue=True):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
@@ -642,7 +641,6 @@ class Evaluator ():
         ## Optional parameters with default values ##
         # WindowSize: The window size when calculating the permutation sets (default: 3).
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True).
-        # NSelCond: The size of conditional inputs to be selected at the same time (default: 1).
         self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random').
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
