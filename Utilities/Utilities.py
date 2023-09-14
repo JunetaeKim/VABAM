@@ -121,6 +121,7 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['SampZType'] = EvalConfigSet['SampZType']          # SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. 
                                                               # Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
     Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
+    Params['SecSampType'] = EvalConfigSet['SecSampType']      # The secondary data sample type
         
     ### Functional parameters
     Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.

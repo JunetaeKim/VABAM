@@ -85,12 +85,19 @@ class Evaluator ():
              - Key (TrackSecData) : Values (Tracked secondary data matrix)
         '''
         
-        
         Cnt = itertools.count()
-        Results = {next(Cnt):{ 'TrackZs' : TrackZs, 'TrackSecData' : TrackSecData} 
-                    for TrackZs, TrackSecData, TrackMetrics 
-                    in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackSecData'], SubTrackerCand['TrackMetrics'])
-                    if TrackMetrics < self.MetricCut }
+        if self.SecDataType == None:
+            Results = {next(Cnt):{ 'TrackZs' : TrackZs} 
+                        for TrackZs, TrackMetrics 
+                        in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackMetrics'])
+                        if TrackMetrics < self.MetricCut }
+
+        else:
+            Results = {next(Cnt):{ 'TrackZs' : TrackZs, 'TrackSecData' : TrackSecData} 
+                        for TrackZs, TrackSecData, TrackMetrics 
+                        in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackSecData'], SubTrackerCand['TrackMetrics'])
+                        if TrackMetrics < self.MetricCut }
+            
         return Results
     
     
