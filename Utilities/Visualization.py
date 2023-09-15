@@ -86,9 +86,7 @@ def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZ
     
 def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
-    zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
-    for KeyVal in ZFix.items():
-        zVal[:,KeyVal[0]] = KeyVal[1]
+    zVal = np.tile(ZFix, (N_Gen,1))
     
     SigGen_FcVar, Amplitude_FcVar = GenSig_FCA(FeatGenModel,  ReconModel, zVal, N_Gen=N_Gen, zType='Fixed')
     Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
@@ -127,9 +125,7 @@ def VisReconGivenZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', 
     
     assert Mode in ['Origin','HH','HL','LH','LL'], '''either 'Origin', 'HH', 'HL', 'LH', and 'LL' is allowed for 'Mode' '''
 
-    zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
-    for KeyVal in ZFix.items():
-        zVal[:,KeyVal[0]] = KeyVal[1]
+    zVal = np.tile(ZFix, (N_Gen,1))
         
     FC_Comm = np.tile(np.linspace(MinFreqR, MaxFreqR, N_Gen )[:, None], (1,2))
     FC_Each = np.tile(np.linspace(MinFreqR, MaxFreqR, N_Gen )[:, None], (1,4))
