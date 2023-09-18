@@ -23,7 +23,7 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
-    parser.add_argument('--GPUID', type=int, required=False, default=1)
+    parser.add_argument('--GPUID', type=int, required=False, default=0)
     parser.add_argument('--Resume', type=bool, required=False, default=False)
     
     args = parser.parse_args() # Parse the arguments
@@ -36,14 +36,18 @@ if __name__ == "__main__":
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"]= str(GPU_ID)
 
-    # TensorFlow wizardry
-    config = tf.compat.v1.ConfigProto()
-    # Don't pre-allocate memory; allocate as-needed
-    config.gpu_options.allow_growth = True
-    # Only allow a total of half the GPU memory to be allocated
-    config.gpu_options.per_process_gpu_memory_fraction = 1.0
-    # Create a session with the above options specified.
-    tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))         
+    # TensorFlow memory configuration
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            gpu = gpus[0]  # Fix the index as zero since GPU_ID has already been given. 
+            tf.config.experimental.set_memory_growth(gpu, False)
+            tf.config.experimental.set_virtual_device_configuration
+            (
+                gpu, [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=(1024*23.5))]  
+            )
+        except RuntimeError as e:
+            print(e)        
     
     
     if 'ART' in ConfigName:
@@ -97,7 +101,7 @@ if __name__ == "__main__":
     
     # Calling dynamic controller for losses (DCL)
     ## The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLoss = DCLCall (ConfigSet[ConfigName], ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max')
+    RelLoss = DCLCall (ConfigSet[ConfigName], ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume)
         
     
     #### Model Training

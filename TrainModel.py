@@ -21,7 +21,7 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
-    parser.add_argument('--GPUID', type=int, required=False, default=0.97)
+    parser.add_argument('--GPUID', type=int, required=False, default=0)
     parser.add_argument('--Resume', type=bool, required=False, default=False)
     
     # Parsing the arguments
