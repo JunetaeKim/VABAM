@@ -65,7 +65,7 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
 
 
 # Dynamic controller for losses
-def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max'):
+def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=False):
     
     if ToSaveLoss is None:
         ToSaveLoss = ['val_FeatRecLoss', 'val_OrigRecLoss']
@@ -127,6 +127,7 @@ def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max'):
         MaxLimit['Beta_DTC'] = SelConfigSet['MxWDTC']
         
 
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, ToSaveLoss=ToSaveLoss , SaveWay=SaveWay )
+    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, 
+                            ToSaveLoss=ToSaveLoss, SaveWay=SaveWay, Resume=Resume)
     
     return RelLoss

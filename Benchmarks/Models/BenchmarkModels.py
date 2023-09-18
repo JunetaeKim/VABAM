@@ -9,6 +9,17 @@ from Utilities.Utilities import Lossweight
 from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch, FFT_PSD
 
 
+def CustCCE(y_true, y_pred):
+    epsilon = 1e-15
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    y_pred = tf.clip_by_value(y_pred, epsilon, 1. - epsilon)
+    return -tf.reduce_mean(tf.reduce_sum(y_true * tf.math.log(y_pred), axis=-1))
+
+
+def CustMSE(y_true, y_pred):
+    return tf.reduce_mean(tf.square(y_pred - y_true))
+    
 
 
 def SKLDZ (Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z):
@@ -47,9 +58,7 @@ def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None
     Beta_Rec = Lossweight(name='Beta_Rec', InitVal=1.)(VAEModel.input)
 
     ### Adding the RecLoss; 
-    MSE = tf.keras.losses.MeanSquaredError()
-
-    ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input)
+    ReconOutLoss = Beta_Rec * CustMSE(ReconOut, EncModel.input)
     VAEModel.add_loss(ReconOutLoss)
     VAEModel.add_metric(ReconOutLoss, 'ReconOutLoss')
     print('ReconOutLoss added')
@@ -100,8 +109,7 @@ def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaS
     Beta_Rec = Lossweight(name='Beta_Rec', InitVal=1.)(ReconOut)
 
     ### Adding the RecLoss; 
-    MSE = tf.keras.losses.MeanSquaredError()
-    ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input[0])
+    ReconOutLoss = Beta_Rec * CustMSE(ReconOut, EncModel.input[0])
 
     ### Adding losses to the model
     CVAEModel.add_loss(ReconOutLoss)
@@ -157,8 +165,7 @@ def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaSt
     
     
     ### Adding the RecLoss; 
-    MSE = tf.keras.losses.MeanSquaredError()
-    ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input)
+    ReconOutLoss = Beta_Rec * CustMSE(ReconOut, EncModel.input)
     
     
     'Reference: https://github.com/YannDubs/disentangling-vae/issues/60#issuecomment-705164833' 
@@ -249,8 +256,7 @@ def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None
 
     
     ### Adding the RecLoss; 
-    MSE = tf.keras.losses.MeanSquaredError()
-    ReconOutLoss = Beta_Rec * MSE(ReconOut, EncModel.input)
+    ReconOutLoss = Beta_Rec * CustMSE(ReconOut, EncModel.input)
 
     
     ### KL Divergence for p(Z) vs q(Z)
@@ -273,9 +279,8 @@ def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None
 
     Ones = tf.ones_like(HalfBatchIdx1)[:,None]
     Zeros = tf.zeros_like(HalfBatchIdx2)[:,None]
-    CCE = tf.keras.losses.MeanSquaredError()
 
-    kl_Loss_DTC = 0.5 * (CCE(Zeros, FacDiscOut_D1) + CCE(Ones, FacDiscOut_D2))
+    kl_Loss_DTC = 0.5 * (CustCCE(Zeros, FacDiscOut_D1) + CustCCE(Ones, FacDiscOut_D2))
     kl_Loss_DTC = Beta_DTC * tf.abs(kl_Loss_DTC - Capacity_DTC)
 
     
