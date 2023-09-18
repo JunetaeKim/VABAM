@@ -14,6 +14,8 @@ def CustCCE(y_true, y_pred):
 
 
 def CustMSE(y_true, y_pred):
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
     return tf.reduce_mean(tf.square(y_pred - y_true))
 
 
@@ -91,8 +93,9 @@ def TCLosses (Models, DataSize, LossConfigSet):
     
     
     ### KL Divergence for p(FC) vs q(FC)
-    BernP = 0.5 # hyperparameter
+    BernP = tf.cast(0.5, tf.float32) # hyperparameter
     FC_Mu = SigRepModel.get_layer('FC_Mu').output 
+    FC_Mu = tf.cast(FC_Mu, tf.float32)
     kl_Loss_FC = FC_Mu*(tf.math.log(FC_Mu) - tf.math.log(BernP)) + (1-FC_Mu)*(tf.math.log(1-FC_Mu) - tf.math.log(1-BernP))
     kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
     

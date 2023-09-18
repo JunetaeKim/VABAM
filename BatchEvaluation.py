@@ -70,7 +70,10 @@ if __name__ == "__main__":
             if ConfigName not in ConfigSpecName:
                 continue
                 
-
+        print()
+        print(ConfigName)
+        print()
+                
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
         ModelConfigSet, ModelLoadPath = LoadModelConfigs(ConfigName, Training=False)
@@ -142,7 +145,7 @@ if __name__ == "__main__":
 
 
         # Evaluating KLD (P || K)
-        #Eval.KLD_TrueGen(SecSampType ='FCA', RepeatSize = 1, PlotDist=False) 
+        #Eval.KLD_TrueGen(SecDataType ='FCA', RepeatSize = 1, PlotDist=False) 
 
         # Saving the instance's objects to a file
         SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)

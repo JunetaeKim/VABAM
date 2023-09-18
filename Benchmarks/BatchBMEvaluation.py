@@ -13,7 +13,7 @@ from Benchmarks.Models.BenchmarkCaller import *
 from Utilities.EvaluationMain import *
 from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs, LoadParams
 
-
+# python .\BatchBMEvaluation.py --Config EvalConfigART --GPUID 0 
     
 
 if __name__ == "__main__":
@@ -73,6 +73,9 @@ if __name__ == "__main__":
             if ConfigName not in ConfigSpecName:
                 continue
                 
+        print()
+        print(ConfigName)
+        print()
 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
@@ -114,15 +117,11 @@ if __name__ == "__main__":
         Inp_Enc = BenchModel.get_layer('Inp_Enc')
         Zs = BenchModel.get_layer('Zs').output
         
-        if Params['SecDataType'] == 'CON':
+        if Params['SecDataType'] == 'CONA' or Params['SecDataType'] == 'CONR':
             Inp_Cond = BenchModel.get_layer('Inp_Cond')
             SampModel = Model([Inp_Enc.input, Inp_Cond.input], Zs)
         else:
             SampModel = Model(Inp_Enc.input, Zs)
-        
-        
-        
-
 
 
         #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------    
@@ -131,16 +130,16 @@ if __name__ == "__main__":
                NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = Params['NSelZ'], SampBatchSize = Params['SampBatchSize'], 
                GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'])
         
-        if Params['SecDataType'] == 'CON':
+        if Params['SecDataType'] == 'CONA' or Params['SecDataType'] == 'CONR':
             ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-            Eval.Eval_ZCON(AnalData,  SampModel, GenModel, NSelCond=Params['NSelCond'], Continue=False, WindowSize=Params['WindowSize'],
+            Eval.Eval_ZCON(AnalData,  SampModel, GenModel, Continue=False, WindowSize=Params['WindowSize'],
                            SampZType=Params['SampZType'], SecDataType=Params['SecDataType'])
         else:
-            Eval.Eval_Z(AnalData[:], SampModel, GenModel,  Continue=False, SampZType=Params['SampZType'])
+            Eval.Eval_Z(AnalData, SampModel, GenModel,  Continue=False, SampZType=Params['SampZType'])
 
 
         # Selecting post Samp_Zj for generating plausible signals
-        PostSamp_Zj, NestedZFix = Eval.SelPostSamp_Zj( Params['MetricCut'], SavePath=SampZjSavePath)
+        SelPostSamp = Eval.SelPostSamp( Params['MetricCut'], SavePath=SampZjSavePath)
 
 
         # Evaluating KLD (P || K)
