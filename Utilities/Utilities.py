@@ -236,7 +236,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         if Resume == True:
             with open(self.LogsPath, "r") as file:
                 self.Logs = file.read().split('\n')
-                self.StartEpoch = int(self.Logs[-1].split(' ')[0])
+                self.StartEpoch = int(self.Logs[-1].split(' ')[0]) + 1
         else:
             self.Logs = []
             self.StartEpoch = 0
