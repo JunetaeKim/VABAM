@@ -8,6 +8,7 @@ from tensorflow.keras import Model
 from Utilities.Utilities import ReName
 
 
+
 def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     ## Masking vector generation 1 vs 0
     NBatch = tf.shape(InpRegul)[0]
