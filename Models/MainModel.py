@@ -146,7 +146,6 @@ def Encoder(SigDim, SlidingSize = 50, LatDim= 2, Type = '', MaskingRate = 0., No
 def FeatExtractor(SigDim, LatDim= 2, CompSize = 600, DecayH = 0. , DecayL = 0. ):
     
     FiltLen = (1000 - CompSize)//2 + 1
-    FiltLenList = [FiltLen, FiltLen, FiltLen, FiltLen, FiltLen, FiltLen]
     
     EncReInp = Input(shape=(SigDim,), name='Inp_EncRe')
     FCs = Input(shape=(6,), name='Inp_FCs')
@@ -156,8 +155,8 @@ def FeatExtractor(SigDim, LatDim= 2, CompSize = 600, DecayH = 0. , DecayL = 0. )
 
     ### Filtering level 1 -------------------------------------------------------------------
     ## Filter generation
-    To_H = GenHighFilter(H_F,  N=FiltLenList[0], Decay=DecayH)
-    To_L = GenLowFilter(L_F, N=FiltLenList[1], Decay=DecayL)
+    To_H = GenHighFilter(H_F,  N=FiltLen, Decay=DecayH)
+    To_L = GenLowFilter(L_F, N=FiltLen, Decay=DecayL)
 
     ## Perform signal filtering level 1
     InpFrame =  tf.signal.frame(EncReInp, To_H.shape[-1], 1)
@@ -172,8 +171,8 @@ def FeatExtractor(SigDim, LatDim= 2, CompSize = 600, DecayH = 0. , DecayL = 0. )
 
     ### Filtering level HH and HL (from Sig_H) -------------------------------------------------------------------
     ## Filter generation
-    To_HH = GenHighFilter(HH_F, N=FiltLenList[2], Decay=DecayH)
-    To_HL = GenLowFilter(HL_F, N=FiltLenList[3], Decay=DecayL)
+    To_HH = GenHighFilter(HH_F, N=FiltLen, Decay=DecayH)
+    To_HL = GenLowFilter(HL_F, N=FiltLen, Decay=DecayL)
 
     ## Perform signal filtering level 2
     Frame_H =  tf.signal.frame(Sig_H[:,:,0], To_HH.shape[-1], 1)
@@ -187,8 +186,8 @@ def FeatExtractor(SigDim, LatDim= 2, CompSize = 600, DecayH = 0. , DecayL = 0. )
 
     ### Filtering level LH and LL (from Sig_L) -------------------------------------------------------------------
     ## Filter generation
-    To_LH = GenHighFilter(LH_F,  N=FiltLenList[4], Decay=DecayH)
-    To_LL = GenLowFilter(LL_F,  N=FiltLenList[5], Decay=DecayL)
+    To_LH = GenHighFilter(LH_F,  N=FiltLen, Decay=DecayH)
+    To_LL = GenLowFilter(LL_F,  N=FiltLen, Decay=DecayL)
 
     ## Perform signal filtering level 2
     Frame_L =  tf.signal.frame(Sig_L[:,:,0], To_LH.shape[-1], 1)
