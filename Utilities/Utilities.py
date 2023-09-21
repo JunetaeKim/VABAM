@@ -229,8 +229,9 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.SavePath = SavePath
         self.Resume = Resume
         PathInfo = SavePath.split('/')
+        self.ModelName = PathInfo[-1].split('.')[0]
         self.SaveLogOnly = SaveLogOnly
-        self.LogsPath = './Logs/'+PathInfo[2]+'/Logs_'+PathInfo[-1].split('.')[0]+ '.txt'
+        self.LogsPath = './Logs/'+PathInfo[2]+'/Logs_'+self.ModelName+ '.txt'
         self.CheckPoint = CheckPoint
 
         if Resume == True:
@@ -294,7 +295,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 
             elif (epoch+self.StartEpoch) > 0:
                 print()
-                print('The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
+                print('The model has not been saved since the loss did not decrease.')
                 print()
                 
                 #self.Logs.append(str(epoch+self.StartEpoch)+': The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
@@ -319,7 +320,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
 
         if self.verbose==1:
 
-            print('------------------------------------')
+            print('----------------' +self.ModelName+ '--------------------')
             print('Losses')
             for key, value in Losses.items():
                 print("%s: %.7f" % (key, value))
