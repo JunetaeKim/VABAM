@@ -447,7 +447,7 @@ class Evaluator ():
 
             # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptFCar.
             ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            ## Return shape: (Batch_size, N_sample)
+            ## Return shape: (Batch_size, N_sample) -> (Batch_size x N_sample) for the computational efficiency (i.e, ravel function applied)
             MaxFreq = np.argmax(self.SubPSPDF_ZjRptFCar, axis=1).ravel() + 1
             
             self.LocCandZs ( MaxFreq, EntH, self.Samp_ZjRPT,  self.FC_Arange)
