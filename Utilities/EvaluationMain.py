@@ -810,7 +810,7 @@ class Evaluator ():
             ## This indicates which frequency is most activated in the generated signal.
             EntH = -np.sum(self.SubPSPDF_ZjRptCONa * np.log(self.SubPSPDF_ZjRptCONa), axis=1).ravel()
             
-            # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptFCar.
+            # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptCONa.
             ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
             ## Return shape: (Batch_size, N_sample)
             MaxFreq = np.argmax(self.SubPSPDF_ZjRptCONa, axis=1).ravel() + 1
