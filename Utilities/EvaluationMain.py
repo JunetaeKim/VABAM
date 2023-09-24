@@ -369,8 +369,10 @@ class Evaluator ():
             '''
             ## Binding the samples together, generate signals through the model 
             Set_FCs = np.concatenate([self.FCs,   self.FCs,     self.FCs,         self.FC_Arange]) 
-            Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_Zj,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
-            Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
+            Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_ZjRPT,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
+            '''Mathematically, Samp_ZjRPT seems more valid than Samp_Zj on the 2nd element in Set_Zs, thus a test needs to be conducted. 
+             Expect cascading effects when modifying this; ensure to check variable names carefully while making changes.'''
+           Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
             # Choosing GPU or CPU and generating signals
