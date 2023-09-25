@@ -80,7 +80,7 @@ def ProbPermutation(Data, WindowSize=3):
     # Reducing the window and frequency axes
     CountPerms = np.sum(CountPerms, axis=(1,2))
     
-    # Data shape: (Batch_size, N_frequency, N_permutation_cases)
+    # Data shape: (Batch_size, N_permutation_cases)
     ProbCountPerms = CountPerms / np.sum(CountPerms, axis=-1, keepdims=True)
     
     return np.maximum(ProbCountPerms, 1e-7)    
