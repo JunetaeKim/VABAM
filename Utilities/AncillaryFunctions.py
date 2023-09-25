@@ -66,7 +66,8 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
 
 # Permutation given PSD over each generation
 def ProbPermutation(Data, WindowSize=3):
-    # Data shape: (Batch_size, N_frequency, N_sample)
+    # For the M generation vectors, Data shape: (Batch_size, N_frequency, N_sample)
+    # For the true PSD, Data shape: (1, N_frequency, Batch_size)
     
     # Generating true permutation cases
     TruePerms = np.concatenate(list(itertools.permutations(np.arange(WindowSize)))).reshape(-1, WindowSize)
