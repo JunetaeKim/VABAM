@@ -396,8 +396,9 @@ class Evaluator ():
             self.SubPSPDF_ZjRptFC = FFT_PSD(self.SigGen_ZjRptFC, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
             self.SubPSPDF_ZjRptFCar = FFT_PSD(self.SigGen_ZjRptFCar, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
-            # Return shape: (Batch_size, 1, N_frequency)
-            self.SubPSPDF_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape: (1, N_frequency, Batch_size)
+            ## Since it is the true PSD, there are no M generations. 
+            self.SubPSPDF_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
 
 
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
@@ -758,10 +759,10 @@ class Evaluator ():
             self.SubPSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
             self.SubPSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
-            # Return shape: (Batch_size, 1, N_frequency)
-            self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq) #
-
-
+            # Return shape: (1, N_frequency, Batch_size)
+            ## Since it is the true PSD, there are no M generations. 
+            self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
+                        
             
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (Batch_size, N_frequency, N_permutation_cases)
