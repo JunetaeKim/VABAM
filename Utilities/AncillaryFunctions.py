@@ -68,16 +68,17 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
 def ProbPermutation(Data, WindowSize=3):
     # Data shape: (Batch_size, N_frequency, N_sample)
     
-    # Generate true permutation cases
+    # Generating true permutation cases
     TruePerms = np.concatenate(list(itertools.permutations(np.arange(WindowSize)))).reshape(-1, WindowSize)
 
-    # Get all permutation cases
+    # Getting all permutation cases
     Data_Ext = tf.signal.frame(Data, frame_length=WindowSize, frame_step=1, axis=-1)
     PermsTable =  np.argsort(Data_Ext, axis=-1)
 
     CountPerms = 1- (TruePerms[None,None,None] == PermsTable[:,:,:, None])
     CountPerms = 1-np.sum(CountPerms, axis=-1).astype('bool')
-    CountPerms = np.sum(CountPerms, axis=(2))
+    # Reducing the window and frequency axes
+    CountPerms = np.sum(CountPerms, axis=(1,2))
     
     # Data shape: (Batch_size, N_frequency, N_permutation_cases)
     ProbCountPerms = CountPerms / np.sum(CountPerms, axis=-1, keepdims=True)

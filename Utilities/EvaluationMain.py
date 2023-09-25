@@ -372,7 +372,7 @@ class Evaluator ():
             Set_Zs = np.concatenate([self.Samp_Z,  self.Samp_ZjRPT,  self.Samp_ZjRPT,  self.Samp_ZjRPT])
             '''Mathematically, Samp_ZjRPT seems more valid than Samp_Zj on the 2nd element in Set_Zs, thus a test needs to be conducted. 
              Expect cascading effects when modifying this; ensure to check variable names carefully while making changes.'''
-           Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
+            Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
             # Choosing GPU or CPU and generating signals
