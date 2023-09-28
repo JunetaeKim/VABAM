@@ -136,8 +136,7 @@ if __name__ == "__main__":
         FC_ArangeInp = np.tile(np.linspace(Params['MinFreqR'], Params['MaxFreqR'], Params['NGen'])[:, None], (1, NFCs))
 
         ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-        Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FC_ArangeInp, FcLimit=Params['FcLimit'],  
-                      WindowSize=Params['WindowSize'],  Continue=False, SampZType=Params['SampZType'])
+        Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FcLimit=Params['FcLimit'], WindowSize=Params['WindowSize'], Continue=False)
 
 
         # Selecting post Samp_Zj for generating plausible signals
