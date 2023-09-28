@@ -185,7 +185,7 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecDataType=None, FcLimit=None, RepeatSize=1, PlotDist=True):
+    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecDataType=None, RepeatSize=1, PlotDist=True):
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
@@ -197,13 +197,11 @@ class Evaluator ():
         # SecDataType: Secondary data type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
                       # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
                       # 'False' for models without secondary-data inputs.
-        # FcLimit: The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
         # PostSamp: The selected sampled data.
 
         
         # Setting arguments
         PostSamp = self.PostSamp if PostSamp is None else PostSamp
-        FcLimit = self.FcLimit if FcLimit is None and hasattr(self, 'FcLimit') else FcLimit
         AnalData = self.AnalData if AnalData is None else AnalData
         SecDataType = self.SecDataType if SecDataType is None else SecDataType
         
