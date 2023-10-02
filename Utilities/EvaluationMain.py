@@ -147,7 +147,7 @@ class Evaluator ():
     def SelPostSamp (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, SavePath=None ):
         
         ## Optional parameters
-        # MetricCut: The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut
+        # Updating The threshold value for selecting Zs in SubNestedZFix
         self.MetricCut = MetricCut
 
         # Setting arguments
@@ -287,7 +287,7 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3, Continue=True,   SecDataType='FCA'):
+    def Eval_ZFC (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCA', MetricCut = 100. , Continue=True ):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
@@ -303,6 +303,7 @@ class Evaluator ():
         self.FcLimit = FcLimit               # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
+        self.MetricCut = MetricCut           # The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut.
         
         
         ## Intermediate variables
