@@ -36,7 +36,7 @@ class Evaluator ():
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
 
     ### ----------- Searching for candidate Zj for plausible signal generation ----------- ###
-    def LocCandZs (self, MaxFreq, EntH, Samp_Z, SecData=None):
+    def LocCandZsMaxFreq (self, MaxFreq, EntH, Samp_Z, SecData=None):
         # Shape of MaxFreq: (NMiniBat*NGen, )
         # Shape of EntH: (NMiniBat*NGen, )
         # Shape of Samp_Z: (NMiniBat*NGen, LatDim)
@@ -429,32 +429,32 @@ class Evaluator ():
             
             
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Temporal objects with the shape : (Batch_size, N_sample, N_frequency)
+            # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
             QV_Zjb_FCbm_ = FFT_PSD(self.Sig_Zjb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             QV_Zjb_FCbSt_ = FFT_PSD(self.Sig_Zjb_FCbSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             
 
             # Q(v)s
-            ## Return shape: (Batch_size, N_frequency)
+            ## Return shape: (NMiniBat, N_frequency)
             self.QV_Zb_FCbm = FFT_PSD(self.Sig_Zb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.QV_Zjb_FCbm = QV_Zjb_FCbm_.mean(axis=1)
             self.QV_Zjb_FCbSt = QV_Zjb_FCbSt_.mean(axis=1)
 
             
             # Intermediate objects for Q(s) and H(')
-            ## Return shape: (Batch_size, N_frequency, N_sample)
+            ## Return shape: (NMiniBat, N_frequency, NGen)
             self.QV_Zjb_FCbm_T = QV_Zjb_FCbm_.transpose(0,2,1)
             self.QV_Zjb_FCbSt_T = QV_Zjb_FCbSt_.transpose(0,2,1)
             self.QV_Zjbm_FCbm_T = FFT_PSD(self.Sig_Zjbm_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
             
-            ## Return shape: (1, N_frequency, Batch_size)
+            ## Return shape: (1, N_frequency, NMiniBat)
             ### Since it is the true PSD, there are no M generations. 
             self.QV_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
 
 
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
-            # Return shape: (Batch_size, N_frequency, N_permutation_cases)
+            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
             self.QS_Zjb_FCbm = ProbPermutation(self.QV_Zjb_FCbm_T, WindowSize=WindowSize)
             self.QS_Zjb_FCbSt = ProbPermutation(self.QV_Zjb_FCbSt_T, WindowSize=WindowSize)
             self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
@@ -502,10 +502,10 @@ class Evaluator ():
 
             # Getting the maximum frequency given the PSD from QV_Zjbm_FCbm_T.
             ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            ## Return shape: (Batch_size, N_sample) -> (Batch_size x N_sample) for the computational efficiency (i.e, ravel function applied)
+            ## Return shape: (NMiniBat, NGen) -> (NMiniBat x NGen) for the computational efficiency (i.e, ravel function applied)
             MaxFreq = np.argmax(self.QV_Zjbm_FCbm_T, axis=1).ravel() + 1
             
-            self.LocCandZs ( MaxFreq, EntH, self.Zjbm,  self.FCbm)
+            self.LocCandZsMaxFreq ( MaxFreq, EntH, self.Zjbm,  self.FCbm)
  
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
@@ -624,7 +624,7 @@ class Evaluator ():
 
 
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Return shape: (Batch_size, N_frequency)
+            # Return shape: (NMiniBat, N_frequency)
             self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
 
@@ -649,7 +649,7 @@ class Evaluator ():
 
 
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            # Return shape: (Batch_size, N_sample, N_frequency)
+            # Return shape: (NMiniBat, NGen, N_frequency)
             self.SubPSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             
             # Calculating the entropies given the probability density function of the power spectral.
@@ -658,10 +658,10 @@ class Evaluator ():
 
             # Getting the maximum frequency given the PSD from SigGen_Zj.
             # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            # Return shape: (Batch_size, N_sample)
+            # Return shape: (NMiniBat, NGen)
             MaxFreq = np.argmax(self.SubPSPDF_Zj, axis=1).ravel() + 1
 
-            self.LocCandZs ( MaxFreq, EntH, self.Samp_Zj)
+            self.LocCandZsMaxFreq ( MaxFreq, EntH, self.Samp_Zj)
 
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
@@ -801,23 +801,23 @@ class Evaluator ():
 
 
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Return shape: (Batch_size, N_frequency)
+            # Return shape: (NMiniBat, N_frequency)
             self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.Q_PSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.Q_PSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
 
-            # Return shape: (Batch_size, N_frequency, N_sample)
+            # Return shape: (NMiniBat, N_frequency, NGen)
             self.SubPSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
             self.SubPSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
-            # Return shape: (1, N_frequency, Batch_size)
+            # Return shape: (1, N_frequency, NMiniBat)
             ## Since it is the true PSD, there are no M generations. 
             self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
                         
             
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
-            # Return shape: (Batch_size, N_frequency, N_permutation_cases)
+            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
             self.Q_PDPSD_ZjRptCONr = ProbPermutation(self.SubPSPDF_ZjRptCONr, WindowSize=WindowSize)
             self.Q_PDPSD_ZjRptCONa = ProbPermutation(self.SubPSPDF_ZjRptCONa, WindowSize=WindowSize)
             self.Q_PDPSD_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
@@ -867,10 +867,10 @@ class Evaluator ():
             
             # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptCONa.
             ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            ## Return shape: (Batch_size, N_sample)
+            ## Return shape: (NMiniBat, NGen)
             MaxFreq = np.argmax(self.SubPSPDF_ZjRptCONa, axis=1).ravel() + 1
             
-            self.LocCandZs ( MaxFreq, EntH, self.Samp_ZjRPT,  self.CON_Arange)
+            self.LocCandZsMaxFreq ( MaxFreq, EntH, self.Samp_ZjRPT,  self.CON_Arange)
 
             # Restructuring TrackerCand
             ## item[0] contains frequency domains

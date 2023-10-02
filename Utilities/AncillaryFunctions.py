@@ -37,13 +37,13 @@ def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
 # Power spectral density 
 def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     # Dimension check; this part operates with 3D tensors.
-    # (Batch_size, N_sample, SigDim)
+    # (NMiniBat, NGen, SigDim)
     Data = Data[:,None] if len(Data.shape) < 3 else Data
 
     # Power Spectral Density
     HalfLen = Data.shape[-1]//2
     FFTRes = np.abs(np.fft.fft(Data, axis=-1)[..., :HalfLen])[..., MinFreq:MaxFreq]
-    # (Batch_size, N_sample, N_frequency)
+    # (NMiniBat, NGen, N_frequency)
     PSD = (FFTRes**2)/Data.shape[-1]
 
     # Probability Density Function
@@ -54,11 +54,11 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     
     elif ReducedAxis =='Sample':
         AggPSD = np.mean(PSD, axis=(1))
-        # (Batch_size, N_frequency)
+        # (NMiniBat, N_frequency)
         AggPSPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
     
     elif ReducedAxis == 'None':
-        # (Batch_size, N_sample, N_frequency)
+        # (NMiniBat, NGen, N_frequency)
         AggPSPDF = PSD / np.sum(PSD, axis=(-1),keepdims=True)    
         
     return AggPSPDF
@@ -66,8 +66,8 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
 
 # Permutation given PSD over each generation
 def ProbPermutation(Data, WindowSize=3):
-    # For the M generation vectors, Data shape: (Batch_size, N_frequency, N_sample)
-    # For the true PSD, Data shape: (1, N_frequency, Batch_size)
+    # For the M generation vectors, Data shape: (NMiniBat, N_frequency, NGen)
+    # For the true PSD, Data shape: (1, N_frequency, NMiniBat)
     
     # Generating true permutation cases
     TruePerms = np.concatenate(list(itertools.permutations(np.arange(WindowSize)))).reshape(-1, WindowSize)
@@ -81,7 +81,7 @@ def ProbPermutation(Data, WindowSize=3):
     # Reducing the window axis
     CountPerms = np.sum(CountPerms, axis=(2))
     
-    # Data shape: (Batch_size, N_frequency, N_permutation_cases)
+    # Data shape: (NMiniBat, N_frequency, N_permutation_cases)
     ProbCountPerms = CountPerms / np.sum(CountPerms, axis=-1, keepdims=True)
     
     return np.maximum(ProbCountPerms, 1e-7)    
@@ -237,34 +237,6 @@ def GenConArange (ConData, NGen):
     return ConData[SelIDX[:,0]]
 
 
-def log_importance_weight_matrix(batch_size, dataset_size):
-    """
-    Calculates a log importance weight matrix
 
-    Parameters
-    ----------
-    batch_size: int
-        number of training images in the batch
-
-    dataset_size: int
-        number of training images in the dataset
-        
-    Reference:
-    https://github.com/JunetaeKim/disentangling-vae-torch/blob/master/disvae/utils/math.py#L54
-    """
-    
-    
-    N = dataset_size
-    M = batch_size - 1
-    strat_weight = (N - M) / (N * M)
-
-    W = tf.fill([batch_size, batch_size], 1 / M)
-    W = tf.reshape(W, [-1])
-    W = tf.tensor_scatter_nd_update( W,  tf.range(0, tf.size(W), M + 1)[:, None],  tf.fill([tf.size(W) // (M + 1)], 1 / N))
-    W = tf.tensor_scatter_nd_update( W, tf.range(1, tf.size(W), M + 1)[:, None], tf.fill([tf.size(W) // (M + 1) - 1 + 1], strat_weight))
-    W = tf.tensor_scatter_nd_update( W,  tf.constant([[M * (M + 1)]]),   tf.constant([strat_weight]))
-    W = tf.reshape(W, [batch_size, batch_size])
-
-    return tf.math.log(W)
 
         
