@@ -36,11 +36,20 @@ class Evaluator ():
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
 
     ### ----------- Searching for candidate Zj for plausible signal generation ----------- ###
-    def LocCandZsMaxFreq (self, MaxFreq, EntH, Samp_Z, SecData=None):
-        # Shape of MaxFreq: (NMiniBat*NGen, )
-        # Shape of EntH: (NMiniBat*NGen, )
-        # Shape of Samp_Z: (NMiniBat*NGen, LatDim)
-        # Shape of SecData: (NMiniBat*NGen, SecDataDim)
+    def LocCandZsMaxFreq (self, CandQV, Samp_Z, SecData=None):
+        # Shape of CandQV: (NMiniBat x NGen, )
+        # Shape of Samp_Z: (NMiniBat x NGen, LatDim)
+        # Shape of SecData: (NMiniBat x NGen, SecDataDim)
+
+        # Calculating the entropies given the probability density function of the power spectral.
+        ## This indicates which frequency is most activated in the generated signal.
+        # Return shape: (NMiniBat x NGen )
+        EntH = -np.sum(CandQV * np.log(CandQV), axis=1).ravel()
+
+        # Getting the maximum frequency given the PSD from CandQV.
+        ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
+        ## Return shape: (NMiniBat, NGen) -> (NMiniBat x NGen) for the computational efficiency (i.e, ravel function applied)
+        MaxFreq = np.argmax(CandQV, axis=1).ravel() + 1
 
         for Freq, _ in self.BestZsMetrics.items():
             FreqIdx = np.where(MaxFreq == Freq)[0]
