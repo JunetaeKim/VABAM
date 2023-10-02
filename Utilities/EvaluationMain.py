@@ -505,16 +505,7 @@ class Evaluator ():
             
             
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            # Calculating the entropies given the probability density function of the power spectral.
-            ## This indicates which frequency is most activated in the generated signal.
-            EntH = -np.sum(self.QV_Zjbm_FCbm_T * np.log(self.QV_Zjbm_FCbm_T), axis=1).ravel()
-
-            # Getting the maximum frequency given the PSD from QV_Zjbm_FCbm_T.
-            ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            ## Return shape: (NMiniBat, NGen) -> (NMiniBat x NGen) for the computational efficiency (i.e, ravel function applied)
-            MaxFreq = np.argmax(self.QV_Zjbm_FCbm_T, axis=1).ravel() + 1
-            
-            self.LocCandZsMaxFreq ( MaxFreq, EntH, self.Zjbm,  self.FCbm)
+            self.LocCandZsMaxFreq ( self.QV_Zjbm_FCbm_T, self.Zjbm,  self.FCbm)
  
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
