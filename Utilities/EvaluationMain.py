@@ -15,8 +15,9 @@ from Utilities.Utilities import CompResource
        
 class Evaluator ():
     
-    def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100, 
-                  NGen=100, ReparaStdZj = 1, NSelZ = 1, SampBatchSize = 1000, GenBatchSize = 1000, GPU=True):
+    def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  NGen=100, ReparaStdZj = 1, NSelZ = 1, 
+                  SampBatchSize = 1000, GenBatchSize = 1000, MetricCut = 1., MetricType = 'KLD', GPU=True):
+
         
         # Optional parameters with default values
         self.MinFreq = MinFreq               # The minimum frequency value within the analysis range (default = 1).
@@ -29,9 +30,10 @@ class Evaluator ():
         self.SampBatchSize = SampBatchSize   # The batch size during prediction of the sampling model.
         self.GenBatchSize= GenBatchSize      # The batch size during prediction of the generation model.
         self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-        
-        
-        
+        self.MetricCut = MetricCut           # The threshold for Zs and ancillary data where the metric value is below MetricCut.
+        self.MetricType = MetricType         # The type of metric used for selecting Zs and ancillary data. 
+
+    
     
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
 
@@ -41,11 +43,22 @@ class Evaluator ():
         # Shape of Samp_Z: (NMiniBat x NGen, LatDim)
         # Shape of SecData: (NMiniBat x NGen, SecDataDim)
 
-        # Calculating the entropies given the probability density function of the power spectral.
-        ## This indicates which frequency is most activated in the generated signal.
-        # Return shape: (NMiniBat x NGen )
-        EntH = -np.sum(CandQV * np.log(CandQV), axis=1).ravel()
+        
+        if self.MetricType == 'Entropy': 
+            # Calculating the entropies given the probability density function of the power spectral.
+            ## Return shape: (NMiniBat x NGen )
+            Score = -np.sum(CandQV * np.log(CandQV), axis=1).ravel()
+    
+        elif self.MetricType == 'KLD':
+            # Calculating KLD(QV_Batch||CandQV_T) (KLD_BatGen) and selecing IDs for which KLD_BatGen less than MetricCut.
+            ## Shape of CandQV_T: (NMiniBat, N_frequency, NGen) -> (NMiniBat x NGen, N_frequency, 1), Shape of QV_Batch: (1, N_frequency, NMiniBat)
+            CandQV_T = CandQV.transpose(0,2,1).reshape(self.NMiniBat*self.NGen, -1)[:,:,None]
+            KLD_BatGen = np.sum(self.QV_Batch * np.log(self.QV_Batch / CandQV_T ), axis=1)
+        
+            ## Return shape: (NMiniBat x NGen )
+            Score = np.min(KLD_BatGen, axis=-1)
 
+        
         # Getting the maximum frequency given the PSD from CandQV.
         ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
         ## Return shape: (NMiniBat, NGen) -> (NMiniBat x NGen) for the computational efficiency (i.e, ravel function applied)
@@ -58,25 +71,25 @@ class Evaluator ():
             if len(FreqIdx) <1: 
                 continue;
 
-            # Calculating the minimum of EntH (Entropy, H) and selecting candidate Z-values(CandZs)
-            MinEntHIdx = np.argmin(EntH[FreqIdx]) 
-            MinEntH = np.min(EntH[FreqIdx]) 
-            CandZs = Samp_Z[[FreqIdx[MinEntHIdx]]]
+            # Calculating the minimum of Score and selecting candidate Z-values(CandZs)
+            MinScoreIdx = np.argmin(Score[FreqIdx]) 
+            MinScore = np.min(Score[FreqIdx]) 
+            CandZs = Samp_Z[[FreqIdx[MinScoreIdx]]]
             
             #tracking results
             self.TrackerCand_Temp[Freq]['TrackZs'].append(CandZs[None])
-            self.TrackerCand_Temp[Freq]['TrackMetrics'].append(MinEntH[None])
+            self.TrackerCand_Temp[Freq]['TrackMetrics'].append(MinScore[None])
             
             if SecData is not None: # for processing secondary data (SecData).
-                CandSecData = SecData[[FreqIdx[MinEntHIdx]]]
+                CandSecData = SecData[[FreqIdx[MinScoreIdx]]]
                 self.TrackerCand_Temp[Freq]['TrackSecData'].append(CandSecData[None])
             else:
                 CandSecData = None
 
             # Updating the Min_SumH value if the current iteration value is smaller.
-            if MinEntH < self.BestZsMetrics[Freq][0]:
-                self.BestZsMetrics[Freq] = [MinEntH, CandZs, CandSecData]
-                print('Candidate Z updated! ', 'Freq:', Freq, ', EntH:', np.round(MinEntH, 4))
+            if MinScore < self.BestZsMetrics[Freq][0]:
+                self.BestZsMetrics[Freq] = [MinScore, CandZs, CandSecData]
+                print('Candidate Z updated! ', 'Freq:', Freq, ', Score:', np.round(MinScore, 4))
 
 
     
@@ -287,7 +300,7 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCA', MetricCut = 100. , Continue=True ):
+    def Eval_ZFC (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCA',  Continue=True ):
         
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
@@ -303,7 +316,7 @@ class Evaluator ():
         self.FcLimit = FcLimit               # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
         self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
                                              # and 'CON' for conditional inputs such as power spectral density.
-        self.MetricCut = MetricCut           # The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut.
+        
         
         
         ## Intermediate variables
