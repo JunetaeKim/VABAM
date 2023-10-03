@@ -16,7 +16,7 @@ from Utilities.Utilities import CompResource
 class Evaluator ():
     
     def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  NGen=100, ReparaStdZj = 1, NSelZ = 1, 
-                  SampBatchSize = 1000, GenBatchSize = 1000, MetricCut = 1., MetricType = 'KLD', GPU=True):
+                  SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=True):
 
         
         # Optional parameters with default values
@@ -30,8 +30,8 @@ class Evaluator ():
         self.SampBatchSize = SampBatchSize   # The batch size during prediction of the sampling model.
         self.GenBatchSize= GenBatchSize      # The batch size during prediction of the generation model.
         self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-        self.MetricCut = MetricCut           # The threshold for Zs and ancillary data where the metric value is below MetricCut.
-        self.MetricType = MetricType         # The type of metric used for selecting Zs and ancillary data. 
+        self.SelMetricCut = SelMetricCut           # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
+        self.SelMetricType = SelMetricType         # The type of metric used for selecting Zs and ancillary data. 
 
     
     
@@ -44,13 +44,13 @@ class Evaluator ():
         # Shape of SecData: (NMiniBat x NGen, SecDataDim)
 
         
-        if self.MetricType == 'Entropy': 
+        if self.SelMetricType == 'Entropy': 
             # Calculating the entropies given the probability density function of the power spectral.
             ## Return shape: (NMiniBat x NGen )
             Score = -np.sum(CandQV * np.log(CandQV), axis=1).ravel()
     
-        elif self.MetricType == 'KLD':
-            # Calculating KLD(QV_Batch||CandQV_T) (KLD_BatGen) and selecing IDs for which KLD_BatGen less than MetricCut.
+        elif self.SelMetricType == 'KLD':
+            # Calculating KLD(QV_Batch||CandQV_T) (KLD_BatGen) and selecing IDs for which KLD_BatGen less than SelMetricCut.
             ## Shape of CandQV_T: (NMiniBat, N_frequency, NGen) -> (NMiniBat x NGen, N_frequency, 1), Shape of QV_Batch: (1, N_frequency, NMiniBat)
             CandQV_T = CandQV.transpose(0,2,1).reshape(self.NMiniBat*self.NGen, -1)[:,:,None]
             KLD_BatGen = np.sum(self.QV_Batch * np.log(self.QV_Batch / CandQV_T ), axis=1)
@@ -76,7 +76,7 @@ class Evaluator ():
             MinScore = np.min(Score[FreqIdx]) 
             CandZs = Samp_Z[[FreqIdx[MinScoreIdx]]]
             
-            #tracking results
+            # Tracking results
             self.TrackerCand_Temp[Freq]['TrackZs'].append(CandZs[None])
             self.TrackerCand_Temp[Freq]['TrackMetrics'].append(MinScore[None])
             
@@ -112,13 +112,13 @@ class Evaluator ():
             Results = {next(Cnt):{ 'TrackZs' : TrackZs} 
                         for TrackZs, TrackMetrics 
                         in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackMetrics'])
-                        if TrackMetrics < self.MetricCut }
+                        if TrackMetrics < self.SelMetricCut }
 
         else:
             Results = {next(Cnt):{ 'TrackZs' : TrackZs, 'TrackSecData' : TrackSecData} 
                         for TrackZs, TrackSecData, TrackMetrics 
                         in zip(SubTrackerCand['TrackZs'], SubTrackerCand['TrackSecData'], SubTrackerCand['TrackMetrics'])
-                        if TrackMetrics < self.MetricCut }
+                        if TrackMetrics < self.SelMetricCut }
             
         return Results
     
@@ -157,11 +157,11 @@ class Evaluator ():
     
     
     ### ------------------- Selecting post-sampled Z values for generating plausible signals ------------------- ###
-    def SelPostSamp (self, MetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, SavePath=None ):
+    def SelPostSamp (self, SelMetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, SavePath=None ):
         
         ## Optional parameters
         # Updating The threshold value for selecting Zs in SubNestedZFix
-        self.MetricCut = MetricCut
+        self.SelMetricCut = SelMetricCut
 
         # Setting arguments
         BestZsMetrics = self.BestZsMetrics if BestZsMetrics is None else BestZsMetrics
@@ -404,8 +404,8 @@ class Evaluator ():
               2) Zjb + FCbm              ->         Sig_Zjb_FCbm        ->          MI()
               3) Zjb + FCb_Sort          ->         Sig_Zjb_FCbSt       ->          MI()
               4) Zjb + FCbm_Sort         ->         Sig_Zjb_FCbmSt      ->          MI()
-              5) Zjbm + FCbm             ->         Sig_Zjbm_FCbm       ->          H()
-                                                  * bm = ARand, b=BRpt, St=Sort *
+              5) Zjbm + FCbm             ->         Sig_Zjbm_FCbm       ->          H() or KLD()
+                                                    * bm = ARand, b=BRpt, St=Sort *
             ''' 
             
             ## Binding the samples together, generate signals through the model 
@@ -429,7 +429,7 @@ class Evaluator ():
             
             '''                                        ## Sub-Metric list ##
                 ------------------------------------------------------------------------------------------------------------- 
-                   # Metric    # Function            # Code                       # Function             # Code 
+                   # Metrics    # Function            # Code                       # Function             # Code 
                 1) I_V_Z       q(v|Sig_Zb_FCbm)      <QV_Zb_FCbm>          vs     p(v)                   <QV_Pop>
                 2) I_V_ZjZ     q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     q(v|Sig_Zb_FCbm)       <QV_Zb_FCbm>
                 
@@ -439,7 +439,7 @@ class Evaluator ():
                 5) I_S_Zj      q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                   <QV//QS_Batch>
                 6) I_S_FcsZj   q(s|Sig_Zjb_FCbSt)    <QV//QS_Zjb_FCbSt>    vs     q(s|Sig_Zjb_FCbm)      <QV//QS_Zjb_FCbm>
 
-                7) H(')        q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
+                7) H()//KLD()  q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
                 --------------------------------------------------------------------------------------------------------------
                                                        
                                                        ## Metric list ##
