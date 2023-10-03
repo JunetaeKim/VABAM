@@ -360,22 +360,36 @@ class Evaluator ():
             ## The values are repeated NGen times after the sampling. 
             self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
+                        
+            # Selecting Samp_Zjs from Samp_Z 
+            ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
+            self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
 
+            # Permuting all values repeated NGen times except for the selected ones from Zj.
+            RandBool = self.Zjb == 0
+            self.Zbm = self.Zb.copy()
+            self.Zbm[RandBool] = np.random.permutation(self.Zbm[RandBool])
+
+            # Selecting Samp_Zjs from Samp_Z                 
+            ## Permuting rows and columns of Zbm randomly.
+            self.ZbmARand = self.Zbm[np.random.permutation(self.Zbm.shape[0])][:, np.random.permutation(self.Zbm.shape[1])]
+            self.Zjbm = SamplingZj(self.ZbmARand , self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
+
+            
+            ''' Alternative approach
+            # Sampling Samp_Z 
+            ## The values are repeated NGen times after the sampling. 
+            self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
 
             # Selecting Samp_Zjs from Samp_Z 
             ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
             self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
             ### The efficient approach for 'Zjbm'; Zb -> Zjbm
             self.Zjbm = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
-
-            ''' Methodologically orthodox approach for 'Zjbm'; Zbm -> Zjbm
-            ## The data is repeated NGen times before the sampling. 
-            self.Zbm = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelARand', ReparaStdZj=self.ReparaStdZj)
-            self.Zjbm = SamplingZj (self.Zbm, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
             '''
 
-
+            
             # Sampling FCs
             ## Return shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
             # Generating FC values randomly across all axes (i.e., the batch, generation, and fc axes).
@@ -399,7 +413,7 @@ class Evaluator ():
                        
                                 ## Variable cases for the signal generation ##
                                 
-              # Cases                               # Signal name                   # Purpose
+              # Cases                               # Signal name                   # Target metric
               1) Zb + FCbm               ->         Sig_Zb_FCbm         ->          MI() 
               2) Zjb + FCbm              ->         Sig_Zjb_FCbm        ->          MI()
               3) Zjb + FCb_Sort          ->         Sig_Zjb_FCbSt       ->          MI()
@@ -429,25 +443,26 @@ class Evaluator ():
             
             '''                                        ## Sub-Metric list ##
                 ------------------------------------------------------------------------------------------------------------- 
-                   # Metrics    # Function            # Code                       # Function             # Code 
-                1) I_V_Z       q(v|Sig_Zb_FCbm)      <QV_Zb_FCbm>          vs     p(v)                   <QV_Pop>
-                2) I_V_ZjZ     q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     q(v|Sig_Zb_FCbm)       <QV_Zb_FCbm>
+                # Sub-metrics   # Function            # Code                       # Function           # Code 
+                1) I_V_Z        q(v|Sig_Zb_FCbm)      <QV_Zb_FCbm>          vs     p(v)                 <QV_Pop>
+                2) I_V_ZjZ      q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     q(v|Sig_Zb_FCbm)     <QV_Zb_FCbm>
                 
-                3) I_V_Zj      q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     p(v)                   <QV_Pop>
-                4) I_V_FcsZj   q(v|Sig_Zjb_FCbSt)    <QV_Zjb_FCbSt>        vs     q(v|Sig_Zjb_FCbm)      <QV_Zjb_FCbm>
+                3) I_V_Zj       q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     p(v)                 <QV_Pop>
+                4) I_V_FcsZj    q(v|Sig_Zjb_FCbSt)    <QV_Zjb_FCbSt>        vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
                 
-                5) I_S_Zj      q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                   <QV//QS_Batch>
-                6) I_S_FcsZj   q(s|Sig_Zjb_FCbSt)    <QV//QS_Zjb_FCbSt>    vs     q(s|Sig_Zjb_FCbm)      <QV//QS_Zjb_FCbm>
+                5) I_S_Zj       q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                 <QV//QS_Batch>
+                6) I_S_FcsZj    q(s|Sig_Zjb_FCbSt)    <QV//QS_Zjb_FCbSt>    vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
 
-                7) H()//KLD()  q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
-                --------------------------------------------------------------------------------------------------------------
+                7) H()//KLD()   q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
+                
                                                        
                                                        ## Metric list ##
                 --------------------------------------------------------------------------------------------------------------
-                                                    MI_V_ZjZ = I_V_Z + I_V_ZjZ
-                                                    MI_V_FcsZj = I_V_Zj + I_V_FcsZj
-                                                    MI_S_FcsZj = I_S_Zj + I_S_FcsZj
-                --------------------------------------------------------------------------------------------------------------
+                                                   - MI_V_ZjZ = I_V_Z + I_V_ZjZ
+                                                   - MI_V_FcsZj = I_V_Zj + I_V_FcsZj
+                                                   - MI_S_FcsZj = I_S_Zj + I_S_FcsZj
+                                                   - H() or KLD()
+                
             '''
             
             
