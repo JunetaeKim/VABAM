@@ -423,7 +423,7 @@ class Evaluator ():
             ''' 
             
             ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Zb,    self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
+            Set_Zs = np.concatenate([self.Zbm,    self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
             Set_FCs = np.concatenate([self.FCbm, self.FCbm, self.FCb_Sort, self.FCbm_Sort, self.FCbm]) 
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
