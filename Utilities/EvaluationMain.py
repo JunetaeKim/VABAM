@@ -579,138 +579,177 @@ class Evaluator ():
     
     
     ### -------------------------- Evaluating the performance of the model using only Z inputs  -------------------------- ###
-    def Eval_Z (self, AnalData, SampModel, GenModel, Continue=True, SampZType='ModelRptA',  SecDataType=False):
-
+    def Eval_Z (self, AnalData, SampModel, GenModel, FcLimit=0.05, WindowSize=3, Continue=True ):
+        
         ## Required parameters
         self.AnalData = AnalData             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
-        assert SecDataType in ['FCA','FCR','CONR','CONA', False], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CONR', 'CONA'  or False are valid."
+        self.SecDataType = False             # The ancillary data-type: False means there is no ancillary dataset. 
         
-
-        ## Optional parameters with default values ##
-        # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
-        self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random')
-
-
         ## Intermediate variables
         self.Ndata = len(AnalData) # The dimension size of the data.
         self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
         self.SigDim = AnalData.shape[-1] # The dimension (i.e., length) size of the raw signal.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
-
-
+        
+        
         # Functional trackers
         if Continue == False or not hasattr(self, 'iter'):
             self.sim, self.mini, self.iter = 0, 0, 0
-
+        
             ## Result trackers
-            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[]}
-            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'MI_zPSD_ZjZ':[]}
+            self.SubResDic = {'I_V_Z':[],'I_V_ZjZ':[]}
+            self.AggResDic = {'I_V_Z':[],'I_V_ZjZ':[], 'MI_V_ZjZ':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
-            self.TrackerCand_Temp = {i:{'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
-            self.I_zPSD_Z, self.I_zPSD_ZjZ = 0, 0
+            self.TrackerCand_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.I_V_Z, self.I_V_ZjZ = 0,0
+        
+         
 
-
-
+        
         ### ------------------------------------------------ Task logics ------------------------------------------------ ###
-
+        
         # P(V=v)
-        # Data shape: (N_frequency)
-        self.P_PSPDF = FFT_PSD(self.AnalData, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-
+        ## Data shape: (N_frequency)
+        self.QV_Pop = FFT_PSD(self.AnalData, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+        
+        
         def TaskLogic(SubData):
 
             ### ------------------------------------------------ Sampling ------------------------------------------------ ###
             # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
-            self.NMiniBat = len(SubData)           
+            self.NMiniBat = len(SubData) 
 
             # Sampling Samp_Z 
-            self.Samp_Z = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType, ReparaStdZj=self.ReparaStdZj)
+            ## The values are repeated NGen times after the sampling. 
+            self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
+                        
+            # Selecting Samp_Zjs from Samp_Z 
+            ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
+            self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
 
-            # Selecting Samp_Zj from Samp_Z 
-            ## For Samp_Zj, j is selected randomly across both the j and generation axes.
-            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
+            # Permuting all values repeated NGen times except for the selected ones from Zj.
+            RandBool = self.Zjb == 0
+            self.Zbm = self.Zb.copy()
+            self.Zbm[RandBool] = np.random.permutation(self.Zbm[RandBool])
 
+            # Selecting Samp_Zjs from Samp_Z                 
+            ## Permuting rows and columns of Zbm randomly.
+            self.ZbmARand = self.Zbm[np.random.permutation(self.Zbm.shape[0])][:, np.random.permutation(self.Zbm.shape[1])]
+            self.Zjbm = SamplingZj (self.ZbmARand , self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
 
+            
+            
 
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
+            '''
+            - To maximize the efficiency of GPU utilization, 
+              we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, NFCs) for FCs, respectively, 
+              transforming them to (NMiniBat X NGen, LatDim) and (NMiniBat X NGen, NFCs). 
+              After the computation, we then reverted them back to their original dimensions.
+                       
+                                ## Variable cases for the signal generation ##
+                                
+              # Cases                         # Signal name                       # Target metric
+              1) Zbm               ->         Sig_Zbm                ->           MI() 
+              2) Zjb               ->         Sig_Zjb                ->           MI()
+              3) Zjbm              ->         Sig_Zjbm               ->           H() or KLD()
+                                              * bm = ARand, b=BRpt, St=Sort *
+            ''' 
+            
             ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj])
+            Data = np.concatenate([self.Zbm, self.Zjb, self.Zjbm])            
+
             
             # Choosing GPU or CPU and generating signals
-            Set_Pred  = CompResource (self.GenModel, Set_Zs, BatchSize=self.GenBatchSize, GPU=self.GPU)
+            Set_Pred = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
+
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.SigGen_Z, self.SigGen_Zj = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 2) ]  
+            self.Sig_Zbm, self.Sig_Zjb, self.Sig_Zjbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
 
+ 
 
-
+            ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
+            
+            '''                                        ## Sub-Metric list ##
+                ------------------------------------------------------------------------------------------------------------- 
+                # Sub-metrics    # Function        # Code               # Function           # Code 
+                1) I_V_Z         q(v|Sig_Zbm)     <QV_Zbm>      vs      p(v)                 <QV_Pop>
+                2) I_V_ZjZ       q(v|Sig_Zjb)     <QV_Zjb>      vs      q(v|Sig_Zbm)         <QV_Zbm>
+                3) H()//KLD()    q(v|Sig_Zjbm)    <QV_Zjbm>       
+                
+                                                       
+                                                       ## Metric list ##
+                --------------------------------------------------------------------------------------------------------------
+                                                   - MI_V_ZjZ = I_V_Z + I_V_ZjZ
+                                                   - H() or KLD()                
+            '''
+            
+            
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Return shape: (NMiniBat, N_frequency)
-            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'Sample', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
 
+            # Q(v)s
+            ## Return shape: (NMiniBat, N_frequency)
+            self.QV_Zbm = FFT_PSD(self.Sig_Zbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.QV_Zjb = FFT_PSD(self.Sig_Zjb, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            
+            
+            # Intermediate objects for Q(s) and H(')
+            ## Return shape: (NMiniBat, N_frequency, NGen)
+            self.QV_Zjbm_T = FFT_PSD(self.Sig_Zjbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
+            
+            ## Return shape: (1, N_frequency, NMiniBat)
+            ### Since it is the true PSD, there are no M generations. 
+            self.QV_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
 
 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            # zPSD stands for z-wise power spectral density.
-            I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
-            I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
+            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
+            I_V_Z_ = MeanKLD(self.QV_Zbm, self.QV_Pop[None] ) # I(V;z)
+            I_V_ZjZ_ = MeanKLD(self.QV_Zjb, self.QV_Zbm )  # I(V;z'|z)
+   
 
 
+            print('I(V;z) :', I_V_Z_)
+            self.SubResDic['I_V_Z'].append(I_V_Z_)
+            self.I_V_Z += I_V_Z_
 
-            print('I_zPSD_Z :', I_zPSD_Z_)
-            self.SubResDic['I_zPSD_Z'].append(I_zPSD_Z_)
-            self.I_zPSD_Z += I_zPSD_Z_
-
-            print('I_zPSD_ZjZ :', I_zPSD_ZjZ_)
-            self.SubResDic['I_zPSD_ZjZ'].append(I_zPSD_ZjZ_)
-            self.I_zPSD_ZjZ += I_zPSD_ZjZ_
-
+            print("I(V;z'|z) :", I_V_ZjZ_)
+            self.SubResDic['I_V_ZjZ'].append(I_V_ZjZ_)
+            self.I_V_ZjZ += I_V_ZjZ_
 
 
-            ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            # Return shape: (NMiniBat, NGen, N_frequency)
-            self.SubPSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             
-            # Calculating the entropies given the probability density function of the power spectral.
-            ## This indicates which frequency is most activated in the generated signal.
-            EntH = -np.sum(self.SubPSPDF_Zj * np.log(self.SubPSPDF_Zj), axis=1).ravel()
-
-            # Getting the maximum frequency given the PSD from SigGen_Zj.
-            # The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            # Return shape: (NMiniBat, NGen)
-            MaxFreq = np.argmax(self.SubPSPDF_Zj, axis=1).ravel() + 1
-
-            self.LocCandZsMaxFreq ( MaxFreq, EntH, self.Samp_Zj)
-
+            
+            ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
+            self.LocCandZsMaxFreq ( self.QV_Zjbm_T, self.Zjbm)
+ 
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
             ## item[1] contains tracked Z values and metrics
             self.TrackerCand = {item[0]: {'TrackZs': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackZs']), 
                                    'TrackMetrics': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackMetrics'])} 
                                      for item in self.TrackerCand_Temp.items() if len(item[1]['TrackZs']) > 0} 
-
-
+            
+            
         # Conducting the task iteration
         self.Iteration(TaskLogic)
 
 
         # MI(V;Zj,Z)
-        self.I_zPSD_Z /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
-        self.I_zPSD_ZjZ /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_ZjZ'].append(self.I_zPSD_ZjZ)
-        self.MI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
-        self.AggResDic['MI_zPSD_ZjZ'].append(self.MI_zPSD_ZjZ)
+        self.I_V_Z /= (self.TotalIterSize)
+        self.AggResDic['I_V_Z'].append(self.I_V_Z)
+        self.I_V_ZjZ /= (self.TotalIterSize)
+        self.AggResDic['I_V_ZjZ'].append(self.I_V_ZjZ)
+        self.MI_V_ZjZ = self.I_V_Z + self.I_V_ZjZ             
+        self.AggResDic['MI_V_ZjZ'].append(self.MI_V_ZjZ)
+
         
         
         
