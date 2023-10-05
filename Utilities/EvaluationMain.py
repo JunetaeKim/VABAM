@@ -360,33 +360,22 @@ class Evaluator ():
             ## The values are repeated NGen times after the sampling. 
             self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
+
+            self.Zbm = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelARand', ReparaStdZj=self.ReparaStdZj)
                         
             # Selecting Samp_Zjs from Samp_Z 
             ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
             self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
 
-            # Permuting all values repeated NGen times except for the selected ones from Zj.
-            RandBool = self.Zjb == 0
-            self.Zbm = self.Zb.copy()
-            self.Zbm[RandBool] = np.random.permutation(self.Zbm[RandBool])
-
             # Selecting Samp_Zjs from Samp_Z                 
             ## Permuting rows and columns of Zbm randomly.
-            self.ZbmARand = self.Zbm[np.random.permutation(self.Zbm.shape[0])][:, np.random.permutation(self.Zbm.shape[1])]
-            self.Zjbm = SamplingZj(self.ZbmARand , self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
+            self.Zjbm = self.Zjb.copy()  # Create a copy of Zjb
+            self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
 
             
-            ''' Alternative approach
-            # Sampling Samp_Z 
-            ## The values are repeated NGen times after the sampling. 
-            self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
-
-            # Selecting Samp_Zjs from Samp_Z 
-            ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
-            self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
-            ### The efficient approach for 'Zjbm'; Zb -> Zjbm
-            self.Zjbm = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
+            '''
+            Optimization for the part 'Binding the samples together, generate signals through the model' is needed
             '''
 
             
@@ -423,7 +412,7 @@ class Evaluator ():
             ''' 
             
             ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Zbm,    self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
+            Set_Zs = np.concatenate([self.Zjbm,    self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
             Set_FCs = np.concatenate([self.FCbm, self.FCbm, self.FCb_Sort, self.FCbm_Sort, self.FCbm]) 
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
