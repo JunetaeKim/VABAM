@@ -369,7 +369,6 @@ class Evaluator ():
             self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
 
             # Selecting Samp_Zjs from Samp_Z                 
-            ## Permuting rows and columns of Zbm randomly.
             self.Zjbm = self.Zjb.copy()  # Create a copy of Zjb
             self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
 
@@ -412,8 +411,8 @@ class Evaluator ():
             ''' 
             
             ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Zjbm,    self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
-            Set_FCs = np.concatenate([self.FCbm, self.FCbm, self.FCb_Sort, self.FCbm_Sort, self.FCbm]) 
+            Set_Zs = np.concatenate([self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
+            Set_FCs = np.concatenate([self.FCbm, self.FCb_Sort, self.FCbm_Sort, self.FCbm]) 
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
@@ -423,7 +422,8 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zb_FCbm, self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbSt, self.Sig_Zjb_FCbmSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 5)]  
+            self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbSt, self.Sig_Zjb_FCbmSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
+            self.Sig_Zb_FCbm = self.Sig_Zjbm_FCbm.copy()
 
 
  
