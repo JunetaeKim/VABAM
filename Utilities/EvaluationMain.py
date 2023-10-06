@@ -368,14 +368,10 @@ class Evaluator ():
             ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
             self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
 
-            # Selecting Samp_Zjs from Samp_Z                 
-            self.Zjbm = self.Zjb.copy()  # Create a copy of Zjb
+            # Sampling Samp_Zjs by fixing j            
+            self.Zjbm = self.Zjb.copy()  
+            # Replacing values where Zj is 0 with Zbm
             self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
-
-            
-            '''
-            Optimization for the part 'Binding the samples together, generate signals through the model' is needed
-            '''
 
             
             # Sampling FCs
@@ -423,6 +419,7 @@ class Evaluator ():
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
             self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbSt, self.Sig_Zjb_FCbmSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
+            # Approximating Sig_Zb_FCbm using Sig_Zjbm_FCbm
             self.Sig_Zb_FCbm = self.Sig_Zjbm_FCbm.copy()
 
 
@@ -615,20 +612,18 @@ class Evaluator ():
             ## The values are repeated NGen times after the sampling. 
             self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
+
+            self.Zbm = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelARand', ReparaStdZj=self.ReparaStdZj)
                         
             # Selecting Samp_Zjs from Samp_Z 
             ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
             self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
 
-            # Permuting all values repeated NGen times except for the selected ones from Zj.
-            RandBool = self.Zjb == 0
-            self.Zbm = self.Zb.copy()
-            self.Zbm[RandBool] = np.random.permutation(self.Zbm[RandBool])
-
-            # Selecting Samp_Zjs from Samp_Z                 
-            ## Permuting rows and columns of Zbm randomly.
-            self.ZbmARand = self.Zbm[np.random.permutation(self.Zbm.shape[0])][:, np.random.permutation(self.Zbm.shape[1])]
-            self.Zjbm = SamplingZj (self.ZbmARand , self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='ARand')
+            # Sampling Samp_Zjs by fixing j               
+            self.Zjbm = self.Zjb.copy()  
+            # Replacing values where Zj is 0 with Zbm
+            self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
 
             
             
@@ -643,14 +638,14 @@ class Evaluator ():
                                 ## Variable cases for the signal generation ##
                                 
               # Cases                         # Signal name                       # Target metric
-              1) Zbm               ->         Sig_Zbm                ->           MI() 
+              1) Zb               ->         Sig_Zb                ->           MI() 
               2) Zjb               ->         Sig_Zjb                ->           MI()
               3) Zjbm              ->         Sig_Zjbm               ->           H() or KLD()
                                               * bm = ARand, b=BRpt, St=Sort *
             ''' 
             
             ## Binding the samples together, generate signals through the model 
-            Data = np.concatenate([self.Zbm, self.Zjb, self.Zjbm])            
+            Data = np.concatenate([self.Zjb, self.Zjbm])            
 
             
             # Choosing GPU or CPU and generating signals
@@ -659,17 +654,17 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zbm, self.Sig_Zjb, self.Sig_Zjbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
-
- 
+            self.Sig_Zjb, self.Sig_Zjbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 2)]  
+            # Approximating Sig_Zb_FCbm using Sig_Zjbm_FCbm
+            self.Sig_Zb = self.Sig_Zjbm.copy()
 
             ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
             
             '''                                        ## Sub-Metric list ##
                 ------------------------------------------------------------------------------------------------------------- 
                 # Sub-metrics    # Function        # Code               # Function           # Code 
-                1) I_V_Z         q(v|Sig_Zbm)     <QV_Zbm>      vs      p(v)                 <QV_Pop>
-                2) I_V_ZjZ       q(v|Sig_Zjb)     <QV_Zjb>      vs      q(v|Sig_Zbm)         <QV_Zbm>
+                1) I_V_Z         q(v|Sig_Zb)      <QV_Zb>       vs      p(v)                 <QV_Pop>
+                2) I_V_ZjZ       q(v|Sig_Zjb)     <QV_Zjb>      vs      q(v|Sig_Zb)          <QV_Zb>
                 3) H()//KLD()    q(v|Sig_Zjbm)    <QV_Zjbm>       
                 
                                                        
@@ -684,7 +679,7 @@ class Evaluator ():
 
             # Q(v)s
             ## Return shape: (NMiniBat, N_frequency)
-            self.QV_Zbm = FFT_PSD(self.Sig_Zbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.QV_Zb = FFT_PSD(self.Sig_Zb, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.QV_Zjb = FFT_PSD(self.Sig_Zjb, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             
             
@@ -700,8 +695,8 @@ class Evaluator ():
 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
             # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
-            I_V_Z_ = MeanKLD(self.QV_Zbm, self.QV_Pop[None] ) # I(V;z)
-            I_V_ZjZ_ = MeanKLD(self.QV_Zjb, self.QV_Zbm )  # I(V;z'|z)
+            I_V_Z_ = MeanKLD(self.QV_Zb, self.QV_Pop[None] ) # I(V;z)
+            I_V_ZjZ_ = MeanKLD(self.QV_Zjb, self.QV_Zb )  # I(V;z'|z)
    
 
 
@@ -739,8 +734,6 @@ class Evaluator ():
         self.MI_V_ZjZ = self.I_V_Z + self.I_V_ZjZ             
         self.AggResDic['MI_V_ZjZ'].append(self.MI_V_ZjZ)
 
-        
-        
         
         
         
