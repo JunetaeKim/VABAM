@@ -401,14 +401,13 @@ class Evaluator ():
               1) Zb + FCbm               ->         Sig_Zb_FCbm         ->          MI() 
               2) Zjb + FCbm              ->         Sig_Zjb_FCbm        ->          MI()
               3) Zjb + FCb_Sort          ->         Sig_Zjb_FCbSt       ->          MI()
-              4) Zjb + FCbm_Sort         ->         Sig_Zjb_FCbmSt      ->          MI()
-              5) Zjbm + FCbm             ->         Sig_Zjbm_FCbm       ->          H() or KLD()
+              4) Zjbm + FCbm             ->         Sig_Zjbm_FCbm       ->          H() or KLD()
                                                     * bm = ARand, b=BRpt, St=Sort *
             ''' 
             
             ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Zjb,  self.Zjb,      self.Zjb,       self.Zjbm])            
-            Set_FCs = np.concatenate([self.FCbm, self.FCb_Sort, self.FCbm_Sort, self.FCbm]) 
+            Set_Zs = np.concatenate([self.Zjb,  self.Zjb,        self.Zjbm])            
+            Set_FCs = np.concatenate([self.FCbm, self.FCb_Sort,  self.FCbm]) 
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
@@ -418,7 +417,7 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbSt, self.Sig_Zjb_FCbmSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
+            self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
             # Approximating Sig_Zb_FCbm using Sig_Zjbm_FCbm
             self.Sig_Zb_FCbm = self.Sig_Zjbm_FCbm.copy()
 
