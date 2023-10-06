@@ -333,12 +333,12 @@ class Evaluator ():
             self.sim, self.mini, self.iter = 0, 0, 0
         
             ## Result trackers
-            self.SubResDic = {'I_V_Z':[],'I_V_ZjZ':[],'I_V_Zj':[],'I_V_FcsZj':[],'I_S_Zj':[],'I_S_FcsZj':[]}
-            self.AggResDic = {'I_V_Z':[],'I_V_ZjZ':[],'I_V_Zj':[],'I_V_FcsZj':[],'I_S_Zj':[],'I_S_FcsZj':[], 
-                         'MI_V_ZjZ':[], 'MI_V_FcsZj':[], 'MI_S_FcsZj':[]}
+            self.SubResDic = {'I_V_Z':[],'I_V_ZjZ':[],'I_V_Zj':[],'I_V_FCsZj':[],'I_S_Zj':[],'I_S_FCsZj':[]}
+            self.AggResDic = {'I_V_Z':[],'I_V_ZjZ':[],'I_V_Zj':[],'I_V_FCsZj':[],'I_S_Zj':[],'I_S_FCsZj':[], 
+                         'MI_V_ZjZ':[], 'MI_V_FCsZj':[], 'MI_S_FCsZj':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCand_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
-            self.I_V_Z, self.I_V_ZjZ, self.I_V_Zj, self.I_V_FcsZj, self.I_S_Zj, self.I_S_FcsZj = 0,0,0,0,0,0
+            self.I_V_Z, self.I_V_ZjZ, self.I_V_Zj, self.I_V_FCsZj, self.I_S_Zj, self.I_S_FCsZj = 0,0,0,0,0,0
         
          
 
@@ -434,10 +434,10 @@ class Evaluator ():
                 2) I_V_ZjZ      q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     q(v|Sig_Zb_FCbm)     <QV_Zb_FCbm>
                 
                 3) I_V_Zj       q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     p(v)                 <QV_Pop>
-                4) I_V_FcsZj    q(v|Sig_Zjb_FCbSt)    <QV_Zjb_FCbSt>        vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
+                4) I_V_FCsZj    q(v|Sig_Zjb_FCbSt)    <QV_Zjb_FCbSt>        vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
                 
                 5) I_S_Zj       q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                 <QV//QS_Batch>
-                6) I_S_FcsZj    q(s|Sig_Zjb_FCbSt)    <QV//QS_Zjb_FCbSt>    vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
+                6) I_S_FCsZj    q(s|Sig_Zjb_FCbSt)    <QV//QS_Zjb_FCbSt>    vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
 
                 7) H()//KLD()   q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
                 
@@ -445,8 +445,8 @@ class Evaluator ():
                                                        ## Metric list ##
                 --------------------------------------------------------------------------------------------------------------
                                                    - MI_V_ZjZ = I_V_Z + I_V_ZjZ
-                                                   - MI_V_FcsZj = I_V_Zj + I_V_FcsZj
-                                                   - MI_S_FcsZj = I_S_Zj + I_S_FcsZj
+                                                   - MI_V_FCsZj = I_V_Zj + I_V_FCsZj
+                                                   - MI_S_FCsZj = I_S_Zj + I_S_FCsZj
                                                    - H() or KLD()
                 
             '''
@@ -489,9 +489,9 @@ class Evaluator ():
             I_V_Z_ = MeanKLD(self.QV_Zb_FCbm, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb_FCbm, self.QV_Zb_FCbm )  # I(V;z'|z)
             I_V_Zj_ =  MeanKLD(self.QV_Zjb_FCbm, self.QV_Pop[None] ) # I(V;z')
-            I_V_FcsZj_ = MeanKLD(self.QV_Zjb_FCbSt, self.QV_Zjb_FCbm ) # I(V;fc'|z')
+            I_V_FCsZj_ = MeanKLD(self.QV_Zjb_FCbSt, self.QV_Zjb_FCbm ) # I(V;fc'|z')
             I_S_Zj_ = MeanKLD(self.QS_Zjb_FCbm, self.QS_Batch) # I(S;z')
-            I_S_FcsZj_ = MeanKLD(self.QS_Zjb_FCbSt, self.QS_Zjb_FCbm) # I(S;fc'|z')
+            I_S_FCsZj_ = MeanKLD(self.QS_Zjb_FCbSt, self.QS_Zjb_FCbm) # I(S;fc'|z')
 
 
             print('I(V;z) :', I_V_Z_)
@@ -506,17 +506,17 @@ class Evaluator ():
             self.SubResDic['I_V_Zj'].append(I_V_Zj_)
             self.I_V_Zj += I_V_Zj_
 
-            print("I(V;fc'|z') :", I_V_FcsZj_)
-            self.SubResDic['I_V_FcsZj'].append(I_V_FcsZj_)
-            self.I_V_FcsZj += I_V_FcsZj_
+            print("I(V;fc'|z') :", I_V_FCsZj_)
+            self.SubResDic['I_V_FCsZj'].append(I_V_FCsZj_)
+            self.I_V_FCsZj += I_V_FCsZj_
 
             print("I(S;z') :", I_S_Zj_)
             self.SubResDic['I_S_Zj'].append(I_S_Zj_)
             self.I_S_Zj += I_S_Zj_
 
-            print("I(S;fc'|z') :", I_S_FcsZj_)
-            self.SubResDic['I_S_FcsZj'].append(I_S_FcsZj_)
-            self.I_S_FcsZj += I_S_FcsZj_
+            print("I(S;fc'|z') :", I_S_FCsZj_)
+            self.SubResDic['I_S_FCsZj'].append(I_S_FCsZj_)
+            self.I_S_FCsZj += I_S_FCsZj_
             
             
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
@@ -546,18 +546,18 @@ class Evaluator ():
         # MI(V;FC,Zj)
         self.I_V_Zj /= (self.TotalIterSize)
         self.AggResDic['I_V_Zj'].append(self.I_V_Zj)
-        self.I_V_FcsZj /= (self.TotalIterSize)
-        self.AggResDic['I_V_FcsZj'].append(self.I_V_FcsZj)
-        self.MI_V_FcsZj = self.I_V_Zj + self.I_V_FcsZj       
-        self.AggResDic['MI_V_FcsZj'].append(self.MI_V_FcsZj)
+        self.I_V_FCsZj /= (self.TotalIterSize)
+        self.AggResDic['I_V_FCsZj'].append(self.I_V_FCsZj)
+        self.MI_V_FCsZj = self.I_V_Zj + self.I_V_FCsZj       
+        self.AggResDic['MI_V_FCsZj'].append(self.MI_V_FCsZj)
 
         # MI(VE;FCa,Zj) 
         self.I_S_Zj /= (self.TotalIterSize)
         self.AggResDic['I_S_Zj'].append(self.I_S_Zj)
-        self.I_S_FcsZj /= (self.TotalIterSize)
-        self.AggResDic['I_S_FcsZj'].append(self.I_S_FcsZj)
-        self.MI_S_FcsZj = self.I_S_Zj + self.I_S_FcsZj
-        self.AggResDic['MI_S_FcsZj'].append(self.MI_S_FcsZj)
+        self.I_S_FCsZj /= (self.TotalIterSize)
+        self.AggResDic['I_S_FCsZj'].append(self.I_S_FCsZj)
+        self.MI_S_FCsZj = self.I_S_Zj + self.I_S_FCsZj
+        self.AggResDic['MI_S_FCsZj'].append(self.MI_S_FCsZj)
 
         
         
