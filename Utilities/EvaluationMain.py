@@ -380,8 +380,6 @@ class Evaluator ():
             self.FCbm = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='ARand', FcLimit = self.FcLimit)
             # Generating FC values randomly across the batch and fc axes, and then repeat them NGen times.
             self.FCb = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='BRpt', FcLimit = self.FcLimit)
-            # Sorting the FC values in ascending order at the generation index.
-            self.FCbm_Sort = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, FCexist=self.FCbm, SampFCType='Sort', FcLimit = self.FcLimit)
             # Sorting the arranged FC values in ascending order at the generation index.
             self.FCb_Sort = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, FCexist=self.FCb, SampFCType='Sort', FcLimit = self.FcLimit)
 
