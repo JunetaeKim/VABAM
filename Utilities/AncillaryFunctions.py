@@ -226,7 +226,7 @@ def GenConArange (ConData, NGen):
     UniqPSPDF = np.unique(ArgMaxP_PSPDF)
     NIter = NGen // len(UniqPSPDF)
 
-    # Selecting one row index for each unique value, repeated for NIter times and ensure the total number of selected indices matches NGen
+    # Selecting one row index for each unique value, repeated for NIter times and ensuring the total number of selected indices matches NGen
     SelIDX = np.concatenate([np.random.permutation(SortIDX[SortIDX[:, 1] == psd])[:1] for psd in UniqPSPDF for _ in range(NIter)], axis=0)
     SelIDX = np.vstack((SelIDX, np.random.permutation(SortIDX)[:NGen - len(SelIDX)]))
 
