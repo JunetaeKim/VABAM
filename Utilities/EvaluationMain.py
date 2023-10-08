@@ -136,10 +136,10 @@ class Evaluator ():
 
                 # Check the types of ancillary data fed into the sampler model and define the pipeline accordingly.
                 if self.SecDataType == 'CONR' or self.SecDataType == 'CONA' : 
-                    SplitData = [np.array_split(sub, self.SubIterSize) for sub in self.AnalData]   
+                    SplitData = [np.array_split(sub, self.SubIterSize) for sub in self.AnalSig]   
 
                 else: # For models with a single input such as VAE and TCVAE.
-                    SplitData = np.array_split(self.AnalData, self.SubIterSize)    
+                    SplitData = np.array_split(self.AnalSig, self.SubIterSize)    
 
                 for mini in range(self.mini, self.SubIterSize):
                     self.mini = mini
@@ -207,11 +207,11 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, PostSamp=None, AnalData=None, SecDataType=None, RepeatSize=1, PlotDist=True):
+    def KLD_TrueGen (self, PostSamp=None, AnalSig=None, SecDataType=None, RepeatSize=1, PlotDist=True):
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
-        # AnalData: The raw true signals for obtaining the population PSD.    
+        # AnalSig: The raw true signals for obtaining the population PSD.    
         
         ## Optional parameters
         # RepeatSize: The number of iterations to repetitively generate identical PostSampZ; 
@@ -224,7 +224,7 @@ class Evaluator ():
         
         # Setting arguments
         PostSamp = self.PostSamp if PostSamp is None else PostSamp
-        AnalData = self.AnalData if AnalData is None else AnalData
+        AnalSig = self.AnalSig if AnalSig is None else AnalSig
         SecDataType = self.SecDataType if SecDataType is None else SecDataType
         
         # Converting the dictionary to the list type.
@@ -273,9 +273,9 @@ class Evaluator ():
         # Calculating the KLD between the PSD of the true signals and the generated signals    
         PSDGenSamp =  FFT_PSD(self.GenSamp, 'All', MinFreq = self.MinFreq, MaxFreq = self.MaxFreq)
         if SecDataType == 'CONA' or SecDataType == 'CONR'  : # Conditional inputs such as power spectral density
-            PSDTrueData =  FFT_PSD(AnalData[0], 'All', MinFreq = self.MinFreq, MaxFreq = self.MaxFreq)
+            PSDTrueData =  FFT_PSD(AnalSig[0], 'All', MinFreq = self.MinFreq, MaxFreq = self.MaxFreq)
         else:
-            PSDTrueData =  FFT_PSD(AnalData, 'All', MinFreq = self.MinFreq, MaxFreq = self.MaxFreq)
+            PSDTrueData =  FFT_PSD(AnalSig, 'All', MinFreq = self.MinFreq, MaxFreq = self.MaxFreq)
             
         self.KldPSD_GenTrue = MeanKLD(PSDGenSamp, PSDTrueData)
         self.KldPSD_TrueGen  = MeanKLD(PSDTrueData, PSDGenSamp)
@@ -300,10 +300,10 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCA',  Continue=True ):
+    def Eval_ZFC (self, AnalSig, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCA',  Continue=True ):
         
         ## Required parameters
-        self.AnalData = AnalData             # The data to be used for analysis.
+        self.AnalSig = AnalSig             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         
@@ -320,10 +320,10 @@ class Evaluator ():
         
         
         ## Intermediate variables
-        self.Ndata = len(AnalData) # The dimension size of the data.
+        self.Ndata = len(AnalSig) # The dimension size of the data.
         self.NFCs = GenModel.get_layer('Inp_FCEach').output.shape[-1] + GenModel.get_layer('Inp_FCCommon').output.shape[-1] # The dimension size of FCs.
         self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
-        self.SigDim = AnalData.shape[-1] # The dimension (i.e., length) size of the raw signal.
+        self.SigDim = AnalSig.shape[-1] # The dimension (i.e., length) size of the raw signal.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
         
@@ -347,7 +347,7 @@ class Evaluator ():
         
         # P(V=v)
         ## Data shape: (N_frequency)
-        self.QV_Pop = FFT_PSD(self.AnalData, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+        self.QV_Pop = FFT_PSD(self.AnalSig, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
         
         
         def TaskLogic(SubData):
@@ -562,18 +562,18 @@ class Evaluator ():
     
     
     ### -------------------------- Evaluating the performance of the model using only Z inputs  -------------------------- ###
-    def Eval_Z (self, AnalData, SampModel, GenModel, FcLimit=0.05, WindowSize=3, Continue=True ):
+    def Eval_Z (self, AnalSig, SampModel, GenModel, FcLimit=0.05, WindowSize=3, Continue=True ):
         
         ## Required parameters
-        self.AnalData = AnalData             # The data to be used for analysis.
+        self.AnalSig = AnalSig             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         self.SecDataType = False             # The ancillary data-type: False means there is no ancillary dataset. 
         
         ## Intermediate variables
-        self.Ndata = len(AnalData) # The dimension size of the data.
+        self.Ndata = len(AnalSig) # The dimension size of the data.
         self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
-        self.SigDim = AnalData.shape[-1] # The dimension (i.e., length) size of the raw signal.
+        self.SigDim = AnalSig.shape[-1] # The dimension (i.e., length) size of the raw signal.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
         
@@ -596,7 +596,7 @@ class Evaluator ():
         
         # P(V=v)
         ## Data shape: (N_frequency)
-        self.QV_Pop = FFT_PSD(self.AnalData, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+        self.QV_Pop = FFT_PSD(self.AnalSig, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
         
         
         def TaskLogic(SubData):
@@ -738,10 +738,10 @@ class Evaluator ():
         
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_ZCON (self, AnalData, SampModel, GenModel,  WindowSize=3, SampZType='ModelRptA', SecDataType=None, Continue=True):
+    def Eval_ZCON (self, AnalSig, SampModel, GenModel,  WindowSize=3, SampZType='ModelRptA', SecDataType=None, Continue=True):
         
         ## Required parameters
-        self.AnalData = AnalData             # The data to be used for analysis.
+        self.AnalSig = AnalSig             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         
@@ -759,10 +759,10 @@ class Evaluator ():
         
 
         ## Intermediate variables
-        self.Ndata = len(AnalData[0]) # The dimension size of the data.
+        self.Ndata = len(AnalSig[0]) # The dimension size of the data.
         self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
-        self.SigDim = AnalData[0].shape[-1] # The dimension (i.e., length) size of the raw signal.
-        self.CondDim = AnalData[1].shape[-1] # The dimension size of the conditional inputs.
+        self.SigDim = AnalSig[0].shape[-1] # The dimension (i.e., length) size of the raw signal.
+        self.CondDim = AnalSig[1].shape[-1] # The dimension size of the conditional inputs.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
         
@@ -788,7 +788,7 @@ class Evaluator ():
         
         # P(V=v)
         ## Data shape: (N_frequency)
-        self.P_PSPDF = FFT_PSD(self.AnalData[0], 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+        self.P_PSPDF = FFT_PSD(self.AnalSig[0], 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
         
         
         def TaskLogic(SubData):
@@ -813,12 +813,12 @@ class Evaluator ():
             
             # Processing Conditional information 
             ## Generating CON_Arange
-            CON_Arange = GenConArange(self.AnalData[1], self.NGen)
+            CON_Arange = GenConArange(self.AnalSig[1], self.NGen)
             self.CON_Arange = np.tile(CON_Arange[None], (self.NMiniBat, 1,1)).reshape(self.NMiniBat*self.NGen, -1)
                         
             ## Generating CONRand
             #self.CONRand = np.random.rand(self.NMiniBat * self.NGen, self.CondDim)
-            CONRand = np.random.permutation(self.AnalData[1])[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
+            CONRand = np.random.permutation(self.AnalSig[1])[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
             self.CONRand= np.random.permutation(CONRand.T).T
             
             
