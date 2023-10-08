@@ -136,7 +136,7 @@ class Evaluator ():
 
                 # Check the types of ancillary data fed into the sampler model and define the pipeline accordingly.
                 if self.SecDataType == 'CONR' or self.SecDataType == 'CONA' : 
-                    SplitData = [np.array_split(sub, self.SubIterSize) for sub in self.AnalSig]   
+                    SplitData = [np.array_split(sub, self.SubIterSize) for sub in (self.AnalSig, self.TrueCond)] 
 
                 else: # For models with a single input such as VAE and TCVAE.
                     SplitData = np.array_split(self.AnalSig, self.SubIterSize)    
