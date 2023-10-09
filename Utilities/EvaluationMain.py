@@ -305,8 +305,8 @@ class Evaluator ():
         ## Optional parameters with default values ##
         # WindowSize: The window size when calculating the permutation sets (default: 3)
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
-        self.FcLimit = FcLimit               # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+        self.FcLimit = FcLimit           # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
+        self.SecDataType = SecDataType   # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
         
         
         
@@ -523,7 +523,7 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # MI(V;Zj,Z)
+        # MI(V;Z',Z)
         self.I_V_Z /= (self.TotalIterSize)
         self.AggResDic['I_V_Z'].append(self.I_V_Z)
         self.I_V_ZjZ /= (self.TotalIterSize)
@@ -531,7 +531,7 @@ class Evaluator ():
         self.MI_V_ZjZ = self.I_V_Z + self.I_V_ZjZ             
         self.AggResDic['MI_V_ZjZ'].append(self.MI_V_ZjZ)
 
-        # MI(V;FC,Zj)
+        # MI(V;FC,Z')
         self.I_V_Zj /= (self.TotalIterSize)
         self.AggResDic['I_V_Zj'].append(self.I_V_Zj)
         self.I_V_FCsZj /= (self.TotalIterSize)
@@ -539,7 +539,7 @@ class Evaluator ():
         self.MI_V_FCsZj = self.I_V_Zj + self.I_V_FCsZj       
         self.AggResDic['MI_V_FCsZj'].append(self.MI_V_FCsZj)
 
-        # MI(VE;FCa,Zj) 
+        # MI(VE;FC',Z') 
         self.I_S_Zj /= (self.TotalIterSize)
         self.AggResDic['I_S_Zj'].append(self.I_S_Zj)
         self.I_S_FCsZj /= (self.TotalIterSize)
@@ -714,7 +714,7 @@ class Evaluator ():
         self.Iteration(TaskLogic)
 
 
-        # MI(V;Zj,Z)
+        # MI(V;Z',Z)
         self.I_V_Z /= (self.TotalIterSize)
         self.AggResDic['I_V_Z'].append(self.I_V_Z)
         self.I_V_ZjZ /= (self.TotalIterSize)
@@ -729,12 +729,11 @@ class Evaluator ():
         
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_ZCON (self, AnalSig, SampModel, GenModel,  WindowSize=3, SampZType='ModelRptA', SecDataType=None, Continue=True):
+    def Eval_ZCON (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType=None,  Continue=True ):
         
         ## Required parameters
-        self.AnalSig = AnalSig             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
-        self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
+        self.GenModel = GenModel             # The model that generates signals based on given Zs and Cons.
         
         assert SecDataType in ['FCIN','CONDIN', False], "Please verify the value of 'SecDataType'. Only 'FCIN', 'CONDIN'  or False are valid."
         
@@ -743,16 +742,17 @@ class Evaluator ():
         ## Optional parameters with default values ##
         # WindowSize: The window size when calculating the permutation sets (default: 3).
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True).
-        self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random').
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+        self.SecDataType = SecDataType   # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
         
         
 
         ## Intermediate variables
-        self.Ndata = len(AnalSig[0]) # The dimension size of the data.
+        self.AnalSig = AnalData[0]  # The raw true signals to be used for analysis.
+        self.TrueCond = AnalData[1] # The raw true PSD to be used for analysis.
+        self.Ndata = len(self.AnalSig) # The dimension size of the data.
         self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
-        self.SigDim = AnalSig[0].shape[-1] # The dimension (i.e., length) size of the raw signal.
-        self.CondDim = AnalSig[1].shape[-1] # The dimension size of the conditional inputs.
+        self.SigDim =  self.AnalSig.shape[-1] # The dimension (i.e., length) size of the raw signal.
+        self.CondDim = self.TrueCond.shape[-1] # The dimension size of the conditional inputs.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
         
@@ -764,151 +764,207 @@ class Evaluator ():
             self.sim, self.mini, self.iter = 0, 0, 0
         
             ## Result trackers
-            self.SubResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[]}
-            self.AggResDic = {'I_zPSD_Z':[],'I_zPSD_ZjZ':[],'I_zPSD_ZjCr':[],'I_zPSD_CaZj':[],'I_fcPE_ZjCr':[],'I_fcPE_CaZj':[], 
-                              'MI_zPSD_ZjZ':[], 'MI_zPSD_CrZj':[], 'MI_fcPE_CaCr':[]}
+            self.SubResDic = {'I_V_Z':[],'I_V_ZjZ':[],'I_V_Zj':[],'I_V_CONsZj':[],'I_S_Zj':[],'I_S_CONsZj':[]}
+            self.AggResDic = {'I_V_Z':[],'I_V_ZjZ':[],'I_V_Zj':[],'I_V_CONsZj':[],'I_S_Zj':[],'I_S_CONsZj':[], 
+                         'MI_V_ZjZ':[], 'MI_V_CONsZj':[], 'MI_S_CONsZj':[]}
             self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
             self.TrackerCand_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
-            self.I_zPSD_Z, self.I_zPSD_ZjZ, self.I_zPSD_ZjCr, self.I_zPSD_CaZj, self.I_fcPE_ZjCr, self.I_fcPE_CaZj = 0,0,0,0,0,0
+            self.I_V_Z, self.I_V_ZjZ, self.I_V_Zj, self.I_V_CONsZj, self.I_S_Zj, self.I_S_CONsZj = 0,0,0,0,0,0
         
+         
+
         
-
-
         ### ------------------------------------------------ Task logics ------------------------------------------------ ###
         
         # P(V=v)
         ## Data shape: (N_frequency)
-        self.P_PSPDF = FFT_PSD(self.AnalSig[0], 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+        self.QV_Pop = FFT_PSD(self.AnalSig, 'All', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
         
         
         def TaskLogic(SubData):
-            
-            
 
             ### ------------------------------------------------ Sampling ------------------------------------------------ ###
             # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
             self.NMiniBat = len(SubData[0]) 
+            self.SubCond = SubData[1]
 
             # Sampling Samp_Z 
-            self.Samp_Z = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType=self.SampZType, SecDataType=self.SecDataType)
-            
-            # Selecting Samp_Zj from Samp_Z 
-            ## For Samp_Zj, j is selected randomly across both the j and generation axes.
-            self.Samp_Zj = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='AllRand')
-            
-            ## For Samp_ZjRPT, the same j is selected NGen times in all generations within a mini-batch.
-            self.Samp_ZjRPT = SamplingZj (self.Samp_Z, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='RptBat')
-  
+            ## The values are repeated NGen times after the sampling. 
+            self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, SecDataType='CONDIN',
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
+
+            self.Zbm = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, SecDataType='CONDIN',
+                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelARand', ReparaStdZj=self.ReparaStdZj)
+                        
+            # Selecting Samp_Zjs from Samp_Z 
+            ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
+            self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
+
+            # Sampling Samp_Zjs by fixing j            
+            self.Zjbm = self.Zjb.copy()  
+            # Replacing values where Zj is 0 with Zbm
+            self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
+
+
             
             # Processing Conditional information 
-            ## Generating CON_Arange
-            CON_Arange = GenConArange(self.AnalSig[1], self.NGen)
-            self.CON_Arange = np.tile(CON_Arange[None], (self.NMiniBat, 1,1)).reshape(self.NMiniBat*self.NGen, -1)
-                        
-            ## Generating CONRand
-            #self.CONRand = np.random.rand(self.NMiniBat * self.NGen, self.CondDim)
-            CONRand = np.random.permutation(self.AnalSig[1])[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
-            self.CONRand= np.random.permutation(CONRand.T).T
-            
-            
-            
+            ## Generating CONb_Sort (NMiniBat x NGen, CondDim)
+            ### Generating random indices for selecting true conditions
+            RandSelIDX = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat)
+            ### Selecting the true conditions using the generated indices
+            SelTrueCond = self.TrueCond[RandSelIDX]
+            ### Identifying the index of maximum frequency for each selected condition
+            MaxFreqSelCond = np.argmax(SelTrueCond, axis=-1)
+            ### Sorting the selected conditions by their maximum frequency
+            Idx_MaxFreqSelCond = np.argsort(MaxFreqSelCond)
+            CONb_Sort_Tmp = SelTrueCond[Idx_MaxFreqSelCond]
+            ### Repeating the sorted conditions by NGen times
+            self.CONb_Sort = np.repeat(CONb_Sort_Tmp,  self.NGen, axis=0)
+
+
+            ## Generating CONbm (NMiniBat x NGen, CondDim) by random Shuffling on both axes 
+            ### Shuffling the conditional data, self.TrueCond along the first axis, and selecting elements of size of NMiniBat x NGen using random indices.
+            CONbm = np.random.permutation(self.TrueCond)[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
+            ### Shuffling the columns of CONbm by permuting them along the first axis and then transposing back to the original shape.
+            self.CONbm= np.random.permutation(CONbm.T).T
+
+
+
+
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
             '''
             - To maximize the efficiency of GPU utilization, 
-              we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, NFCs) for FCs, respectively, 
-              transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, NFCs). 
+              we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, CondDim) for CONs, respectively, 
+              transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, CondDim). 
               After the computation, we then reverted them back to their original dimensions.
-            '''
+                       
+                                ## Variable cases for the signal generation ##
+                                
+              # Cases                               # Signal name                   # Target metric
+              1) Zb + CONbm               ->         Sig_Zb_CONbm         ->          MI() 
+              2) Zjb + CONbm              ->         Sig_Zjb_CONbm        ->          MI()
+              3) Zjb + CONb_Sort          ->         Sig_Zjb_CONbSt       ->          MI()
+              4) Zjbm + CONbm             ->         Sig_Zjbm_CONbm       ->          H() or KLD()
+                                                    * bm = ARand, b=BRpt, St=Sort *
+            ''' 
             
             ## Binding the samples together, generate signals through the model 
-            Set_CONs = np.concatenate([self.CONRand,  self.CONRand, self.CONRand, self.CON_Arange])
-            Set_Zs = np.concatenate([self.Samp_Z, self.Samp_Zj, self.Samp_ZjRPT, self.Samp_ZjRPT ])
+            Set_Zs = np.concatenate([self.Zjb,  self.Zjb,        self.Zjbm])            
+            Set_CONs = np.concatenate([self.CONbm, self.CONb_Sort,  self.CONbm]) 
             Data = [Set_Zs, Set_CONs]
-            
-            
+
+
             # Choosing GPU or CPU and generating signals
-            Set_Pred  = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
+            Set_Pred = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
+
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            # Shape of each generation: NMiniBat, NGen, SigDim
-            self.SigGen_Z, self.SigGen_Zj, self.SigGen_ZjRptCONr, self.SigGen_ZjRptCONa = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 4)]  
+            self.Sig_Zjb_CONbm, self.Sig_Zjb_CONbSt, self.Sig_Zjbm_CONbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
+            # Approximating Sig_Zb_CONbm using Sig_Zjbm_CONbm
+            self.Sig_Zb_CONbm = self.Sig_Zjbm_CONbm.copy()
 
 
 
-            ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Return shape: (NMiniBat, N_frequency)
-            self.Q_PSPDF_Z = FFT_PSD(self.SigGen_Z, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.Q_PSPDF_Zj = FFT_PSD(self.SigGen_Zj, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.Q_PSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.Q_PSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+ 
 
-            # Return shape: (NMiniBat, N_frequency, NGen)
-            self.SubPSPDF_ZjRptCONr = FFT_PSD(self.SigGen_ZjRptCONr, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
-            self.SubPSPDF_ZjRptCONa = FFT_PSD(self.SigGen_ZjRptCONa, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
-
-            # Return shape: (1, N_frequency, NMiniBat)
-            ## Since it is the true PSD, there are no M generations. 
-            self.SubPSPDF_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
-                        
+            ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
             
+            '''                                        ## Sub-Metric list ##
+                ------------------------------------------------------------------------------------------------------------- 
+                # Sub-metrics   # Function            # Code                       # Function           # Code 
+                1) I_V_Z        q(v|Sig_Zb_CONbm)      <QV_Zb_CONbm>          vs     p(v)                 <QV_Pop>
+                2) I_V_ZjZ      q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     q(v|Sig_Zb_CONbm)     <QV_Zb_CONbm>
+                
+                3) I_V_Zj       q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     p(v)                 <QV_Pop>
+                4) I_V_CONsZj   q(v|Sig_Zjb_CONbSt)    <QV_Zjb_CONbSt>        vs     q(v|Sig_Zjb_CONbm)    <QV_Zjb_CONbm>
+                
+                5) I_S_Zj       q(s|Sig_Zjb_CONbm)     <QV//QS_Zjb_CONbm>     vs     p(s)                 <QV//QS_Batch>
+                6) I_S_CONsZj   q(s|Sig_Zjb_CONbSt)    <QV//QS_Zjb_CONbSt>    vs     q(s|Sig_Zjb_CONbm)    <QV//QS_Zjb_CONbm>
+
+                7) H()//KLD()   q(v|Sig_Zjbm_CONbm)    <QV_Zjbm_CONbm>       
+                
+                                                       
+                                                       ## Metric list ##
+                --------------------------------------------------------------------------------------------------------------
+                                                   - MI_V_ZjZ = I_V_Z + I_V_ZjZ
+                                                   - MI_V_CONsZj = I_V_Zj + I_V_CONsZj
+                                                   - MI_S_CONsZj = I_S_Zj + I_S_CONsZj
+                                                   - H() or KLD()
+                
+            '''
+            
+            
+            ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
+            # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
+            QV_Zjb_CONbm_ = FFT_PSD(self.Sig_Zjb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            QV_Zjb_CONbSt_ = FFT_PSD(self.Sig_Zjb_CONbSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            
+
+            # Q(v)s
+            ## Return shape: (NMiniBat, N_frequency)
+            self.QV_Zb_CONbm = FFT_PSD(self.Sig_Zb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
+            self.QV_Zjb_CONbm = QV_Zjb_CONbm_.mean(axis=1)
+            self.QV_Zjb_CONbSt = QV_Zjb_CONbSt_.mean(axis=1)
+
+            
+            # Intermediate objects for Q(s) and H(')
+            ## Return shape: (NMiniBat, N_frequency, NGen)
+            self.QV_Zjb_CONbm_T = QV_Zjb_CONbm_.transpose(0,2,1)
+            self.QV_Zjb_CONbSt_T = QV_Zjb_CONbSt_.transpose(0,2,1)
+            self.QV_Zjbm_CONbm_T = FFT_PSD(self.Sig_Zjbm_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
+
+            
+            ## Return shape: (1, N_frequency, NMiniBat)
+            ### Since it is the true PSD, there are no M generations. 
+            self.QV_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
+
+
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
-            self.Q_PDPSD_ZjRptCONr = ProbPermutation(self.SubPSPDF_ZjRptCONr, WindowSize=WindowSize)
-            self.Q_PDPSD_ZjRptCONa = ProbPermutation(self.SubPSPDF_ZjRptCONa, WindowSize=WindowSize)
-            self.Q_PDPSD_Batch = ProbPermutation(self.SubPSPDF_Batch, WindowSize=WindowSize)
-            
-            
-            
+            self.QS_Zjb_CONbm = ProbPermutation(self.QV_Zjb_CONbm_T, WindowSize=WindowSize)
+            self.QS_Zjb_CONbSt = ProbPermutation(self.QV_Zjb_CONbSt_T, WindowSize=WindowSize)
+            self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
+
+                
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            # zPSD stands for z-wise power spectral density.
-            I_zPSD_Z_ = MeanKLD(self.Q_PSPDF_Z, self.P_PSPDF[None] ) # I(zPSD;Z)
-            I_zPSD_ZjZ_ = MeanKLD(self.Q_PSPDF_Zj, self.Q_PSPDF_Z )  # I(zPSD;Zj|Z)
-            I_zPSD_ZjCr_ =  MeanKLD(self.Q_PSPDF_ZjRptCONr, self.P_PSPDF[None] ) # I(zPSD;Zj)
-            I_zPSD_CaZj_ = MeanKLD(self.Q_PSPDF_ZjRptCONa, self.Q_PSPDF_ZjRptCONr ) # I(zPSD;CON|Zj)
-            I_fcPE_ZjCr_ = MeanKLD(self.Q_PDPSD_ZjRptCONr, self.Q_PDPSD_Batch) # I(fcPE;CONr,Zj)
-            I_fcPE_CaZj_ = MeanKLD(self.Q_PDPSD_ZjRptCONa, self.Q_PDPSD_ZjRptCONr) # I(fcPE;CONa,Zj)
+            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
+            I_V_Z_ = MeanKLD(self.QV_Zb_CONbm, self.QV_Pop[None] ) # I(V;z)
+            I_V_ZjZ_ = MeanKLD(self.QV_Zjb_CONbm, self.QV_Zb_CONbm )  # I(V;z'|z)
+            I_V_Zj_ =  MeanKLD(self.QV_Zjb_CONbm, self.QV_Pop[None] ) # I(V;z')
+            I_V_CONsZj_ = MeanKLD(self.QV_Zjb_CONbSt, self.QV_Zjb_CONbm ) # I(V;con'|z')
+            I_S_Zj_ = MeanKLD(self.QS_Zjb_CONbm, self.QS_Batch) # I(S;z')
+            I_S_CONsZj_ = MeanKLD(self.QS_Zjb_CONbSt, self.QS_Zjb_CONbm) # I(S;con'|z')
 
 
-            print('I_zPSD_Z :', I_zPSD_Z_)
-            self.SubResDic['I_zPSD_Z'].append(I_zPSD_Z_)
-            self.I_zPSD_Z += I_zPSD_Z_
+            print('I(V;z) :', I_V_Z_)
+            self.SubResDic['I_V_Z'].append(I_V_Z_)
+            self.I_V_Z += I_V_Z_
 
-            print('I_zPSD_ZjZ :', I_zPSD_ZjZ_)
-            self.SubResDic['I_zPSD_ZjZ'].append(I_zPSD_ZjZ_)
-            self.I_zPSD_ZjZ += I_zPSD_ZjZ_
+            print("I(V;z'|z) :", I_V_ZjZ_)
+            self.SubResDic['I_V_ZjZ'].append(I_V_ZjZ_)
+            self.I_V_ZjZ += I_V_ZjZ_
+
+            print("I(V;z') :", I_V_Zj_)
+            self.SubResDic['I_V_Zj'].append(I_V_Zj_)
+            self.I_V_Zj += I_V_Zj_
+
+            print("I(V;con'|z') :", I_V_CONsZj_)
+            self.SubResDic['I_V_CONsZj'].append(I_V_CONsZj_)
+            self.I_V_CONsZj += I_V_CONsZj_
+
+            print("I(S;z') :", I_S_Zj_)
+            self.SubResDic['I_S_Zj'].append(I_S_Zj_)
+            self.I_S_Zj += I_S_Zj_
+
+            print("I(S;con'|z') :", I_S_CONsZj_)
+            self.SubResDic['I_S_CONsZj'].append(I_S_CONsZj_)
+            self.I_S_CONsZj += I_S_CONsZj_
             
-            print('I_zPSD_ZjCr :', I_zPSD_ZjCr_)
-            self.SubResDic['I_zPSD_ZjCr'].append(I_zPSD_ZjCr_)
-            self.I_zPSD_ZjCr += I_zPSD_ZjCr_
-
-            print('I_zPSD_CaZj :', I_zPSD_CaZj_)
-            self.SubResDic['I_zPSD_CaZj'].append(I_zPSD_CaZj_) 
-            self.I_zPSD_CaZj += I_zPSD_CaZj_
-
-            print('I_fcPE_ZjCr :', I_fcPE_ZjCr_)
-            self.SubResDic['I_fcPE_ZjCr'].append(I_fcPE_ZjCr_)
-            self.I_fcPE_ZjCr += I_fcPE_ZjCr_
-
-            print('I_fcPE_CaZj :', I_fcPE_CaZj_)
-            self.SubResDic['I_fcPE_CaZj'].append(I_fcPE_CaZj_)
-            self.I_fcPE_CaZj += I_fcPE_CaZj_
-
-
-
+            
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            # Calculating the entropies given the probability density function of the power spectral. 
-            ## This indicates which frequency is most activated in the generated signal.
-            EntH = -np.sum(self.SubPSPDF_ZjRptCONa * np.log(self.SubPSPDF_ZjRptCONa), axis=1).ravel()
-            
-            # Getting the maximum frequency given the PSD from SubPSPDF_ZjRptCONa.
-            ## The 0 frequency is excluded as it represents the constant term; by adding 1 to the index, the frequency and index can be aligned to be the same.
-            ## Return shape: (NMiniBat, NGen)
-            MaxFreq = np.argmax(self.SubPSPDF_ZjRptCONa, axis=1).ravel() + 1
-            
-            self.LocCandZsMaxFreq ( MaxFreq, EntH, self.Samp_ZjRPT,  self.CON_Arange)
-
+            self.LocCandZsMaxFreq ( self.QV_Zjbm_CONbm_T, self.Zjbm,  self.CONbm)
+ 
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
             ## item[1] contains tracked Z values, 2nd data, and metrics
@@ -916,32 +972,32 @@ class Evaluator ():
                                           'TrackSecData': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackSecData']), 
                                           'TrackMetrics': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackMetrics'])} 
                                           for item in self.TrackerCand_Temp.items() if len(item[1]['TrackSecData']) > 0} 
-
-
+            
+            
         # Conducting the task iteration
         self.Iteration(TaskLogic)
 
 
-        # MI(V;Zj,Z)
-        self.I_zPSD_Z /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_Z'].append(self.I_zPSD_Z)
-        self.I_zPSD_ZjZ /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_ZjZ'].append(self.I_zPSD_ZjZ)
-        self.MI_zPSD_ZjZ = self.I_zPSD_Z + self.I_zPSD_ZjZ             
-        self.AggResDic['MI_zPSD_ZjZ'].append(self.MI_zPSD_ZjZ)
+        # MI(V;Z',Z)
+        self.I_V_Z /= (self.TotalIterSize)
+        self.AggResDic['I_V_Z'].append(self.I_V_Z)
+        self.I_V_ZjZ /= (self.TotalIterSize)
+        self.AggResDic['I_V_ZjZ'].append(self.I_V_ZjZ)
+        self.MI_V_ZjZ = self.I_V_Z + self.I_V_ZjZ             
+        self.AggResDic['MI_V_ZjZ'].append(self.MI_V_ZjZ)
 
-        # MI(V;Cr,Zj)
-        self.I_zPSD_ZjCr /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_ZjCr'].append(self.I_zPSD_ZjCr)
-        self.I_zPSD_CaZj /= (self.TotalIterSize)
-        self.AggResDic['I_zPSD_CaZj'].append(self.I_zPSD_CaZj)
-        self.MI_zPSD_CrZj = self.I_zPSD_ZjCr + self.I_zPSD_CaZj       
-        self.AggResDic['MI_zPSD_CrZj'].append(self.MI_zPSD_CrZj)
+        # MI(V;CON,Z')
+        self.I_V_Zj /= (self.TotalIterSize)
+        self.AggResDic['I_V_Zj'].append(self.I_V_Zj)
+        self.I_V_CONsZj /= (self.TotalIterSize)
+        self.AggResDic['I_V_CONsZj'].append(self.I_V_CONsZj)
+        self.MI_V_CONsZj = self.I_V_Zj + self.I_V_CONsZj       
+        self.AggResDic['MI_V_CONsZj'].append(self.MI_V_CONsZj)
 
-        # MI(VE;Ca,Zj) - MI(VE;Cr,Zj)
-        self.I_fcPE_ZjCr /= (self.TotalIterSize)
-        self.AggResDic['I_fcPE_ZjCr'].append(self.I_fcPE_ZjCr)
-        self.I_fcPE_CaZj /= (self.TotalIterSize)
-        self.AggResDic['I_fcPE_CaZj'].append(self.I_fcPE_CaZj)
-        self.MI_fcPE_CaCr = self.I_fcPE_CaZj - self.I_fcPE_ZjCr
-        self.AggResDic['MI_fcPE_CaCr'].append(self.MI_fcPE_CaCr)
+        # MI(VE;CON',Z') 
+        self.I_S_Zj /= (self.TotalIterSize)
+        self.AggResDic['I_S_Zj'].append(self.I_S_Zj)
+        self.I_S_CONsZj /= (self.TotalIterSize)
+        self.AggResDic['I_S_CONsZj'].append(self.I_S_CONsZj)
+        self.MI_S_CONsZj = self.I_S_Zj + self.I_S_CONsZj
+        self.AggResDic['MI_S_CONsZj'].append(self.MI_S_CONsZj)
