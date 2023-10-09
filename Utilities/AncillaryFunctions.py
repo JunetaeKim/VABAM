@@ -137,7 +137,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
     
     elif SampZType =='ModelARand': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ)
         
-        if SecDataType == 'CONA' or SecDataType == 'CONR' : # For the CondVAE
+        if SecDataType == 'CONDIN' : # For the CondVAE
             DataRpt = [np.repeat(arr, NGen, axis=0) for arr in Data]
         else:
             DataRpt = np.repeat(Data, NGen, axis=0)

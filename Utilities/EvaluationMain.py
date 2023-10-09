@@ -135,7 +135,7 @@ class Evaluator ():
                 self.sim = sim
 
                 # Check the types of ancillary data fed into the sampler model and define the pipeline accordingly.
-                if self.SecDataType == 'CONR' or self.SecDataType == 'CONA' : 
+                if self.SecDataType == 'CONDIN' : 
                     SplitData = [np.array_split(sub, self.SubIterSize) for sub in (self.AnalSig, self.TrueCond)] 
 
                 else: # For models with a single input such as VAE and TCVAE.
@@ -147,7 +147,7 @@ class Evaluator ():
                     print()
 
                     # Core part; the task logic as the function
-                    if self.SecDataType  == 'CONR' or self.SecDataType == 'CONA' : 
+                    if self.SecDataType  == 'CONDIN': 
                         TaskLogic([subs[mini] for subs in SplitData])
                     else:
                         TaskLogic(SplitData[mini])
@@ -215,10 +215,8 @@ class Evaluator ():
         
         ## Optional parameters
         # RepeatSize: The number of iterations to repetitively generate identical PostSampZ; 
-                    # this is to observe variations in other inputs such as FCs while PostSampZ remains constant.
-        # SecDataType: Secondary data type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
-                      # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
-                      # 'False' for models without secondary-data inputs.
+                      # this is to observe variations in other inputs such as FCs while PostSampZ remains constant.
+        # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
         # PostSamp: The selected sampled data.
 
         
@@ -244,19 +242,15 @@ class Evaluator ():
         
         
         # Data binding for the model input
-        if SecDataType == 'FCA' : 
-            Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
         
-        elif SecDataType == 'FCR':
+        if SecDataType == 'FCIN':
             PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
             PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
             PostSecDataList = np.random.permutation(np.random.permutation(PostSecDataList.T).T)
             Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
         
-        elif SecDataType == 'CONA': 
-            Data = [PostZsList, PostSecDataList]
         
-        elif SecDataType == 'CONR':  
+        elif SecDataType == 'CONDIN':  
             PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
             PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
             PostSecDataList = np.random.permutation(PostSecDataList.T).T
@@ -298,22 +292,21 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalSig, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCA',  Continue=True ):
+    def Eval_ZFC (self, AnalSig, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCIN',  Continue=True ):
         
         ## Required parameters
         self.AnalSig = AnalSig             # The data to be used for analysis.
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         
-        assert SecDataType in ['FCA','FCR','CONR','CONA', False], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CONR', 'CONA'  or False are valid."
+        assert SecDataType in ['FCIN','CONDIN', False], "Please verify the value of 'SecDataType'. Only 'FCIN', 'CONDIN'  or False are valid."
         
         
         ## Optional parameters with default values ##
         # WindowSize: The window size when calculating the permutation sets (default: 3)
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True)
         self.FcLimit = FcLimit               # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz)      
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
+        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
         
         
         
@@ -743,7 +736,7 @@ class Evaluator ():
         self.SampModel = SampModel           # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
         
-        assert SecDataType in ['FCA','FCR','CONR','CONA', False], "Please verify the value of 'SecDataType'. Only 'FCA', 'FCR', 'CONR', 'CONA'  or False are valid."
+        assert SecDataType in ['FCIN','CONDIN', False], "Please verify the value of 'SecDataType'. Only 'FCIN', 'CONDIN'  or False are valid."
         
         
         
@@ -751,8 +744,7 @@ class Evaluator ():
         # WindowSize: The window size when calculating the permutation sets (default: 3).
         # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True).
         self.SampZType = SampZType  # Z~ N(Zμ|y, σ) (SampZType = 'Model') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Random').
-        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, 
-                                             # and 'CON' for conditional inputs such as power spectral density.
+        self.SecDataType = SecDataType       # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
         
         
 
