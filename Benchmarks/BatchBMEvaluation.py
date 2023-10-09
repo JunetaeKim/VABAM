@@ -117,7 +117,7 @@ if __name__ == "__main__":
         Inp_Enc = BenchModel.get_layer('Inp_Enc')
         Zs = BenchModel.get_layer('Zs').output
         
-        if Params['SecDataType'] == 'CONA' or Params['SecDataType'] == 'CONR':
+        if Params['SecDataType'] == 'CONDIN':
             Inp_Cond = BenchModel.get_layer('Inp_Cond')
             SampModel = Model([Inp_Enc.input, Inp_Cond.input], Zs)
         else:
@@ -130,7 +130,7 @@ if __name__ == "__main__":
                NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = Params['NSelZ'], SampBatchSize = Params['SampBatchSize'], 
                GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'])
         
-        if Params['SecDataType'] == 'CONA' or Params['SecDataType'] == 'CONR':
+        if Params['SecDataType'] == 'CONDIN':
             ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
             Eval.Eval_ZCON(AnalData,  SampModel, GenModel, Continue=False, WindowSize=Params['WindowSize'],
                            SampZType=Params['SampZType'], SecDataType=Params['SecDataType'])
