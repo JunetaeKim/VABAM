@@ -41,7 +41,7 @@ if __name__ == "__main__":
     if gpus:
         try:
             gpu = gpus[0]  # Fix the index as zero since GPU_ID has already been given. 
-            tf.config.experimental.set_memory_growth(gpu, False)
+            tf.config.experimental.set_memory_growth(gpu, True)
             tf.config.experimental.set_virtual_device_configuration
             (
                 gpu, [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=(1024*23.5))]  
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # Calling dynamic controller for losses (DCL)
     ## The relative size of the loss is reflected in the weight to minimize the loss.
     RelLoss = DCLCall (ConfigSet[ConfigName], ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume)
-        
+    NEpochs -= (RelLoss.StartEpoch + 1)    
     
     #### Model Training
     BenchModel.fit(TrInp, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValInp, None) , callbacks=[  RelLoss]) 
