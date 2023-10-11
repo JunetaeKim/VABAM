@@ -872,15 +872,15 @@ class Evaluator ():
             
             '''                                        ## Sub-Metric list ##
                 ------------------------------------------------------------------------------------------------------------- 
-                # Sub-metrics   # Function            # Code                       # Function           # Code 
+                # Sub-metrics   # Function            # Code                       # Function            # Code 
                 1) I_V_Z        q(v|Sig_Zb_CONbm)      <QV_Zb_CONbm>          vs     p(v)                 <QV_Pop>
-                2) I_V_ZjZ      q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     q(v|Sig_Zb_CONbm)     <QV_Zb_CONbm>
+                2) I_V_ZjZ      q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     q(v|Sig_Zb_CONbm)    <QV_Zb_CONbm>
                 
                 3) I_V_Zj       q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     p(v)                 <QV_Pop>
-                4) I_V_CONsZj   q(v|Sig_Zjb_CONbSt)    <QV_Zjb_CONbSt>        vs     q(v|Sig_Zjb_CONbm)    <QV_Zjb_CONbm>
+                4) I_V_CONsZj   q(v|Sig_Zjb_CONbSt)    <QV_Zjb_CONbSt>        vs     q(v|Sig_Zjb_CONbm)   <QV_Zjb_CONbm>
                 
                 5) I_S_Zj       q(s|Sig_Zjb_CONbm)     <QV//QS_Zjb_CONbm>     vs     p(s)                 <QV//QS_Batch>
-                6) I_S_CONsZj   q(s|Sig_Zjb_CONbSt)    <QV//QS_Zjb_CONbSt>    vs     q(s|Sig_Zjb_CONbm)    <QV//QS_Zjb_CONbm>
+                6) I_S_CONsZj   q(s|Sig_Zjb_CONbSt)    <QV//QS_Zjb_CONbSt>    vs     q(s|Sig_Zjb_CONbm)   <QV//QS_Zjb_CONbm>
 
                 7) H()//KLD()   q(v|Sig_Zjbm_CONbm)    <QV_Zjbm_CONbm>       
                 
