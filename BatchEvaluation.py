@@ -83,8 +83,8 @@ if __name__ == "__main__":
         Params['Common_Info'] = EvalConfigs['Common_Info']
 
         # Object save path
-        ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'.pkl'
-        SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_SampZj_'+str(Params['NSelZ'])+'.npy'
+        ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(Params['NSelZ'])+'.pkl'
+        SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(Params['NSelZ'])+'.npy'
 
 
         #### -----------------------------------------------------   Loading data -------------------------------------------------------------------------   
