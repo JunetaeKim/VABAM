@@ -207,15 +207,13 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, PostSamp=None, AnalSig=None, SecDataType=None, RepeatSize=1, PlotDist=True):
+    def KLD_TrueGen (self, PostSamp=None, AnalSig=None, SecDataType=None, PlotDist=True):
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
         # AnalSig: The raw true signals for obtaining the population PSD.    
         
         ## Optional parameters
-        # RepeatSize: The number of iterations to repetitively generate identical PostSampZ; 
-                      # this is to observe variations in other inputs such as FCs while PostSampZ remains constant.
         # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
         # PostSamp: The selected sampled data.
 
@@ -242,22 +240,12 @@ class Evaluator ():
         
         
         # Data binding for the model input
-        
         if SecDataType == 'FCIN':
-            PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
-            PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
-            PostSecDataList = np.random.permutation(np.random.permutation(PostSecDataList.T).T)
             Data = [PostSecDataList[:, :2], PostSecDataList[:, 2:], PostZsList]
-        
-        
         elif SecDataType == 'CONDIN':  
-            PostZsList = np.repeat(PostZsList, RepeatSize, axis=0)
-            PostSecDataList = np.repeat(PostSecDataList, RepeatSize, axis=0)
-            PostSecDataList = np.random.permutation(PostSecDataList.T).T
-            Data = [PostZsList, PostSecDataList]
-            
+             Data = [PostZsList, PostSecDataList]
         elif SecDataType == False :
-            Data = PostZsList
+             Data = PostZsList
             
           
         # Generating signals
