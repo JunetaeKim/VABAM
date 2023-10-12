@@ -1,9 +1,7 @@
-'''FreqPulse-VAE: A Frequency-Conditioned Variational Autoencoder for Pulsatile Signal Generation'''
-
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda
+from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, Bidirectional, Activation, GaussianNoise
 from tensorflow.keras import Model
 from Utilities.Utilities import ReName
 
