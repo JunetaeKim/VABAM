@@ -1,12 +1,9 @@
 import tensorflow as tf
-from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, TimeDistributed, Bidirectional, Activation, GaussianNoise, Lambda, LSTM
 from tensorflow.keras import Model
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from Benchmarks.Models.BaseModels import *
 from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import Lossweight
-from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch, FFT_PSD
+from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch
 
 
 def CustCCE(y_true, y_pred):
