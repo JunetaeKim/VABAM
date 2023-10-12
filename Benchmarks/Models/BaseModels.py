@@ -3,7 +3,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Input, GRU, Dense, Reshape, RepeatVector, Bidirectional, Activation,  Concatenate
+from tensorflow.keras.layers import Input, GRU, Dense, Reshape, RepeatVector, Bidirectional, Activation,  Concatenate, Lambda
 from tensorflow.keras import Model
 
 

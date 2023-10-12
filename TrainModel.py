@@ -83,7 +83,7 @@ if __name__ == "__main__":
     # Calling dynamic controller for losses (DCL)
     ## The relative size of the loss is reflected in the weight to minimize the loss.
     RelLoss = DCLCall (ModelConfigSet, ModelSavePath, ToSaveLoss=None, SaveWay='max', Resume=Resume)
-    
+    NEpochs -= (RelLoss.StartEpoch )
     
     # Model Training
     SigRepModel.fit(TrData, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValData, None) , callbacks=[RelLoss]) 
