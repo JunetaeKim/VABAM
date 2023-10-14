@@ -812,9 +812,7 @@ class Evaluator ():
 
             ## Generating CONbm (NMiniBat x NGen, CondDim) by random Shuffling on both axes 
             ### Selecting elements (NMiniBat x NGen) randomly.
-            CONbm = self.TrueCond[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
-            ### Shuffling the columns of CONbm by permuting them along the first axis and then transposing back to the original shape.
-            self.CONbm= np.random.permutation(CONbm)
+            self.CONbm = self.TrueCond[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
 
 
 
