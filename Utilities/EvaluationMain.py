@@ -9,7 +9,7 @@ from tensorflow.keras import Model
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj, GenConArange, SamplingFCs
+from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj, SamplingFCs
 from Utilities.Utilities import CompResource
 
        
@@ -39,7 +39,7 @@ class Evaluator ():
 
     ### ----------- Searching for candidate Zj for plausible signal generation ----------- ###
     def LocCandZsMaxFreq (self, CandQV, Samp_Z, SecData=None):
-        # Shape of CandQV: (NMiniBat x NGen, )
+        # Shape of CandQV: (NMiniBat, N_frequency, NGen)
         # Shape of Samp_Z: (NMiniBat x NGen, LatDim)
         # Shape of SecData: (NMiniBat x NGen, SecDataDim)
 
@@ -93,7 +93,7 @@ class Evaluator ():
 
 
     
-    ### ------------------------  Selecting nested Z-LOC and Z values --------------------- ###
+    ### ------------------------  # Selecting nested Z values and secondary data matrix --------------------- ###
     def SubNestedZFix(self, SubTrackerCand):
                 
         ''' Constructing the dictionary: {'KeyID': { 'TrackZs' : Zs, 'TrackSecData' : Secondary-data }}
@@ -160,7 +160,7 @@ class Evaluator ():
     def SelPostSamp (self, SelMetricCut=np.inf, BestZsMetrics=None, TrackerCand=None, SavePath=None ):
         
         ## Optional parameters
-        # Updating The threshold value for selecting Zs in SubNestedZFix
+        # Updating The threshold value for selecting Zs in SubNestedZFix if needed.
         self.SelMetricCut = SelMetricCut
 
         # Setting arguments
@@ -174,7 +174,7 @@ class Evaluator ():
         self.CandFreqIDs = [item[0] for item in BestZsMetrics.items() if item[1][0] != np.inf ]
             
         
-        # Selecting nested Z-LOC and Z values
+        # Selecting nested Z values and secondary data matrix
         '''  Constructing the dictionary : {'FreqID' : {'SubKeys' : { 'TrackZs' : Zs, 'TrackSecData' : Secondary-data }}}
         
            - Outermost Dictionary:
@@ -182,7 +182,7 @@ class Evaluator ():
              - Value: A second-level dictionary (explained below).
         
            - Second-level Dictionary:
-             - Key (SubKeys): Represents some sub-category or sub-key for the given 'FreqID'.
+             - Key (SubKeys): Represents sub-key (i.e., ID) for the given 'FreqID'.
              - Value: A third-level dictionary (explained below).
         
            - Third-level Dictionary:

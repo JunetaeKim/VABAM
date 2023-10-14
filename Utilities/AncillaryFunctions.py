@@ -37,13 +37,12 @@ def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
 # Power spectral density 
 def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     # Dimension check; this part operates with 3D tensors.
-    # (NMiniBat, NGen, SigDim)
     Data = Data[:,None] if len(Data.shape) < 3 else Data
 
     # Power Spectral Density
     HalfLen = Data.shape[-1]//2
     FFTRes = np.abs(np.fft.fft(Data, axis=-1)[..., :HalfLen])[..., MinFreq:MaxFreq]
-    # (NMiniBat, NGen, N_frequency)
+    # (N, M, N_frequency)
     PSD = (FFTRes**2)/Data.shape[-1]
 
     # Probability Density Function
