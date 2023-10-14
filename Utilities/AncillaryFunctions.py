@@ -169,12 +169,12 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='ARand' ):
     '''
     
     # Masking for selecting Samp_Zj from Samp_Z 
-    if ZjType =='ARand': #It is strongly recommended when there is no ancillary data inputs or variations in the ancillary data.
+    if ZjType =='ARand': # All random masking
         Mask_Z = np.zeros((NMiniBat*NGen, LatDim))
         for i in range(NMiniBat*NGen):
             Mask_Z[i, np.random.choice(LatDim, NSelZ,replace=False )] = 1
             
-    elif ZjType =='BRpt': # It is strongly recommended in cases where there are variations in ancillary data inputs.
+    elif ZjType =='BRpt': # Random masking at the batch-sample level
         Mask_Z = np.zeros((NMiniBat, NGen, LatDim))
         for i in range(NMiniBat):
             Mask_Z[i, :, np.random.choice(LatDim, NSelZ,replace=False )] = 1
