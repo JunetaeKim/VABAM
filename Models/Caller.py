@@ -34,9 +34,9 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
 
     
     # Adding losses
-    if LossType =='TCLosses':
+    if LossType =='Default':
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
-        SigRepModel = TCLosses(Models, DataSize, SelConfigSet)
+        SigRepModel = DefLosses(Models, DataSize, SelConfigSet)
         ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel]
         
     elif LossType =='FACLosses':

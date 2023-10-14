@@ -19,7 +19,7 @@ def CustMSE(y_true, y_pred):
     return tf.reduce_mean(tf.square(y_pred - y_true))
 
 
-def TCLosses (Models, DataSize, LossConfigSet):
+def DefLosses (Models, DataSize, LossConfigSet):
     SpecLosses = LossConfigSet['SpecLosses']
     
     ###-------------------------------- Model structuring -------------------------------------------- ###

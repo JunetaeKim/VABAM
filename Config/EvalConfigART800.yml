@@ -1,6 +1,6 @@
 # The list of common objects subject to class serialization.
 Common_Info: ['SubResDic', 'AggResDic', 'BestZsMetrics', 'TrackerCand', 'CandFreqIDs', 'I_zPSD_Z', 'I_zPSD_ZjZ', 
-              'MI_zPSD_ZjZ', 'PostSamp', 'LatDim', 'NFCs', 'GenBatchSize', 'GPU' ] 
+              'MI_zPSD_ZjZ', 'PostSamp', 'LatDim', 'NFCs', 'NSelZ', 'GenBatchSize', 'GPU', 'SecDataType' ] 
               
 
 FACFC_ART_30_800:          # SigType_LatDim_CompSize
@@ -20,9 +20,9 @@ FACFC_ART_30_800:          # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # The secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
@@ -44,9 +44,9 @@ FACFC_ART_50_800:          # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
@@ -68,9 +68,9 @@ FACFC_ART_50_800_RE:       # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
@@ -93,9 +93,9 @@ SKZFC_ART_30_800:          # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
@@ -117,9 +117,9 @@ SKZFC_ART_50_800:          # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
     
@@ -141,9 +141,9 @@ SKZFC_ART_50_800_RE:       # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
@@ -166,9 +166,9 @@ SKZ_ART_30_800:            # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
     
@@ -190,9 +190,9 @@ SKZ_ART_50_800:            # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
@@ -215,9 +215,9 @@ TCMIDKZFC_ART_30_800_LoTCKZ: # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
     
@@ -239,9 +239,9 @@ TCMIDKZFC_ART_50_800_LoTCKZ: # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
     
@@ -263,9 +263,9 @@ TCMIDKZFC_ART_50_800_LoTCKZ_RE: # SigType_LatDim_CompSize
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
     MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
-    SampZType: 'GaussRptA' # SampZType: Z~ N(Zmu|y, sigma) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA').
-    SecDataType: 'FCR'     # Secondary data type; 'FCR' for FC values chosen randomly, 'FCA' for FC values given by arrange, and 'CON' for conditional inputs.
-
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
     # The list of specific objects subject to class serialization.
     Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']    
     
@@ -273,9 +273,74 @@ TCMIDKZFC_ART_50_800_LoTCKZ_RE: # SigType_LatDim_CompSize
 
 
 
+SKZFC_II_30_800:          # SigType_LatDim_CompSize
+    NSelZ: 1               # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 51            # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    MinFreqR: 0.           # The minimum value when generating FC_ArangeInp with linspace.
+    MaxFreqR: 0.05         # The maximum value when generating FC_ArangeInp with linspace.
+    FcLimit: 0.5          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
+    # The list of specific objects subject to class serialization.
+    Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']    
     
-    
-    
-    
+SKZFC_II_50_800:          # SigType_LatDim_CompSize
+    NSelZ: 1               # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 51            # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    MinFreqR: 0.           # The minimum value when generating FC_ArangeInp with linspace.
+    MaxFreqR: 0.05         # The maximum value when generating FC_ArangeInp with linspace.
+    FcLimit: 0.5          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
+    # The list of specific objects subject to class serialization.
+    Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']
 
+
+
+FACFC_II_50_800:          # SigType_LatDim_CompSize
+    NSelZ: 1               # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 51            # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    MinFreqR: 0.           # The minimum value when generating FC_ArangeInp with linspace.
+    MaxFreqR: 0.05         # The maximum value when generating FC_ArangeInp with linspace.
+    FcLimit: 0.5          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    MetricCut: 10          # MetricCut: The threshold value for selecting Zs whose Entropy of PSD is less than the MetricCut.
+    SecDataType: 'FCR'     # SecDataType: Secondary data sample type; Use 'FCR' or 'FCA' for random FC or arranged FC values, respectively,
+                           # 'CONA' or 'CONR' for random conditional inputs or arranged conditional inputs, respectively.
+                           # 'False' for models without secondary-data inputs.
+    # The list of specific objects subject to class serialization.
+    Spec_Info: [ 'I_zPSD_ZjFc', 'I_zPSD_FaZj',  'I_fcPE_ZjFc', 'I_fcPE_FaZj', 'MI_zPSD_FcZj', 'MI_fcPE_FaFc', 'FcLimit']    
 
