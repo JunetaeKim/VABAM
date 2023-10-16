@@ -95,7 +95,7 @@ ConVAE_ART_30:             # SigType_LatDim_CompSize
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'CONDIN'  # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
-    Spec_Info: [ 'I_V_Zj', 'I_V_FCsZj', 'I_S_Zj', 'I_S_FCsZj', 'MI_V_FCsZj', 'MI_S_FCsZj' ] # The list of specific objects subject to class serialization.   
+    Spec_Info: [ 'I_V_Zj', 'I_V_CONsZj', 'I_S_Zj', 'I_S_CONsZj', 'MI_V_CONsZj', 'MI_S_CONsZj' ] # The list of specific objects subject to class serialization.
     
 
 
@@ -115,7 +115,7 @@ ConVAE_ART_50:             # SigType_LatDim_CompSize
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'CONDIN'  # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
-    Spec_Info: [ 'I_V_Zj', 'I_V_FCsZj', 'I_S_Zj', 'I_S_FCsZj', 'MI_V_FCsZj', 'MI_S_FCsZj' ] # The list of specific objects subject to class serialization.
+    Spec_Info: [ 'I_V_Zj', 'I_V_CONsZj', 'I_S_Zj', 'I_S_CONsZj', 'MI_V_CONsZj', 'MI_S_CONsZj' ] # The list of specific objects subject to class serialization.
 
     
     
