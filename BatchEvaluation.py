@@ -82,10 +82,6 @@ if __name__ == "__main__":
         Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
         Params['Common_Info'] = EvalConfigs['Common_Info']
 
-        # Object save path
-        ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(Params['NSelZ'])+'.pkl'
-        SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(Params['NSelZ'])+'.npy'
-
 
         #### -----------------------------------------------------   Loading data -------------------------------------------------------------------------   
         if SigTypePrev != Params['SigType']:
@@ -124,29 +120,34 @@ if __name__ == "__main__":
 
 
 
-        #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------    
-        # Instantiation 
-        Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], 
-               NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = Params['NSelZ'], SampBatchSize = Params['SampBatchSize'], 
-               GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'])
+        #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------   
 
+        NSelZs = Params['NSelZ']
 
-        # The main task: Calculating and tracking the Conditional Mutual Information metric 
-        ## FC_ArangeInp: A 2D matrix (NGen, NFCs) containing FCs values that the user creates and inputs directly.
-        FC_ArangeInp = np.tile(np.linspace(Params['MinFreqR'], Params['MaxFreqR'], Params['NGen'])[:, None], (1, NFCs))
+        for NZs in NSelZs:
 
-        ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-        Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FcLimit=Params['FcLimit'], WindowSize=Params['WindowSize'], Continue=False)
-
-
-        # Selecting post Samp_Zj for generating plausible signals
-        SelPostSamp = Eval.SelPostSamp( Params['MetricCut'], SavePath=SampZjSavePath)
-
-
-        # Evaluating KLD (P || K)
-        #Eval.KLD_TrueGen(SecDataType ='FCA', RepeatSize = 1, PlotDist=False) 
-
-        # Saving the instance's objects to a file
-        SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
-
-
+            # Object save path
+            ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'.pkl'
+            SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(NZs)+'.npy'
+        
+            # Instantiation 
+            Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], 
+                   NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'], 
+                   SelMetricType = Params['SelMetricType'], SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], Name=ConfigName+'_Nj'+str(NZs))
+    
+            
+            ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
+            Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FcLimit=Params['FcLimit'], WindowSize=Params['WindowSize'], Continue=False)
+    
+    
+            # Selecting post Samp_Zj for generating plausible signals
+            SelPostSamp = Eval.SelPostSamp( Params['SelMetricCut'], SavePath=SampZjSavePath)
+    
+    
+            # Evaluating KLD (P || K)
+            #Eval.KLD_TrueGen(SecDataType ='FCA', RepeatSize = 1, PlotDist=False) 
+    
+            # Saving the instance's objects to a file
+            SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
+    
+    

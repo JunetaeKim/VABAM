@@ -16,7 +16,7 @@ from Utilities.Utilities import CompResource
 class Evaluator ():
     
     def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  NGen=100, ReparaStdZj = 1, NSelZ = 1, 
-                  SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=True):
+                  SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=True, Name=None):
 
         
         # Optional parameters with default values
@@ -32,6 +32,7 @@ class Evaluator ():
         self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
         self.SelMetricCut = SelMetricCut     # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
         self.SelMetricType = SelMetricType   # The type of metric used for selecting Zs and ancillary data. 
+        self.Name = Name                     # Model name.
 
     
     
@@ -330,6 +331,8 @@ class Evaluator ():
         
         
         def TaskLogic(SubData):
+
+            print('-------------  ',self.Name,'  -------------')
 
             ### ------------------------------------------------ Sampling ------------------------------------------------ ###
             # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
