@@ -1,6 +1,6 @@
-TCVAE_ART_30: # SigType_LatDim
+TCVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
   Capacity_TC: 0.01 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of TC.
@@ -25,9 +25,9 @@ TCVAE_ART_30: # SigType_LatDim
   MxWMI: 0.001 # The max weight for the MI loss.  
   
 
-TCVAE_ART_50: # SigType_LatDim
+TCVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
   Capacity_TC: 0.01 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of TC.
@@ -52,9 +52,9 @@ TCVAE_ART_50: # SigType_LatDim
   MxWMI: 0.001 # The max weight for the MI loss.  
 
 
-FACVAE_ART_30: # SigType_LatDim
+FACVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   DiscHiddenSize: 50 # The size of the hidden nodes within the discriminator model.
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
@@ -80,9 +80,9 @@ FACVAE_ART_30: # SigType_LatDim
   MxWDTC: 0.001 # The max weight for the DTC loss.  
 
 
-FACVAE_ART_50: # SigType_LatDim
+FACVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   DiscHiddenSize: 50 # The size of the hidden nodes within the discriminator model.
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
@@ -108,9 +108,9 @@ FACVAE_ART_50: # SigType_LatDim
   MxWDTC: 0.001 # The max weight for the DTC loss.  
   
 
-ConVAE_ART_30: # SigType_LatDim
+ConVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -125,9 +125,9 @@ ConVAE_ART_30: # SigType_LatDim
   MxWZ: 0.005 # The max weight for the Z loss.
   
 
-ConVAE_ART_50: # SigType_LatDim
+ConVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -142,9 +142,9 @@ ConVAE_ART_50: # SigType_LatDim
   MxWZ: 0.005 # The max weight for the Z loss.
   
   
-BaseVAE_ART_50: # SigType_LatDim
+BaseVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -159,9 +159,9 @@ BaseVAE_ART_50: # SigType_LatDim
   MxWZ: 0.005 # The max weight for the Z loss.
   
   
-BaseVAE_ART_30: # SigType_LatDim
+BaseVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: rawART # Types of signals to train on.: ART, PLETH, II. 
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 

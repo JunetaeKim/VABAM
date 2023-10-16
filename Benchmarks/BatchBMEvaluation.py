@@ -125,27 +125,31 @@ if __name__ == "__main__":
 
 
         #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------    
-        # Instantiation 
-        Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], 
-               NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = Params['NSelZ'], SampBatchSize = Params['SampBatchSize'], 
-               GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'])
-        
-        if Params['SecDataType'] == 'CONDIN':
-            ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-            Eval.Eval_ZCON(AnalData,  SampModel, GenModel, Continue=False, WindowSize=Params['WindowSize'],
-                           SampZType=Params['SampZType'], SecDataType=Params['SecDataType'])
-        else:
-            Eval.Eval_Z(AnalData, SampModel, GenModel,  Continue=False, SampZType=Params['SampZType'])
 
-
-        # Selecting post Samp_Zj for generating plausible signals
-        SelPostSamp = Eval.SelPostSamp( Params['MetricCut'], SavePath=SampZjSavePath)
-
-
-        # Evaluating KLD (P || K)
-        Eval.KLD_TrueGen(SecDataType = Params['SecDataType'], RepeatSize = 1, PlotDist=False) 
-
-        # Saving the instance's objects to a file
-        SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
+        NSelZs = Params['NSelZ']
+        for NZs in NSelZs:
+            
+            # Instantiation 
+            Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], 
+                   NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'],  SelMetricType = Params['SelMetricType'],
+                   SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], Name=ConfigName+'_Nj'+str(NZs))
+            
+            if Params['SecDataType'] == 'CONDIN':
+                ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
+                Eval.Eval_ZCON([AnalData[0][:500],AnalData[1][:500]],  SampModel, GenModel, WindowSize = Params['WindowSize'],  Continue=False,  SecDataType=Params['SecDataType'])
+            else:
+                Eval.Eval_Z(AnalData[:500], SampModel, GenModel,  Continue=False)
+    
+    
+            # Selecting post Samp_Zj for generating plausible signals
+            SelPostSamp = Eval.SelPostSamp( Params['SelMetricCut'], SavePath=SampZjSavePath)
+    
+    
+            # Evaluating KLD (P || K)
+            #Eval.KLD_TrueGen(SecDataType = Params['SecDataType'], RepeatSize = 1, PlotDist=False) 
+    
+            # Saving the instance's objects to a file
+            SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
+            
 
 
