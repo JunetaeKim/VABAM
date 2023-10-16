@@ -148,6 +148,6 @@ if __name__ == "__main__":
             #Eval.KLD_TrueGen(SecDataType ='FCA', RepeatSize = 1, PlotDist=False) 
     
             # Saving the instance's objects to a file
-            SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
+            SerializeObjects(Eval, Params['Common_Info'], ObjSavePath)
     
     
