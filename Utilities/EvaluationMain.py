@@ -30,8 +30,8 @@ class Evaluator ():
         self.SampBatchSize = SampBatchSize   # The batch size during prediction of the sampling model.
         self.GenBatchSize= GenBatchSize      # The batch size during prediction of the generation model.
         self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-        self.SelMetricCut = SelMetricCut           # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
-        self.SelMetricType = SelMetricType         # The type of metric used for selecting Zs and ancillary data. 
+        self.SelMetricCut = SelMetricCut     # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
+        self.SelMetricType = SelMetricType   # The type of metric used for selecting Zs and ancillary data. 
 
     
     
