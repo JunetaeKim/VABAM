@@ -187,11 +187,11 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='ARand' ):
 
 
 
-def SamplingFCs (NMiniBat, NGen, NFCs, FCexist=None, SampFCType='ARand', FcLimit= 0.05):
+def SamplingFCs (NMiniBat, NGen, NFCs, SampFCType='ARand', FcLimit= 0.05):
 
     # Check for valid SampFCType values
-    if SampFCType not in ['ARand', 'BRpt', 'Sort']:
-        raise ValueError(f"Invalid SampFCType: {SampFCType}. Expected one of: 'ARand', 'BRpt', 'Sort'")
+    if SampFCType not in ['ARand', 'BRpt']:
+        raise ValueError(f"Invalid SampFCType: {SampFCType}. Expected one of: 'ARand', 'BRpt' ")
     
     # Sampling FCs
     ## Return shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
@@ -200,17 +200,6 @@ def SamplingFCs (NMiniBat, NGen, NFCs, FCexist=None, SampFCType='ARand', FcLimit
     elif SampFCType == 'BRpt' :
         FCs = np.random.rand(NMiniBat,  NFCs) * FcLimit
         FCs = np.repeat(FCs, NGen, axis=0)
-
-    # For Sampling FC_organized 
-    ## Return shape of FCs:(NMiniBat, NGen, NFCs) instead of (NMiniBat*NGen, NFCs)
-    if FCexist is None:
-        FCexist = FCs
-        FCexist = FCexist.reshape(NMiniBat, NGen, NFCs)
-
-    
-    # Sampling FC_organized (i.e., FCor)
-    if SampFCType == 'Sort' :
-        FCs =np.sort(FCexist, axis=0).reshape(NMiniBat*NGen, NFCs)
 
     return FCs
     
