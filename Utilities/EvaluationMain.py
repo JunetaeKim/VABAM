@@ -363,7 +363,7 @@ class Evaluator ():
             # Generating FC values randomly across the batch and fc axes, and then repeat them NGen times.
             self.FCb = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='BRpt', FcLimit = self.FcLimit)
             # Sorting the arranged FC values in ascending order at the generation index.
-            self.FCb_Sort = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, FCexist=self.FCb, SampFCType='Sort', FcLimit = self.FcLimit)
+            self.FCbm_Sort = np.sort(self.FCbm , axis=0).reshape(self.NMiniBat*self.NGen, self.NFCs)
 
 
             
@@ -380,14 +380,14 @@ class Evaluator ():
               # Cases                               # Signal name                   # Target metric
               1) Zb + FCbm               ->         Sig_Zb_FCbm         ->          MI() 
               2) Zjb + FCbm              ->         Sig_Zjb_FCbm        ->          MI()
-              3) Zjb + FCb_Sort          ->         Sig_Zjb_FCbSt       ->          MI()
+              3) Zjb + FCbm_Sort         ->         Sig_Zjb_FCbmSt       ->          MI()
               4) Zjbm + FCbm             ->         Sig_Zjbm_FCbm       ->          H() or KLD()
                                                     * bm = ARand, b=BRpt, St=Sort *
             ''' 
             
             ## Binding the samples together, generate signals through the model 
             Set_Zs = np.concatenate([self.Zjb,  self.Zjb,        self.Zjbm])            
-            Set_FCs = np.concatenate([self.FCbm, self.FCb_Sort,  self.FCbm]) 
+            Set_FCs = np.concatenate([self.FCbm, self.FCbm_Sort,  self.FCbm]) 
             Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
 
 
@@ -397,7 +397,7 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
+            self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbmSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
             # Approximating Sig_Zb_FCbm using Sig_Zjbm_FCbm
             self.Sig_Zb_FCbm = self.Sig_Zjbm_FCbm.copy()
 
@@ -413,10 +413,10 @@ class Evaluator ():
                 2) I_V_ZjZ      q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     q(v|Sig_Zb_FCbm)     <QV_Zb_FCbm>
                 
                 3) I_V_Zj       q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     p(v)                 <QV_Pop>
-                4) I_V_FCsZj    q(v|Sig_Zjb_FCbSt)    <QV_Zjb_FCbSt>        vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
+                4) I_V_FCsZj    q(v|Sig_Zjb_FCbmSt)   <QV_Zjb_FCbmSt>        vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
                 
                 5) I_S_Zj       q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                 <QV//QS_Batch>
-                6) I_S_FCsZj    q(s|Sig_Zjb_FCbSt)    <QV//QS_Zjb_FCbSt>    vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
+                6) I_S_FCsZj    q(s|Sig_Zjb_FCbmSt)   <QV//QS_Zjb_FCbmSt>    vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
 
                 7) H()//KLD()   q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
                 
@@ -434,20 +434,20 @@ class Evaluator ():
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
             # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
             QV_Zjb_FCbm_ = FFT_PSD(self.Sig_Zjb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            QV_Zjb_FCbSt_ = FFT_PSD(self.Sig_Zjb_FCbSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            QV_Zjb_FCbmSt_ = FFT_PSD(self.Sig_Zjb_FCbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             
 
             # Q(v)s
             ## Return shape: (NMiniBat, N_frequency)
             self.QV_Zb_FCbm = FFT_PSD(self.Sig_Zb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.QV_Zjb_FCbm = QV_Zjb_FCbm_.mean(axis=1)
-            self.QV_Zjb_FCbSt = QV_Zjb_FCbSt_.mean(axis=1)
+            self.QV_Zjb_FCbmSt = QV_Zjb_FCbmSt_.mean(axis=1)
 
             
             # Intermediate objects for Q(s) and H(')
             ## Return shape: (NMiniBat, N_frequency, NGen)
             self.QV_Zjb_FCbm_T = QV_Zjb_FCbm_.transpose(0,2,1)
-            self.QV_Zjb_FCbSt_T = QV_Zjb_FCbSt_.transpose(0,2,1)
+            self.QV_Zjb_FCbmSt_T = QV_Zjb_FCbmSt_.transpose(0,2,1)
             self.QV_Zjbm_FCbm_T = FFT_PSD(self.Sig_Zjbm_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
             
@@ -459,7 +459,7 @@ class Evaluator ():
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
             self.QS_Zjb_FCbm = ProbPermutation(self.QV_Zjb_FCbm_T, WindowSize=WindowSize)
-            self.QS_Zjb_FCbSt = ProbPermutation(self.QV_Zjb_FCbSt_T, WindowSize=WindowSize)
+            self.QS_Zjb_FCbmSt = ProbPermutation(self.QV_Zjb_FCbmSt_T, WindowSize=WindowSize)
             self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
 
                 
@@ -468,9 +468,9 @@ class Evaluator ():
             I_V_Z_ = MeanKLD(self.QV_Zb_FCbm, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb_FCbm, self.QV_Zb_FCbm )  # I(V;z'|z)
             I_V_Zj_ =  MeanKLD(self.QV_Zjb_FCbm, self.QV_Pop[None] ) # I(V;z')
-            I_V_FCsZj_ = MeanKLD(self.QV_Zjb_FCbSt, self.QV_Zjb_FCbm ) # I(V;fc'|z')
+            I_V_FCsZj_ = MeanKLD(self.QV_Zjb_FCbmSt, self.QV_Zjb_FCbm ) # I(V;fc'|z')
             I_S_Zj_ = MeanKLD(self.QS_Zjb_FCbm, self.QS_Batch) # I(S;z')
-            I_S_FCsZj_ = MeanKLD(self.QS_Zjb_FCbSt, self.QS_Zjb_FCbm) # I(S;fc'|z')
+            I_S_FCsZj_ = MeanKLD(self.QS_Zjb_FCbmSt, self.QS_Zjb_FCbm) # I(S;fc'|z')
 
 
             print('I(V;z) :', I_V_Z_)
@@ -799,18 +799,16 @@ class Evaluator ():
 
             
             # Processing Conditional information 
-            ## Generating CONb_Sort (NMiniBat x NGen, CondDim)
+            ## Generating CONbm_Sort (NMiniBat x NGen, CondDim)
             ### Generating random indices for selecting true conditions
-            RandSelIDX = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat)
+            RandSelIDX = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NGen)
             ### Selecting the true conditions using the generated indices
             SelTrueCond = self.TrueCond[RandSelIDX]
             ### Identifying the index of maximum frequency for each selected condition
             MaxFreqSelCond = np.argmax(SelTrueCond, axis=-1)
             ### Sorting the selected conditions by their maximum frequency
             Idx_MaxFreqSelCond = np.argsort(MaxFreqSelCond)
-            CONb_Sort_Tmp = SelTrueCond[Idx_MaxFreqSelCond]
-            ### Repeating the sorted conditions by NGen times
-            self.CONb_Sort = np.repeat(CONb_Sort_Tmp,  self.NGen, axis=0)
+            self.CONbm_Sort = SelTrueCond[Idx_MaxFreqSelCond]
 
 
             ## Generating CONbm (NMiniBat x NGen, CondDim) by random Shuffling on both axes 
@@ -832,14 +830,14 @@ class Evaluator ():
               # Cases                               # Signal name                   # Target metric
               1) Zb + CONbm               ->         Sig_Zb_CONbm         ->          MI() 
               2) Zjb + CONbm              ->         Sig_Zjb_CONbm        ->          MI()
-              3) Zjb + CONb_Sort          ->         Sig_Zjb_CONbSt       ->          MI()
+              3) Zjb + CONbm_Sort         ->         Sig_Zjb_CONbmSt      ->          MI()
               4) Zjbm + CONbm             ->         Sig_Zjbm_CONbm       ->          H() or KLD()
                                                     * bm = ARand, b=BRpt, St=Sort *
             ''' 
             
             ## Binding the samples together, generate signals through the model 
             Set_Zs = np.concatenate([self.Zjb,  self.Zjb,        self.Zjbm])            
-            Set_CONs = np.concatenate([self.CONbm, self.CONb_Sort,  self.CONbm]) 
+            Set_CONs = np.concatenate([self.CONbm, self.CONbm_Sort,  self.CONbm]) 
             Data = [Set_Zs, Set_CONs]
 
 
@@ -849,7 +847,7 @@ class Evaluator ():
 
             # Re-splitting predictions for each case
             Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zjb_CONbm, self.Sig_Zjb_CONbSt, self.Sig_Zjbm_CONbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
+            self.Sig_Zjb_CONbm, self.Sig_Zjb_CONbmSt, self.Sig_Zjbm_CONbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
             # Approximating Sig_Zb_CONbm using Sig_Zjbm_CONbm
             self.Sig_Zb_CONbm = self.Sig_Zjbm_CONbm.copy()
 
@@ -866,10 +864,10 @@ class Evaluator ():
                 2) I_V_ZjZ      q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     q(v|Sig_Zb_CONbm)    <QV_Zb_CONbm>
                 
                 3) I_V_Zj       q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     p(v)                 <QV_Pop>
-                4) I_V_CONsZj   q(v|Sig_Zjb_CONbSt)    <QV_Zjb_CONbSt>        vs     q(v|Sig_Zjb_CONbm)   <QV_Zjb_CONbm>
+                4) I_V_CONsZj   q(v|Sig_Zjb_CONbmSt)   <QV_Zjb_CONbmSt>       vs     q(v|Sig_Zjb_CONbm)   <QV_Zjb_CONbm>
                 
                 5) I_S_Zj       q(s|Sig_Zjb_CONbm)     <QV//QS_Zjb_CONbm>     vs     p(s)                 <QV//QS_Batch>
-                6) I_S_CONsZj   q(s|Sig_Zjb_CONbSt)    <QV//QS_Zjb_CONbSt>    vs     q(s|Sig_Zjb_CONbm)   <QV//QS_Zjb_CONbm>
+                6) I_S_CONsZj   q(s|Sig_Zjb_CONbmSt)   <QV//QS_Zjb_CONbmSt>   vs     q(s|Sig_Zjb_CONbm)   <QV//QS_Zjb_CONbm>
 
                 7) H()//KLD()   q(v|Sig_Zjbm_CONbm)    <QV_Zjbm_CONbm>       
                 
@@ -887,20 +885,20 @@ class Evaluator ():
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
             # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
             QV_Zjb_CONbm_ = FFT_PSD(self.Sig_Zjb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            QV_Zjb_CONbSt_ = FFT_PSD(self.Sig_Zjb_CONbSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            QV_Zjb_CONbmSt_ = FFT_PSD(self.Sig_Zjb_CONbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             
 
             # Q(v)s
             ## Return shape: (NMiniBat, N_frequency)
             self.QV_Zb_CONbm = FFT_PSD(self.Sig_Zb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.QV_Zjb_CONbm = QV_Zjb_CONbm_.mean(axis=1)
-            self.QV_Zjb_CONbSt = QV_Zjb_CONbSt_.mean(axis=1)
+            self.QV_Zjb_CONbmSt = QV_Zjb_CONbmSt_.mean(axis=1)
 
             
             # Intermediate objects for Q(s) and H(')
             ## Return shape: (NMiniBat, N_frequency, NGen)
             self.QV_Zjb_CONbm_T = QV_Zjb_CONbm_.transpose(0,2,1)
-            self.QV_Zjb_CONbSt_T = QV_Zjb_CONbSt_.transpose(0,2,1)
+            self.QV_Zjb_CONbmSt_T = QV_Zjb_CONbmSt_.transpose(0,2,1)
             self.QV_Zjbm_CONbm_T = FFT_PSD(self.Sig_Zjbm_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
 
             
@@ -912,7 +910,7 @@ class Evaluator ():
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
             self.QS_Zjb_CONbm = ProbPermutation(self.QV_Zjb_CONbm_T, WindowSize=WindowSize)
-            self.QS_Zjb_CONbSt = ProbPermutation(self.QV_Zjb_CONbSt_T, WindowSize=WindowSize)
+            self.QS_Zjb_CONbmSt = ProbPermutation(self.QV_Zjb_CONbmSt_T, WindowSize=WindowSize)
             self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
 
                 
@@ -921,9 +919,9 @@ class Evaluator ():
             I_V_Z_ = MeanKLD(self.QV_Zb_CONbm, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb_CONbm, self.QV_Zb_CONbm )  # I(V;z'|z)
             I_V_Zj_ =  MeanKLD(self.QV_Zjb_CONbm, self.QV_Pop[None] ) # I(V;z')
-            I_V_CONsZj_ = MeanKLD(self.QV_Zjb_CONbSt, self.QV_Zjb_CONbm ) # I(V;con'|z')
+            I_V_CONsZj_ = MeanKLD(self.QV_Zjb_CONbmSt, self.QV_Zjb_CONbm ) # I(V;con'|z')
             I_S_Zj_ = MeanKLD(self.QS_Zjb_CONbm, self.QS_Batch) # I(S;z')
-            I_S_CONsZj_ = MeanKLD(self.QS_Zjb_CONbSt, self.QS_Zjb_CONbm) # I(S;con'|z')
+            I_S_CONsZj_ = MeanKLD(self.QS_Zjb_CONbmSt, self.QS_Zjb_CONbm) # I(S;con'|z')
 
 
             print('I(V;z) :', I_V_Z_)
