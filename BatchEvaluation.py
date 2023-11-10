@@ -105,7 +105,7 @@ if __name__ == "__main__":
 
 
         # Setting Model Specifications and Sub-models
-        if Params['LossType'] =='TCLosses':
+        if Params['LossType'] =='Default':
             EncModel, FeatExtModel, FeatGenModel, ReconModel = ModelParts
         elif Params['LossType'] =='FACLosses':
             EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel = ModelParts

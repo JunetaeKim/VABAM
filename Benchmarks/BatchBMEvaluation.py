@@ -136,9 +136,9 @@ if __name__ == "__main__":
             
             if Params['SecDataType'] == 'CONDIN':
                 ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-                Eval.Eval_ZCON([AnalData[0][:500],AnalData[1][:500]],  SampModel, GenModel, WindowSize = Params['WindowSize'],  Continue=False,  SecDataType=Params['SecDataType'])
+                Eval.Eval_ZCON(AnalData[:],  SampModel, GenModel, WindowSize = Params['WindowSize'],  Continue=False,  SecDataType=Params['SecDataType'])
             else:
-                Eval.Eval_Z(AnalData[:500], SampModel, GenModel,  Continue=False)
+                Eval.Eval_Z(AnalData[:], SampModel, GenModel,  Continue=False)
     
     
             # Selecting post Samp_Zj for generating plausible signals
