@@ -13,10 +13,26 @@ def CustCCE(y_true, y_pred):
     return -tf.reduce_mean(tf.reduce_sum(y_true * tf.math.log(y_pred), axis=-1))
 
 
-def CustMSE(y_true, y_pred):
+def CustMSE_NLL(y_true, y_pred, Type='MSE', Sigma=1., HybRate = 0.85, NLLScale= 1e-7):
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
-    return tf.reduce_mean(tf.square(y_pred - y_true))
+
+    if Type =='MSE':
+        return tf.reduce_mean(tf.square(y_pred - y_true))
+    elif Type =='NLL':
+        # mu : y_true
+        # x : y_pred
+        nll = 0.5 * tf.math.log(2 * tf.constant(np.pi) * Sigma**2) + ((y_pred - y_true)**2 / (2 * Sigma**2))
+        return  tf.reduce_sum(nll) * NLLScale
+
+    elif Type =='MSENLL':
+        MSE = tf.reduce_mean(tf.square(y_pred - y_true))
+        nll = 0.5 * tf.math.log(2 * tf.constant(np.pi) * Sigma**2) + ((y_pred - y_true)**2 / (2 * Sigma**2))
+        return HybRate*MSE  + (1-HybRate)*tf.reduce_sum(nll) * NLLScale  
+
+        
+        
+
 
 
 def DefLosses (Models, DataSize, LossConfigSet):
@@ -55,14 +71,14 @@ def DefLosses (Models, DataSize, LossConfigSet):
     ###-------------------------------- Common losses -------------------------------------------- ###
 
     ### Adding the RecLoss; 
-    ReconOut_ext = Beta_Orig * CustMSE(ReconExtOut, EncInp)
+    ReconOut_ext = Beta_Orig * CustMSE_NLL(ReconExtOut, EncInp)
 
     SigRepModel.add_loss(ReconOut_ext)
     SigRepModel.add_metric(ReconOut_ext, 'OrigRecLoss')
     print('OrigRecLoss added')
 
     ### Adding the FeatRecLoss; It allows connection between the extractor and generator
-    FeatRecLoss= Beta_Feat * CustMSE(tf.concat(FeatGenOut, axis=-1), tf.concat(FeatExtOut, axis=-1))
+    FeatRecLoss= Beta_Feat * CustMSE_NLL(tf.concat(FeatGenOut, axis=-1), tf.concat(FeatExtOut, axis=-1))
 
     SigRepModel.add_loss(FeatRecLoss)
     SigRepModel.add_metric(FeatRecLoss, 'FeatRecLoss')
@@ -195,7 +211,7 @@ def FACLosses (Models, LossConfigSet):
     ### Adding the RecLoss; 
     ReconExtOut_D1 = SplitBatch(ReconExtOut, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
     EncInp_D1 = SplitBatch(EncInp, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
-    ReconOut_ext = Beta_Orig * CustMSE(ReconExtOut_D1, EncInp_D1)
+    ReconOut_ext = Beta_Orig * CustMSE_NLL(ReconExtOut_D1, EncInp_D1)
 
     SigRepModel.add_loss(ReconOut_ext)
     SigRepModel.add_metric(ReconOut_ext, 'OrigRecLoss')
@@ -206,7 +222,7 @@ def FACLosses (Models, LossConfigSet):
     ### Adding the FeatRecLoss; It allows connection between the extractor and generator
     FeatGenOut_D1 = SplitBatch(tf.concat(FeatGenOut, axis=-1), HalfBatchIdx1, HalfBatchIdx2, mode='D1')
     FeatExtOut_D1 = SplitBatch(tf.concat(FeatExtOut, axis=-1), HalfBatchIdx1, HalfBatchIdx2, mode='D1')
-    FeatRecLoss= Beta_Feat * CustMSE(FeatGenOut_D1, FeatExtOut_D1)
+    FeatRecLoss= Beta_Feat * CustMSE_NLL(FeatGenOut_D1, FeatExtOut_D1)
 
     SigRepModel.add_loss(FeatRecLoss)
     SigRepModel.add_metric(FeatRecLoss, 'FeatRecLoss')
