@@ -415,7 +415,7 @@ class Evaluator ():
                 3) I_V_Zj       q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     p(v)                 <QV_Pop>
                 4) I_V_FCsZj    q(v|Sig_Zjb_FCbmSt)   <QV_Zjb_FCbmSt>       vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
                 
-                5) I_S_Zj       q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     q(s)                 <QV//QS_Batch>
+                5) I_S_Zj       q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                 <QV//QS_Batch>
                 6) I_S_FCsZj    q(s|Sig_Zjb_FCbmSt)   <QV//QS_Zjb_FCbmSt>   vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
 
                 7) H()//KLD()   q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
@@ -866,7 +866,7 @@ class Evaluator ():
                 3) I_V_Zj       q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     p(v)                 <QV_Pop>
                 4) I_V_CONsZj   q(v|Sig_Zjb_CONbmSt)   <QV_Zjb_CONbmSt>       vs     q(v|Sig_Zjb_CONbm)   <QV_Zjb_CONbm>
                 
-                5) I_S_Zj       q(s|Sig_Zjb_CONbm)     <QV//QS_Zjb_CONbm>     vs     q(s)                 <QV//QS_Batch>
+                5) I_S_Zj       q(s|Sig_Zjb_CONbm)     <QV//QS_Zjb_CONbm>     vs     p(s)                 <QV//QS_Batch>
                 6) I_S_CONsZj   q(s|Sig_Zjb_CONbmSt)   <QV//QS_Zjb_CONbmSt>   vs     q(s|Sig_Zjb_CONbm)   <QV//QS_Zjb_CONbm>
 
                 7) H()//KLD()   q(v|Sig_Zjbm_CONbm)    <QV_Zjbm_CONbm>       
