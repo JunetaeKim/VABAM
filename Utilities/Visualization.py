@@ -59,7 +59,7 @@ def HeatMapFreqZ ( SigGen, MinFreq=1, MaxFreq=51):
     
 ### ---------------------------------------- For the models with FCs ----------------------------------------  
     
-def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZval = -3., MaxZval = 3., zType='Fixed'):
+def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreqR =0.05, MinZval = -3., MaxZval = 3., zType='Fixed'):
     LatDim= FeatGenModel.input[-1].shape[-1]
     if zType=='Random':
         Z_pred=np.random.normal(0, 1, ( N_Gen, LatDim))
@@ -69,8 +69,8 @@ def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZ
         Z_pred = zValue
         
         
-    FC_Comm = np.tile(np.linspace(1e-7, MaxFreq, N_Gen )[:, None], (1,2))
-    FC_Each = np.tile(np.linspace(1e-7, MaxFreq, N_Gen )[:, None], (1,4))
+    FC_Comm = np.tile(np.linspace(1e-7, MaxFreqR, N_Gen )[:, None], (1,2))
+    FC_Each = np.tile(np.linspace(1e-7, MaxFreqR, N_Gen )[:, None], (1,4))
 
     FeatGen = FeatGenModel([FC_Comm,FC_Each, Z_pred])
     PredFCs = np.concatenate([FC_Comm,FC_Each], axis=-1)
@@ -83,18 +83,18 @@ def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreq =0.05, MinZ
     return SigGen, Amplitude
 
     
-def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
+def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MaxFreqR =0.05, MinFreq=1, MaxFreq=51):
     
     zVal = np.tile(ZFix, (N_Gen,1))
     
-    SigGen_FcVar, Amplitude_FcVar = GenSig_FCA(FeatGenModel,  ReconModel, zVal, N_Gen=N_Gen, zType='Fixed')
+    SigGen_FcVar, Amplitude_FcVar = GenSig_FCA(FeatGenModel,  ReconModel, zVal, N_Gen=N_Gen, MaxFreqR=MaxFreqR, zType='Fixed')
     Heatmap = Amplitude_FcVar[:, MinFreq:MaxFreq]
 
     fig, ax = plt.subplots(figsize=(7,6))
     cax = fig.add_axes([0.95, 0.25, 0.04, 0.5])
 
     im = ax.imshow(Heatmap,  cmap='viridis', aspect='auto',interpolation='nearest') 
-    ax.set(yticks=np.arange(1, N_Gen)[::10], yticklabels=np.round(np.linspace(1e-7, 0.05, N_Gen )[::10]*100, 1));
+    ax.set(yticks=np.arange(1, N_Gen)[::10], yticklabels=np.round(np.linspace(1e-7, MaxFreqR, N_Gen )[::10]*100, 1));
     ax.set(xticks=np.arange(1, MaxFreq)[::5]-0.5, xticklabels=np.arange(1, MaxFreq)[::5]);
     ax.set_xlabel('Frequency', fontsize=16)
     ax.set_ylabel('Frequency given for generating signals', fontsize=16) 
