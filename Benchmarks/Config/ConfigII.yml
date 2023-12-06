@@ -1,6 +1,6 @@
 TCVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
   Capacity_TC: 0.01 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of TC.
@@ -15,19 +15,19 @@ TCVAE_II_30: # SigType_LatDim
   WMI: 1 # The scaling weight for the MI loss.
   
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MnWTC: 0.001 # The min weight for the TC loss. 
   MnWMI: 0.001 # The min weight for the MI loss.
   
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   MxWTC: 0.001 # The max weight for the TC loss.
   MxWMI: 0.001 # The max weight for the MI loss.  
   
 
 TCVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
   Capacity_TC: 0.01 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of TC.
@@ -42,19 +42,19 @@ TCVAE_II_50: # SigType_LatDim
   WMI: 1 # The scaling weight for the MI loss.
   
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MnWTC: 0.001 # The min weight for the TC loss. 
   MnWMI: 0.001 # The min weight for the MI loss.
   
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   MxWTC: 0.001 # The max weight for the TC loss.
   MxWMI: 0.001 # The max weight for the MI loss.  
 
 
 FACVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   DiscHiddenSize: 50 # The size of the hidden nodes within the discriminator model.
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
@@ -70,19 +70,19 @@ FACVAE_II_30: # SigType_LatDim
   WDTC: 1 # The scaling weight for the DTC loss.
   
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MnWTC: 0.001 # The min weight for the TC loss.
   MnWDTC: 0.001 # The min weight for the DTC loss.
   
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   MxWTC: 0.001 # The max weight for the TC loss.
   MxWDTC: 0.001 # The max weight for the DTC loss.  
 
 
 FACVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   DiscHiddenSize: 50 # The size of the hidden nodes within the discriminator model.
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
@@ -98,19 +98,19 @@ FACVAE_II_50: # SigType_LatDim
   WDTC: 1 # The scaling weight for the DTC loss.
   
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MnWTC: 0.001 # The min weight for the TC loss.
   MnWDTC: 0.001 # The min weight for the DTC loss.
   
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   MxWTC: 0.001 # The max weight for the TC loss.
   MxWDTC: 0.001 # The max weight for the DTC loss.  
   
 
 ConVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -120,14 +120,14 @@ ConVAE_II_30: # SigType_LatDim
   WRec: 1 # The scaling weight for the reconstruction loss.
   WZ: 1 # The scaling weight for the Z loss.
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   
 
 ConVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -137,14 +137,14 @@ ConVAE_II_50: # SigType_LatDim
   WRec: 1 # The scaling weight for the reconstruction loss.
   WZ: 1 # The scaling weight for the Z loss.
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   
   
 BaseVAE_II_50: # SigType_LatDim
   LatDim: 50 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -154,14 +154,14 @@ BaseVAE_II_50: # SigType_LatDim
   WRec: 1 # The scaling weight for the reconstruction loss.
   WZ: 1 # The scaling weight for the Z loss.
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   
   
 BaseVAE_II_30: # SigType_LatDim
   LatDim: 30 # The dimensionality of the latent variable z.
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
   Capacity_Z: 0.1 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
 
@@ -171,7 +171,7 @@ BaseVAE_II_30: # SigType_LatDim
   WRec: 1 # The scaling weight for the reconstruction loss.
   WZ: 1 # The scaling weight for the Z loss.
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.005 # The min weight for the Z loss.
+  MnWZ: 0.003 # The min weight for the Z loss.
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.005 # The max weight for the Z loss.
+  MxWZ: 0.003 # The max weight for the Z loss.
   

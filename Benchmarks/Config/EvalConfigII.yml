@@ -1,0 +1,158 @@
+# The list of common objects subject to class serialization.
+Common_Info: ['SubResDic', 'AggResDic', 'BestZsMetrics', 'TrackerCand', 'CandFreqIDs', 'I_V_Z', 'I_V_ZjZ', 'MI_V_ZjZ', 
+              'PostSamp', 'LatDim', 'NSelZ', 'GenBatchSize', 'GPU'] 
+
+BaseVAE_II_30:             # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: null      # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: []          # The list of specific objects subject to class serialization.
+     
+     
+BaseVAE_II_50:             # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: null      # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: []          # The list of specific objects subject to class serialization.
+
+
+FACVAE_II_30:             # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: null      # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: []          # The list of specific objects subject to class serialization.
+
+
+FACVAE_II_50:             # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: null      # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: []          # The list of specific objects subject to class serialization.
+    
+    
+    
+ConVAE_II_30:             # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: 'CONDIN'  # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: [ 'I_V_Zj', 'I_V_CONsZj', 'I_S_Zj', 'I_S_CONsZj', 'MI_V_CONsZj', 'MI_S_CONsZj' ] # The list of specific objects subject to class serialization.
+    
+
+
+ConVAE_II_50:             # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: 'CONDIN'  # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: [ 'I_V_Zj', 'I_V_CONsZj', 'I_S_Zj', 'I_S_CONsZj', 'MI_V_CONsZj', 'MI_S_CONsZj' ] # The list of specific objects subject to class serialization.
+
+    
+    
+TCVAE_II_30:              # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: null      # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: []          # The list of specific objects subject to class serialization.
+
+
+
+TCVAE_II_50:              # SigType_LatDim_CompSize
+    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
+    MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
+    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
+    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
+    SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    SecDataType: null      # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+    Spec_Info: []          # The list of specific objects subject to class serialization.
