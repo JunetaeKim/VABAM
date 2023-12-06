@@ -138,7 +138,7 @@ SKZ_ART_50_800:            # SigType_LatDim_CompSize
 
 
 
-TCMIDKZFC_ART_30_800_LoTCKZ: # SigType_LatDim_CompSize 
+TCMIDKZFC_ART_30_800: # SigType_LatDim_CompSize 
     NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
@@ -160,7 +160,7 @@ TCMIDKZFC_ART_30_800_LoTCKZ: # SigType_LatDim_CompSize
     Spec_Info: [ ]
     
     
-TCMIDKZFC_ART_50_800_LoTCKZ: # SigType_LatDim_CompSize 
+TCMIDKZFC_ART_50_800: # SigType_LatDim_CompSize 
     NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
