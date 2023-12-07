@@ -31,11 +31,17 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
 
 
 
-def LoadModelConfigs(ConfigName, Training=True, Comp=True):
+def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, RootDirRes=None):
     
     # Whether the model performs signal compression (i.e., the main model) or not.
     CompSize = re.findall(r'\d+', ConfigName)[-1] if Comp else ''
- 
+
+    # Set default values for RootDirYaml and RootDirRes if they are None
+    if RootDirYaml is None:
+        RootDirYaml = './Config/'
+    if RootDirRes is None:
+        RootDirRes = './Results/'
+            
     if 'ART' in ConfigName:
         LoadConfig = 'Config' + 'ART' + CompSize
         SubPath = 'ART/'
@@ -48,16 +54,16 @@ def LoadModelConfigs(ConfigName, Training=True, Comp=True):
     else:
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type' + CompSize(optional) , such as ConfigART800."
 
-    YamlPath = './Config/' + LoadConfig+'.yml'
+    YamlPath = RootDirYaml + LoadConfig+'.yml'
     ConfigSet = ReadYaml(YamlPath) # The YAML file
         
     ### Model path
     ModelName = ConfigName +'.hdf5'
-    ModelPath = './Results/' + SubPath + ModelName
+    ModelPath = RootDirRes + SubPath + ModelName
    
     ### Checking whether the model path exists or not.
-    if not os.path.exists('./Results/' + SubPath) and Training == True:
-        os.makedirs('./Results/' + SubPath)
+    if not os.path.exists(RootDirRes + SubPath) and Training == True:
+        os.makedirs(RootDirRes + SubPath)
     
     return ConfigSet[ConfigName], ModelPath
 
