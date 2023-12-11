@@ -24,7 +24,7 @@ def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     return MaskVec, NoisVec
 
 
-def GenLowFilter (LF, N, Decay):
+def GenLowFilter (LF, N, Decay=0.):
     nVec = np.arange(N, dtype=np.float32)
     Window = tf.signal.hamming_window(N)
 
@@ -44,7 +44,7 @@ def GenLowFilter (LF, N, Decay):
     return LPF[:,None] 
 
 
-def GenHighFilter (HF, N, Decay):
+def GenHighFilter (HF, N, Decay=0.):
     nVec = np.arange(N, dtype=np.float32)
     Window = tf.signal.hamming_window(N)
 
@@ -143,7 +143,7 @@ def Encoder(SigDim, SlidingSize = 50, LatDim= 2, Type = '', MaskingRate = 0., No
 ## --------------------------------------------------   FeatExtractor  -------------------------------------------------------------
 def FeatExtractor(SigDim, LatDim= 2, CompSize = 600, DecayH = 0. , DecayL = 0. ):
     
-    FiltLen = (1000 - CompSize)//2 + 1
+    FiltLen = (SigDim - CompSize)//2 + 1
     
     EncReInp = Input(shape=(SigDim,), name='Inp_EncRe')
     FCs = Input(shape=(6,), name='Inp_FCs')
