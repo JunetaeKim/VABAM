@@ -59,6 +59,8 @@ def DefLosses (Models, DataSize, LossConfigSet):
     
     ###-------------------------------- Weights for losses -------------------------------------------- ###
     ### Weight controller; Apply beta and capacity 
+    ''' The values assigned to 'InitVal' are just initial values. TThey are dynamically modified within the on_epoch_end function in the RelLossWeight class, based on the values provided through BetaList as specified in the Config file. '''
+    
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.01)(SigRepModel.input)
     Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.01)(SigRepModel.input)
     Beta_TC = Lossweight(name='Beta_TC', InitVal=0.01)(SigRepModel.input)
