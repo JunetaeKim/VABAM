@@ -13,6 +13,8 @@ from Benchmarks.Models.BenchmarkCaller import *
 from Utilities.EvaluationMain import *
 from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs, LoadParams
 
+
+# Refer to the execution code
 # python .\BatchBMEvaluation.py --Config EvalConfigART --GPUID 0 
     
 

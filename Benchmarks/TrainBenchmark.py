@@ -8,11 +8,12 @@ from argparse import ArgumentParser
 from Utilities.Utilities import *
 from Benchmarks.Models.BenchmarkCaller import *
 
-
 import warnings
 warnings.filterwarnings('ignore')
 
 
+# Refer to the execution code
+# python .\TrainBenchmark.py --Config FACVAE_ART_30 --GPUID 0
    
 
 if __name__ == "__main__":

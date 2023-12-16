@@ -10,7 +10,9 @@ from Utilities.EvaluationMain import *
 from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs, LoadParams
 
 
-
+# Refer to the execution code
+# python .\BatchEvaluation.py --Config EvalConfigART800 --GPUID 0
+# python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0
 
     
 if __name__ == "__main__":
