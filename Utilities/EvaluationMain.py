@@ -464,7 +464,6 @@ class Evaluator ():
 
                 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
             I_V_Z_ = MeanKLD(self.QV_Zb_FCbm, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb_FCbm, self.QV_Zb_FCbm )  # I(V;z'|z)
             I_V_Zj_ =  MeanKLD(self.QV_Zjb_FCbm, self.QV_Pop[None] ) # I(V;z')
@@ -673,7 +672,6 @@ class Evaluator ():
 
 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
             I_V_Z_ = MeanKLD(self.QV_Zb, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb, self.QV_Zb )  # I(V;z'|z)
    
@@ -915,7 +913,6 @@ class Evaluator ():
 
                 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            # zPSD and fcPE stand for z-wise power spectral density and fc-wise permutation sets, respectively.
             I_V_Z_ = MeanKLD(self.QV_Zb_CONbm, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb_CONbm, self.QV_Zb_CONbm )  # I(V;z'|z)
             I_V_Zj_ =  MeanKLD(self.QV_Zjb_CONbm, self.QV_Pop[None] ) # I(V;z')
