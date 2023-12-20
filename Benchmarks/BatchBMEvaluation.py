@@ -87,10 +87,6 @@ if __name__ == "__main__":
         Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
         Params['Common_Info'] = EvalConfigs['Common_Info']
 
-        # Object save path
-        ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(Params['NSelZ'])+'.pkl'
-        SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(Params['NSelZ'])+'.npy'
-
 
         #### -----------------------------------------------------   Loading data -------------------------------------------------------------------------   
         if SigTypePrev != Params['SigType']:
@@ -130,7 +126,11 @@ if __name__ == "__main__":
 
         NSelZs = Params['NSelZ']
         for NZs in NSelZs:
-            
+
+            # Object save path
+            ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'.pkl'
+            SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(NZs)+'.npy'
+                
             # Instantiation 
             Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], 
                    NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'],  SelMetricType = Params['SelMetricType'],
