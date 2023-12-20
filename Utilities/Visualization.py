@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from Utilities.AncillaryFunctions import GenConArange
 
 import tensorflow as tf
 from tensorflow.keras import Model
@@ -251,9 +252,7 @@ def GenSig_CONA (ReconModel, zValue, ConData, N_Gen=200, MinZval = -3., MaxZval 
 
 def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
-    zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
-    for KeyVal in ZFix.items():
-        zVal[:,KeyVal[0]] = KeyVal[1]
+    zVal = np.tile(ZFix, (N_Gen,1))
     
     _, Amplitude_ConVar = GenSig_CONA(ReconModel, zVal, ConData, N_Gen=N_Gen, zType='Fixed')
     Heatmap = Amplitude_ConVar[:, MinFreq:MaxFreq]
@@ -274,9 +273,7 @@ def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, 
 def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
   
 
-    zVal = np.tile(np.zeros(LatDim), (N_Gen,1))
-    for KeyVal in ZFix.items():
-        zVal[:,KeyVal[0]] = KeyVal[1]
+    zVal = np.tile(ZFix, (N_Gen,1))
 
     CON_Arange = GenConArange(ConData, N_Gen)
     SigGen = ReconModel([zVal, CON_Arange])

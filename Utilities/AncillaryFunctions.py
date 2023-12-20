@@ -204,6 +204,41 @@ def SamplingFCs (NMiniBat, NGen, NFCs, SampFCType='ARand', FcLimit= 0.05):
     return FCs
     
 
+def GenConArange (ConData, NGen):
+    # Processing Conditional information 
+    ## Finding the column index of the max value in each row of ConData and sort the indices
+    ArgMaxP_PSPDF = np.argmax(ConData, axis=-1)
+    SortIDX = np.column_stack((np.argsort(ArgMaxP_PSPDF), ArgMaxP_PSPDF[np.argsort(ArgMaxP_PSPDF)]))
+
+    # Computing the number of iterations
+    UniqPSPDF = np.unique(ArgMaxP_PSPDF)
+    NIter = NGen // len(UniqPSPDF)
+
+    # Selecting one row index for each unique value, repeated for NIter times and ensure the total number of selected indices matches NGen
+    SelIDX = np.concatenate([np.random.permutation(SortIDX[SortIDX[:, 1] == psd])[:1] for psd in UniqPSPDF for _ in range(NIter)], axis=0)
+    SelIDX = np.vstack((SelIDX, np.random.permutation(SortIDX)[:NGen - len(SelIDX)]))
+
+    # Sorting IDX based on the max values
+    SelIDX = SelIDX[np.argsort(SelIDX[:, 1])]
+
+    ## Generating CON_Arange
+    return ConData[SelIDX[:,0]]
+
+
+def GenConArangeSimple (ConData, NGen, seed=1):
+
+    ### Selecting Conditional dataset randomly
+    np.random.seed(seed)
+    ConData = np.random.permutation(ConData)[:NGen]
+    
+    ### Identifying the index of maximum frequency for each selected condition
+    MaxFreqSelCond = np.argmax(ConData, axis=-1)
+    ### Sorting the selected conditions by their maximum frequency
+    Idx_MaxFreqSelCond = np.argsort(MaxFreqSelCond)
+    CONbm_Sort = ConData[Idx_MaxFreqSelCond]
+
+    return CONbm_Sort
+
 
 
 
