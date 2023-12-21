@@ -4,7 +4,7 @@ from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import RelLossWeight
 
 
-def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, ReturnModelPart=False, Reparam=True, ReparaStd=None, ModelSaveName=None):
+def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, ReturnModelPart=False, Reparam=True, ReparaStd=None, ModelSaveName=None, ModelSummary=True):
     
     assert not (Resume or LoadWeight) or ModelSaveName is not None, "ModelSaveName must be provided to load the weights."
     
@@ -49,7 +49,8 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
         
     # Model Compile
     SigRepModel.compile(optimizer='adam') 
-    SigRepModel.summary()
+    if ModelSummary == True:
+        SigRepModel.summary()
     
     
     # Model Training
