@@ -16,7 +16,7 @@ from Utilities.Utilities import CompResource
 class Evaluator ():
     
     def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  NGen=100, ReparaStdZj = 1, NSelZ = 1, 
-                  SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=True, Name=None):
+                  SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=False, Name=None):
 
         
         # Optional parameters with default values
@@ -29,7 +29,7 @@ class Evaluator ():
         self.NSelZ = NSelZ                   # The size of js to be selected at the same time (default: 1).
         self.SampBatchSize = SampBatchSize   # The batch size during prediction of the sampling model.
         self.GenBatchSize= GenBatchSize      # The batch size during prediction of the generation model.
-        self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+        self.GPU = GPU                       # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
         self.SelMetricCut = SelMetricCut     # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
         self.SelMetricType = SelMetricType   # The type of metric used for selecting Zs and ancillary data. 
         self.Name = Name                     # Model name.
