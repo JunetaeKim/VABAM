@@ -17,7 +17,7 @@ FACFC_ART_30_800:          # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -39,7 +39,7 @@ FACFC_ART_50_800:          # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -61,7 +61,7 @@ SKZFC_ART_30_800:          # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -83,7 +83,7 @@ SKZFC_ART_50_800:          # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -106,7 +106,7 @@ SKZ_ART_30_800:            # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -128,7 +128,7 @@ SKZ_ART_50_800:            # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -151,7 +151,7 @@ TCMIDKZFC_ART_30_800: # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -173,7 +173,7 @@ TCMIDKZFC_ART_50_800: # SigType_LatDim_CompSize
     GenBatchSize: 50000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
-    GPU: True              # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
     SelMetricCut: 1.       # MetricCut: The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     SecDataType: 'FCIN'    # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
