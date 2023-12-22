@@ -37,14 +37,12 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
     if LossType =='Default':
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
         SigRepModel = DefLosses(Models, DataSize, SelConfigSet)
-        ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel]
         
     elif LossType =='FACLosses':
         DiscHiddenSize = SelConfigSet['DiscHiddenSize']
         FacDiscModel = FacDiscriminator(LatDim, DiscHiddenSize)
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel, FacDiscModel] 
         SigRepModel = FACLosses(Models, SelConfigSet)
-        ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel]
 
         
     # Model Compile
@@ -62,7 +60,7 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
     if ReturnModelPart == False:
         return SigRepModel
     else:
-        return SigRepModel, ModelParts
+        return SigRepModel, Models
 
 
 # Dynamic controller for losses
