@@ -10,8 +10,8 @@ BaseVAE_II_30:             # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -29,8 +29,8 @@ BaseVAE_II_50:             # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -48,8 +48,8 @@ FACVAE_II_30:             # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -67,8 +67,8 @@ FACVAE_II_50:             # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -87,8 +87,8 @@ ConVAE_II_30:             # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -107,8 +107,8 @@ ConVAE_II_50:             # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -127,8 +127,8 @@ TCVAE_II_30:              # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -147,8 +147,8 @@ TCVAE_II_50:              # SigType_LatDim_CompSize
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 100000  # The batch size during prediction of the sampling model.
-    GenBatchSize: 50000    # The batch size during prediction of the generation model.
+    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    GenBatchSize: 10000    # The batch size during prediction of the generation model.
     NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."

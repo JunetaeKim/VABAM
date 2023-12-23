@@ -237,18 +237,52 @@ TCMIDKZFC_II_50_800: # SigType_LatDim_CompSize
   
   MnWRec: 80 # The min weight for the reconstruction loss.
   MnWFeat: 100 # The min weight for the feature loss.
-  MnWZ: 0.0001 # The min weight for the Z loss.
+  MnWZ: 0.00005 # The min weight for the Z loss.
   MnWFC: 1. # The min weight for the FC loss.
   MnWTC: 0.00001 # The min weight for the TC loss. 
   MnWMI: 0.00001 # The min weight for the MI loss.
   
   MxWRec: 80 # The max weight for the reconstruction loss.
   MxWFeat: 100 # The max weight for the feature loss.
-  MxWZ: 0.0001 # The max weight for the Z loss.
+  MxWZ: 0.00005 # The max weight for the Z loss.
   MxWFC: 1. # The max weight for the FC loss.  0.55
   MxWTC: 0.00001 # The max weight for the TC loss.
   MxWMI: 0.00001 # The max weight for the MI loss.  
   
+
+SKZ_II_30_800: # SigType_LatDim_CompSize
+  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  LatDim: 30 # The dimensionality of the latent variable z.
+  CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
+  MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
+  NoiseStd: 0.00 # The standard deviation value for Gaussian noise generation across the entire signal.
+  MaskStd: 0.00 # The standard deviation value for Gaussian noise generation applied to the masked signal.
+  ReparaStd: 0.1 # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+  Capacity_Z: 0.05 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Z.
+  Capacity_Fc: 0.005 # The capacity value for controlling the Kullback-Leibler divergence (KLD) of Fc.
+  FcLimit: 1. # The upper threshold value for frequency.
+  DecayH: 0.00 # The decay effect on the cutoff frequency when creating a high-pass filter.
+  DecayL: 0.00 # The decay effect on the cutoff frequency when creating a low-pass filter.
+  
+  BatSize: 3000 # The batch size for the training
+  NEpochs: 5000 # The epoch size for the training
+  LossType: 'Default' # The loss type for the experiment.: TCLosses or FACLosses
+  SpecLosses: ['SKZ'] # A list set of specific loss nicknames to add, aside from the common losses ['SKZ' 'DKZ' 'FC' 'TC' 'MI']; this can be used for ablation purposes
+  
+  #Each weight may be activated or not depending on the model type.
+  WRec: 1 # The scaling weight for the reconstruction loss.
+  WFeat: 1 # The scaling weight for the feature loss.
+  WZ: 1 # The scaling weight for the Z loss. 
+  WFC: 1 # The scaling weight for the FC loss.     
+  
+  MnWRec: 50 # The min weight for the reconstruction loss.
+  MnWFeat: 10 # The min weight for the feature loss.
+  MnWZ: 0.0001 # The min weight for the Z loss.
+  
+  MxWRec: 50 # The max weight for the reconstruction loss.
+  MxWFeat: 10 # The max weight for the feature loss.
+  MxWZ: 0.0001 # The max weight for the Z loss.  
+
 
 SKZ_II_50_800: # SigType_LatDim_CompSize
   SigType: II # Types of signals to train on.: ART, PLETH, II. 
