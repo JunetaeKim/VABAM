@@ -16,7 +16,7 @@ from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, 
 
 # Refer to the execution code
 # python .\BatchBMEvaluation.py --Config EvalConfigART --GPUID 0 
-    
+# python .\BatchBMEvaluation.py --Config EvalConfigART --ConfigSpec BaseVAE_ART_30 --GPUID 4    
 
 if __name__ == "__main__":
 
