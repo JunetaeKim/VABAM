@@ -582,6 +582,8 @@ class Evaluator ():
         
         def TaskLogic(SubData):
 
+            print('-------------  ',self.Name,'  -------------')
+
             ### ------------------------------------------------ Sampling ------------------------------------------------ ###
             # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
             self.NMiniBat = len(SubData) 
@@ -771,6 +773,8 @@ class Evaluator ():
         
         
         def TaskLogic(SubData):
+
+            print('-------------  ',self.Name,'  -------------')
 
             ### ------------------------------------------------ Sampling ------------------------------------------------ ###
             # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
