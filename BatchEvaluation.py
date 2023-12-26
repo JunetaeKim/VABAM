@@ -13,6 +13,7 @@ from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, 
 # Refer to the execution code
 # python .\BatchEvaluation.py --Config EvalConfigART800 --GPUID 0
 # python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0
+# python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0 --SpecNZs 40 50
 
     
 if __name__ == "__main__":
@@ -25,11 +26,14 @@ if __name__ == "__main__":
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the YAML file).')
     parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, 
                         default=None, help='Set the name of the specific configuration to load (the name of the model config in the YAML file).')
+    parser.add_argument('--SpecNZs', nargs='+', type=int, required=False, 
+                        default=None, help='Set the size of js to be selected at the same time with the list.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
     ConfigSpecName = args.ConfigSpec
+    SpecNZs = args.SpecNZs
     GPU_ID = args.GPUID
     
     YamlPath = './Config/'+ConfigName+'.yml'
@@ -122,9 +126,11 @@ if __name__ == "__main__":
 
 
 
-        #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------   
-
-        NSelZs = Params['NSelZ']
+        #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------          # Is the value assigned by ArgumentParser or assigned by YML?
+        if SpecNZs == None:
+            NSelZs = Params['NSelZ']
+        else:
+            NSelZs = SpecNZs
 
         for NZs in NSelZs:
 
