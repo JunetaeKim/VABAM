@@ -15,9 +15,9 @@ from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, 
 
 
 # Refer to the execution code
-# python .\BatchBMEvaluation.py --Config EvalConfigART --GPUID 0 
-# python .\BatchBMEvaluation.py --Config EvalConfigART --ConfigSpec BaseVAE_ART_30 --GPUID 4    
-# python .\BatchBMEvaluation.py --Config EvalConfigII --ConfigSpec ConVAE_II_50 --GPUID 4 --SpecNZs 40 50
+# python .\BatchBMMIEvaluation.py --Config EvalConfigART --GPUID 0 
+# python .\BatchBMMIEvaluation.py --Config EvalConfigART --ConfigSpec BaseVAE_ART_30 --GPUID 4    
+# python .\BatchBMMIEvaluation.py --Config EvalConfigII --ConfigSpec ConVAE_II_50 --GPUID 4 --SpecNZs 40 50
 
 if __name__ == "__main__":
 
@@ -46,14 +46,18 @@ if __name__ == "__main__":
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"]= str(GPU_ID)
 
-    # TensorFlow wizardry
-    config = tf.compat.v1.ConfigProto()
-    # Don't pre-allocate memory; allocate as-needed
-    config.gpu_options.allow_growth = True
-    # Only allow a total of half the GPU memory to be allocated
-    config.gpu_options.per_process_gpu_memory_fraction = 1.0
-    # Create a session with the above options specified.
-    tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))         
+    # TensorFlow memory configuration
+    gpus = tf.config.experimental.list_physical_devices('GPU')
+    if gpus:
+        try:
+            gpu = gpus[0]  # Fix the index as zero since GPU_ID has already been given. 
+            tf.config.experimental.set_memory_growth(gpu, True)
+            tf.config.experimental.set_virtual_device_configuration
+            (
+                gpu, [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=(1024*23.5))]  
+            )
+        except RuntimeError as e:
+            print(e)         
 
     
     # Checking whether the path to save the object exists or not.
