@@ -241,6 +241,35 @@ def GenConArangeSimple (ConData, NGen, seed=1):
 
 
 
+def Denorm (NormX, MaxX, MinX):
+    return NormX * (MaxX - MinX) + MinX 
+
+
+def MAPECal (TrueData, PredSigRec, MaxX, MinX):
+    # Denormalization
+    DenormTrueData = Denorm(TrueData, MaxX, MinX).copy()
+    DenormPredSigRec = Denorm(PredSigRec, MaxX, MinX).copy()
+   
+    # MAPE
+    MAPEdenorm = np.mean(np.abs((DenormTrueData - DenormPredSigRec) / DenormTrueData)) * 100
+    MAPEnorm = np.mean(np.abs(((TrueData+1e-7) - PredSigRec) / (TrueData+1e-7))) * 100
+
+    return MAPEnorm, MAPEdenorm
+
+
+def MSECal (TrueData, PredSigRec, MaxX, MinX):
+    # Denormalization
+    DenormTrueData = Denorm(TrueData, MaxX, MinX).copy()
+    DenormPredSigRec = Denorm(PredSigRec, MaxX, MinX).copy()
+   
+    # MAPE
+    MSEdenorm = np.mean((DenormTrueData - DenormPredSigRec)**2)
+    MSEnorm = np.mean((TrueData - PredSigRec)**2)
+    
+    return MSEnorm, MSEdenorm
+
+
+
 
 
         
