@@ -15,7 +15,7 @@ from Utilities.AncillaryFunctions import Denorm, MAPECal, MSECal
 
 # Refer to the execution code
 # python .\TabulatingResults.py -CP ./Config/ --GPUID 0
-
+# python .\TabulatingResults.py -CP ./Config/ -NJ 10 -MC 1 -BS 3000  --GPUID 0 EvalConfigART500.yml
 
 
 def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
@@ -139,13 +139,19 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--ConfigPath', '-CP', type=str, required=True, help='Set the path of the configuration to load (the name of the YAML file).')
+    parser.add_argument('-NJ', type=int, required=False, default=1, help='The size of js to be selected at the same time (default: 1).')
+    parser.add_argument('--MetricCut', '-MC',type=int, required=False, default=1, help='The threshold for Zs and ancillary data where the metric value is below SelMetricCut (default: 1)')
+    parser.add_argument('--BatSize', '-BS',type=int, required=False, default=5000, help='The batch size during prediction.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     YamlPath = args.ConfigPath
+    NJ = args.NJ
+    MetricCut = args.MetricCut
+    BatSize = args.BatSize
     GPU_ID = args.GPUID
+   
 
-    
     ## GPU selection
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"]= "0"
@@ -168,7 +174,7 @@ if __name__ == "__main__":
                  
     #### -----------------------------------------------------  Conducting tabulation --------------------------------------------------------------
                  
-    Exp = r'ART|II|\d+'  # Regular expression pattern for 'ART', 'II', or any sequence of digits.
+    Exp = r'ART|II|\d+'  # Regular expression pattern for 'ART' and 'II'.
     
     EvalConfigList = os.listdir(YamlPath) # Retrieve a list of all files in the YamlPath directory.
     EvalConfigList = [i for i in EvalConfigList if 'Eval' in i] # Filter the list to include only files that contain 'Eval' in their names.
@@ -194,8 +200,8 @@ if __name__ == "__main__":
         # Iterate through each filtered configuration name.
         for ConfigName in ConfigNames:
             # Perform aggregation (custom function) and retrieve results.
-            MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=1)
-            
+            MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
+             
             # Append the results to their respective lists.
             ModelName.append(ConfigName)
             MSEnormRes.append(MSEnorm)
@@ -217,5 +223,5 @@ if __name__ == "__main__":
         # Save the AccKLDtables to a CSV file.
         DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
         AccKLDtables = pd.DataFrame(DicRes)
-        AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(TableName) + '.csv', index=False)
+        AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(TableName) + '_Nj'+str(NJ) +'.csv', index=False)
         
