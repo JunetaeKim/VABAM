@@ -218,7 +218,7 @@ if __name__ == "__main__":
         TableName = ''.join(TableName)  # Concatenate the extracted parts.
         
         # Save the MItables to a CSV file.
-        MItables.to_csv('./EvalResults/Tables/MI_' + str(TableName) + '.csv', index=False)
+        MItables.to_csv('./EvalResults/Tables/MI_' + str(TableName) +'_Nj'+str(NJ) + '.csv', index=False)
     
         # Save the AccKLDtables to a CSV file.
         DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
