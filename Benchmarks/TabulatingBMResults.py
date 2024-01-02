@@ -1,21 +1,23 @@
+import sys
+# setting path
+sys.path.append('../')
+
 import os
-import pandas as pd
-import numpy as np
 import re
-import pickle
+import numpy as np
 from argparse import ArgumentParser
+import pandas as pd
+import pickle
 
-
-from Models.Caller import *
-from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects
-from BatchMIEvaluation import LoadModelConfigs, LoadParams
+from Benchmarks.Models.BenchmarkCaller import *
 from Utilities.EvaluationMain import *
+from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs, LoadParams
 from Utilities.AncillaryFunctions import Denorm, MAPECal, MSECal
 
 
 # Refer to the execution code
-# python .\TabulatingResults.py -CP ./Config/ --GPUID 0
-# python .\TabulatingResults.py -CP ./Config/ -NJ 10 -MC 1 -BS 3000  --GPUID 0 
+# python .\TabulatingBMResults.py -CP ./Config/ --GPUID 0
+# python .\TabulatingBMResults.py -CP ./Config/ -NJ 10 -MC 1 -BS 3000  --GPUID 0 
 
 
 def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
@@ -28,7 +30,7 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     print('Loading configurations and objects' )
     ## Loading the model configurations
     EvalConfigs = ReadYaml(ConfigPath)
-    ModelConfigSet, ModelLoadName = LoadModelConfigs(ConfigName)
+    ModelConfigSet, ModelLoadName = LoadModelConfigs(ConfigName, Comp=False)
     
     ## Loading parameters for the evaluation
     Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
@@ -37,22 +39,23 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     ## Object Load path
     ObjLoadPath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NJ)+'.pkl'
     SampZjLoadPath = './Data/IntermediateData/'+ConfigName+'_SampZj_'+str(Params['NSelZ'])+'.npy'
-
-
-
+    
+    
     # Data part
     print('-----------------------------------------------------' )
     print('Loading data')
     ## Loading data
-    AnalData = np.load('./Data/ProcessedData/Val'+str(Params['SigType'])+'.npy')
+    VallData = np.load('../Data/ProcessedData/Val'+str(Params['SigType'])+'.npy')
+    TrData = np.load('../Data/ProcessedData/Tr'+str(Params['SigType'])+'.npy')
+    
     
     ## Intermediate parameters 
-    SigDim = AnalData.shape[1]
-    DataSize = AnalData.shape[0]
+    SigDim = VallData.shape[1]
+    DataSize = VallData.shape[0]
     
-    with open('./Data/ProcessedData/SigMax.pkl', 'rb') as f:
+    with open('../Data/ProcessedData/SigMax.pkl', 'rb') as f:
         SigMax = pickle.load(f)
-    with open('./Data/ProcessedData/SigMin.pkl', 'rb') as f:
+    with open('../Data/ProcessedData/SigMin.pkl', 'rb') as f:
         SigMin = pickle.load(f)
     
     
@@ -62,58 +65,72 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
         MaxX, MinX = SigMax['PLETH'], SigMin['PLETH']
     elif 'II' in ConfigName:
         MaxX, MinX = SigMax['II'], SigMin['II']
-
-
     
     # Model part
     print('-----------------------------------------------------' )
     print('Loading model structures')
     ## Calling Modesl
-    SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, Reparam=False, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadName, ModelSummary=False)
+    BenchModel, _, AnalData = ModelCall (ModelConfigSet, ConfigName, TrData, VallData, LoadWeight=True, Reparam=False, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadName)
     
-    ## Setting Model Specifications and Sub-models
-    if Params['LossType'] =='Default':
-        EncModel, FeatExtModel, FeatGenModel, ReconModel = ModelParts
-    elif Params['LossType'] =='FACLosses':
-        EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel = ModelParts
-            
+    
     ## The generation model for evaluation
-    RecOut = ReconModel(FeatGenModel.output)
-    GenModel = Model(FeatGenModel.input, RecOut)
-
+    GenModel = BenchModel.get_layer('ReconModel')
+    
     ## The sampling model for evaluation
-    Zs_Out = SigRepModel.get_layer('Zs').output
-    SampModel = Model(EncModel.input, Zs_Out)
-
-
+    Inp_Enc = BenchModel.get_layer('Inp_Enc')
+    Zs = BenchModel.get_layer('Zs').output
+    
+    if Params['SecDataType'] == 'CONDIN':
+        Inp_Cond = BenchModel.get_layer('Inp_Cond')
+        SampModel = Model([Inp_Enc.input, Inp_Cond.input], Zs)
+    else:
+        SampModel = Model(Inp_Enc.input, Zs)
+    
+    
     # Evaluating MAPEs
     ## Prediction
     print('-----------------------------------------------------' )
     print('MAPE calculation')
-    PredSigRec = SigRepModel.predict(AnalData, batch_size=BatSize, verbose=1)[-2]
-   
+    
+    PredRes = BenchModel.predict(AnalData, batch_size=BatSize, verbose=1)
+    if 'FAC' in ConfigName:
+        PredSigRec = PredRes[-1]
+    else:
+        PredSigRec = PredRes
+    
+    if Params['SecDataType'] == 'CONDIN':
+        InpData = AnalData[0]
+    else:
+        InpData = AnalData
+    
+    
     ## MAPE    
-    MAPEnorm, MAPEdenorm = MAPECal(AnalData, PredSigRec, MaxX, MinX)
+    MAPEnorm, MAPEdenorm = MAPECal(InpData, PredSigRec, MaxX, MinX)
     ## MSE    
-    MSEnorm, MSEdenorm = MSECal(AnalData, PredSigRec, MaxX, MinX)
-
+    MSEnorm, MSEdenorm = MSECal(InpData, PredSigRec, MaxX, MinX)
+    
     # Evaluating Mutual information
     ## Creating new instances
     NewEval = Evaluator()
     # Populating it with the saved data
     DeserializeObjects(NewEval, ObjLoadPath)
-
+    if Params['SecDataType'] == 'CONDIN':
+        NewEval.SecDataType = 'CONDIN'
+    else:
+        NewEval.SecDataType = False
+    
     # Post evaluation of KLD
     ## MetricCut: The threshold value for selecting Zs whose Entropy of PSD (i.e., SumH) is less than the MetricCut
     PostSamp = NewEval.SelPostSamp( MetricCut)
 
     ## Calculation of KLD
     NewEval.GenModel = GenModel
-    NewEval.KLD_TrueGen(AnalSig=AnalData, PlotDist=False) 
+    NewEval.KLD_TrueGen(AnalSig=InpData, PlotDist=False) 
     MeanKld_GTTG = (NewEval.KldPSD_GenTrue + NewEval.KldPSD_TrueGen) / 2
-
+    
+    
     print(MeanKld_GTTG)
-
+    
     ''' Renaming columns '''
     # r'I(V;Z)'
     # r'I(V; \acute{Z} \mid Z)'
@@ -123,7 +140,11 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     # r'I(S;\acute{\Theta} \mid \acute{Z})'
     
     MIVals = pd.DataFrame(NewEval.SubResDic)
-    MIVals.columns = [r'(1) I(V;Z)',r'(2) $I(V; \acute{Z} \mid Z)$',  r'(3) $I(V;\acute{Z})$', r'(4) $I(V;\acute{\Theta} \mid \acute{Z})$', r'(5) $I(S;\acute{Z})$', r'(6) $I(S;\acute{\Theta} \mid \acute{Z})$']
+    if Params['SecDataType'] == 'CONDIN':
+        MIVals.columns = [r'(1) I(V;Z)',r'(2) $I(V; \acute{Z} \mid Z)$',  r'(3) $I(V;\acute{Z})$', r'(4) $I(V;\acute{\Theta} \mid \acute{Z})$', r'(5) $I(S;\acute{Z})$', r'(6) $I(S;\acute{\Theta} \mid \acute{Z})$']
+    else:
+        MIVals.columns = [r'(1) I(V;Z)',r'(2) $I(V; \acute{Z} \mid Z)$']
+        
     MIVals['Model'] = ConfigName
     longMI = MIVals.melt(id_vars='Model', var_name='Metrics', value_name='Values')
 
@@ -175,7 +196,7 @@ if __name__ == "__main__":
     #### -----------------------------------------------------  Conducting tabulation --------------------------------------------------------------
                  
     Exp = r'ART|II|\d+'  # Regular expression pattern for 'ART' and 'II'.
-    
+   
     EvalConfigList = os.listdir(YamlPath) # Retrieve a list of all files in the YamlPath directory.
     EvalConfigList = [i for i in EvalConfigList if 'Eval' in i] # Filter the list to include only files that contain 'Eval' in their names.
     
@@ -201,7 +222,7 @@ if __name__ == "__main__":
         for ConfigName in ConfigNames:
             # Perform aggregation (custom function) and retrieve results.
             MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
-             
+            
             # Append the results to their respective lists.
             ModelName.append(ConfigName)
             MSEnormRes.append(MSEnorm)
@@ -218,10 +239,10 @@ if __name__ == "__main__":
         TableName = ''.join(TableName)  # Concatenate the extracted parts.
         
         # Save the MItables to a CSV file.
-        MItables.to_csv('./EvalResults/Tables/MI_' + str(TableName) +'_Nj'+str(NJ) + '.csv', index=False)
+        MItables.to_csv('./EvalResults/Tables/BMMI_' + str(TableName) +'_Nj'+str(NJ) + '.csv', index=False)
     
         # Save the AccKLDtables to a CSV file.
         DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
         AccKLDtables = pd.DataFrame(DicRes)
-        AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(TableName) + '_Nj'+str(NJ) +'.csv', index=False)
+        AccKLDtables.to_csv('./EvalResults/Tables/BMAccKLD_' + str(TableName) + '_Nj'+str(NJ) +'.csv', index=False)
         
