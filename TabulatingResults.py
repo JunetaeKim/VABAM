@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
     ## GPU selection
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"]= "0"
+    os.environ["CUDA_VISIBLE_DEVICES"]= str(GPU_ID)
     
     # TensorFlow memory configuration
     gpus = tf.config.experimental.list_physical_devices('GPU')
