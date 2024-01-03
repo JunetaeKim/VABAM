@@ -31,7 +31,10 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     ## Loading the model configurations
     EvalConfigs = ReadYaml(ConfigPath)
     ModelConfigSet, ModelLoadName = LoadModelConfigs(ConfigName, Comp=False)
-    
+
+    if ModelConfigSet['LatDim'] < NJ:
+        return None, None, None, None, None, None  # To ensure consistency with the main return statement, return 6 None
+        
     ## Loading parameters for the evaluation
     Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
     Params['Common_Info'] = EvalConfigs['Common_Info']
@@ -160,14 +163,14 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--ConfigPath', '-CP', type=str, required=True, help='Set the path of the configuration to load (the name of the YAML file).')
-    parser.add_argument('-NJ', type=int, required=False, default=1, help='The size of js to be selected at the same time (default: 1).')
+    parser.add_argument('--SpecNZ','-NJ', type=int, required=False, default=1, help='The size of js to be selected at the same time (default: 1).')
     parser.add_argument('--MetricCut', '-MC',type=int, required=False, default=1, help='The threshold for Zs and ancillary data where the metric value is below SelMetricCut (default: 1)')
     parser.add_argument('--BatSize', '-BS',type=int, required=False, default=5000, help='The batch size during prediction.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     YamlPath = args.ConfigPath
-    NJ = args.NJ
+    NJ = args.SpecNZ
     MetricCut = args.MetricCut
     BatSize = args.BatSize
     GPU_ID = args.GPUID
@@ -222,7 +225,10 @@ if __name__ == "__main__":
         for ConfigName in ConfigNames:
             # Perform aggregation (custom function) and retrieve results.
             MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
-            
+
+            if MSEnorm is None:  # If 'LatDim' is less than 'NJ', stop executing the remaining code within this loop.
+                continue;
+                         
             # Append the results to their respective lists.
             ModelName.append(ConfigName)
             MSEnormRes.append(MSEnorm)
