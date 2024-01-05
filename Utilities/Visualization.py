@@ -87,7 +87,7 @@ def GenSig_FCA (FeatGenModel, ReconModel, zValue, N_Gen=200, MaxFreqR =0.05, Min
     return SigGen, Amplitude
 
     
-def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MaxFreqR =0.05, MinFreq=1, MaxFreq=51):
+def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, ZFix, N_Gen=300, MaxFreqR =0.05, MinFreq=1, MaxFreq=51):
     
     zVal = np.tile(ZFix, (N_Gen,1))
     
@@ -124,7 +124,7 @@ def VisReconExtractZ_FC (Data, idx, FeatExtModel, ReconModel, FC_Comm, FC_Each, 
     return RecPred, HH,HL,LH, LL
 
 
-def VisReconGivenZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
+def VisReconGivenZ_FCA (FeatGenModel,  ReconModel, ZFix, Mode='Origin', N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
     
     assert Mode in ['Origin','HH','HL','LH','LL'], '''either 'Origin', 'HH', 'HL', 'LH', and 'LL' is allowed for 'Mode' '''
 
@@ -231,7 +231,7 @@ def VisReconGivenFC_ZA (FeatGenModel,  ReconModel, LatDim, FcCommFix, FcEachFix,
 
 ### ---------------------------------------- For ConVAE ----------------------------------------
 
-def GenSig_CONA (ReconModel, zValue, ConData, N_Gen=200, MinZval = -3., MaxZval = 3., zType='Fixed'):
+def GenSig_CONA (ReconModel, zValue, ConData, LatDim, N_Gen=200, MinZval = -3., MaxZval = 3., zType='Fixed'):
 
     if zType=='Random':
         Z_pred=np.random.normal(0, 1, ( N_Gen, LatDim))
@@ -253,7 +253,7 @@ def GenSig_CONA (ReconModel, zValue, ConData, N_Gen=200, MinZval = -3., MaxZval 
     return SigGen, Amplitude
 
 
-def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
+def HeatMapFreqZ_CONA (ReconModel, ConData,  ZFix, N_Gen=300, MinFreq=1, MaxFreq=51):
     
     zVal = np.tile(ZFix, (N_Gen,1))
     
@@ -273,7 +273,7 @@ def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, 
     plt.show()
 
     
-def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300):
+def VisReconGivenZ_CONA (ReconModel, ConData,  ZFix, N_Gen=300):
   
 
     zVal = np.tile(ZFix, (N_Gen,1))
