@@ -2,23 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from Utilities.AncillaryFunctions import GenConArange
+from Utilities.AncillaryFunctions import GenConArangeSimple
 
 import tensorflow as tf
 from tensorflow.keras import Model
 
 
-def VisReconGivenZ (ReconModel, LatDim, ZFix,  MinFreqR=0, MaxFreqR=0.05):
-    N_Gen = len(ZFix)
-    zVal = np.tile(np.zeros(LatDim), (len(ZFix), 1))
+def VisReconGivenZ (ReconModel, zValue,  N_Gen=300, MinFreqR=0, MaxFreqR=0.05):
 
-    for Num, KeyVal in enumerate (ZFix.items()):
-        zVal[Num,list(KeyVal[1].keys())] = list(KeyVal[1].values())
-
-    
-    ''' When given z latent values that have non-zero values in only one dimension, 
-    generate signals of N_Gen size, then return the amplitude of the frequency through a Fourier transform. 2D Max[N_Gen, Zs.]'''
-    SigGen = ReconModel.predict(zVal)
+    SigGen = ReconModel.predict(zValue)
     
     # Create a colormap and normalize it based on the number of experiments
     cmap = cm.get_cmap('viridis')
@@ -239,7 +231,7 @@ def GenSig_CONA (ReconModel, zValue, ConData, N_Gen=200, MinZval = -3., MaxZval 
         
         
     ## Generating CON_Arange
-    CON_Arange = GenConArange(ConData, N_Gen)
+    CON_Arange = GenConArangeSimple(ConData, N_Gen)
 
     SigGen = ReconModel([Z_pred, CON_Arange])
 
@@ -275,7 +267,7 @@ def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreqR=
 
     zVal = np.tile(ZFix, (N_Gen,1))
 
-    CON_Arange = GenConArange(ConData, N_Gen)
+    CON_Arange = GenConArangeSimple(ConData, N_Gen)
     SigGen = ReconModel([zVal, CON_Arange])
     
     # Create a colormap and normalize it based on the number of experiments
