@@ -8,18 +8,29 @@ import tensorflow as tf
 from tensorflow.keras import Model
 
 
-def VisReconGivenZ (ReconModel, zValue,  N_Gen=300, MinFreqR=0, MaxFreqR=0.05):
+def VisReconGivenZ (ReconModel, zValue,  N_Gen=300):
 
     SigGen = ReconModel.predict(zValue)
     
     # Create a colormap and normalize it based on the number of experiments
     cmap = cm.get_cmap('viridis')
     norm = plt.Normalize(0, N_Gen-1)
+    MeanZs = np.mean(zValue, axis=1)
+    norm2 = plt.Normalize(min(MeanZs), max(MeanZs))
 
     fig, ax = plt.subplots(figsize=(15, 7))
     for i in range(0, N_Gen):
         color = cmap(norm(i))
         ax.plot(SigGen[i], color=color)
+
+
+    # Create color bar
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.1)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label('Mean of z for signal generation', size=14)
 
     plt.show()
     
@@ -43,7 +54,7 @@ def HeatMapFreqZ ( SigGen, MinFreq=1, MaxFreq=51):
     #ax.set(yticks=np.arange(1, N_Gen)[::25], yticklabels=np.round(np.arange(1, N_Gen)[::25], 1));
     ax.set(xticks=np.arange(1, MaxFreq)[::5]-0.5, xticklabels=np.arange(1, MaxFreq)[::5]);
     ax.set_xlabel('Frequency', fontsize=16)
-    ax.set_ylabel('Generated signals', fontsize=16) 
+    ax.set_ylabel('Index of signals generated with a series of mean of z', fontsize=13) 
 
     fig.colorbar(im, cax=cax, orientation='vertical')
     plt.show()
@@ -256,7 +267,7 @@ def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, 
     ax.set(yticks=np.arange(0, N_Gen)[::20]);
     ax.set(xticks=np.arange(1, MaxFreq)[::5]-0.5, xticklabels=np.arange(1, MaxFreq)[::5]);
     ax.set_xlabel('Frequency', fontsize=16)
-    ax.set_ylabel('Index of signals generated with a series of $\\acute{\\theta}$', fontsize=16) 
+    ax.set_ylabel('Index of signals generated with a series of $\\acute{\\theta}$', fontsize=14) 
 
     fig.colorbar(im, cax=cax, orientation='vertical')
     plt.show()
