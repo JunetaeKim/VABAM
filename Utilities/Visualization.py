@@ -87,10 +87,10 @@ def HeatMapFreqZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, N_Gen=300, MaxFre
     cax = fig.add_axes([0.95, 0.25, 0.04, 0.5])
 
     im = ax.imshow(Heatmap,  cmap='viridis', aspect='auto',interpolation='nearest') 
-    ax.set(yticks=np.arange(1, N_Gen)[::10], yticklabels=np.round(np.linspace(1e-7, MaxFreqR, N_Gen )[::10]*100, 1));
+    ax.set(yticks=np.arange(0, N_Gen)[::20]);
     ax.set(xticks=np.arange(1, MaxFreq)[::5]-0.5, xticklabels=np.arange(1, MaxFreq)[::5]);
     ax.set_xlabel('Frequency', fontsize=16)
-    ax.set_ylabel('Frequency given for generating signals', fontsize=16) 
+    ax.set_ylabel('Index of signals generated with a series of $\\acute{\\theta}$', fontsize=13) 
 
     fig.colorbar(im, cax=cax, orientation='vertical')
     plt.show()
@@ -155,7 +155,7 @@ def VisReconGivenZ_FCA (FeatGenModel,  ReconModel, LatDim, ZFix, Mode='Origin', 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
     sm.set_array([])
     cbar = fig.colorbar(sm, cax=cax)
-    cbar.set_label('Frequency given for generating signals', size=14)
+    cbar.set_label('$\\acute{\\theta}$ given for signal generation', size=14)
 
     plt.show()
     
@@ -256,24 +256,25 @@ def HeatMapFreqZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreq=1, 
     ax.set(yticks=np.arange(0, N_Gen)[::20]);
     ax.set(xticks=np.arange(1, MaxFreq)[::5]-0.5, xticklabels=np.arange(1, MaxFreq)[::5]);
     ax.set_xlabel('Frequency', fontsize=16)
-    ax.set_ylabel('Conditions given for generating signals', fontsize=16) 
+    ax.set_ylabel('Index of signals generated with a series of $\\acute{\\theta}$', fontsize=16) 
 
     fig.colorbar(im, cax=cax, orientation='vertical')
     plt.show()
 
     
-def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreqR=0., MaxFreqR=0.05):
+def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300):
   
 
     zVal = np.tile(ZFix, (N_Gen,1))
 
     CON_Arange = GenConArangeSimple(ConData, N_Gen)
     SigGen = ReconModel([zVal, CON_Arange])
-    
+
     # Create a colormap and normalize it based on the number of experiments
     cmap = cm.get_cmap('viridis')
     norm = plt.Normalize(0, N_Gen-1)
-    norm2 = plt.Normalize(MinFreqR, MaxFreqR)
+    FreqIDX = np.argmax(CON_Arange, axis=-1)
+    norm2 = plt.Normalize(min(FreqIDX), max(FreqIDX))
 
 
     fig, ax = plt.subplots(figsize=(15, 7))
@@ -288,7 +289,7 @@ def VisReconGivenZ_CONA (ReconModel, ConData, LatDim, ZFix, N_Gen=300, MinFreqR=
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm2)
     sm.set_array([])
     cbar = fig.colorbar(sm, cax=cax)
-    cbar.set_label('Conditions given for generating signals', size=14)
+    cbar.set_label('Index of the maximum frequency ($\\acute{\\theta}$) for signal generation', size=13)
 
     plt.show()
     
