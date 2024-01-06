@@ -212,7 +212,7 @@ class Evaluator ():
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).
-        # AnalSig: The raw true signals for obtaining the population PSD.    
+        # AnalSig: The raw true signals for obtaining the population PSD.  Data shape: (N_PostSamp, N_Obs)
         
         ## Optional parameters
         # SecDataType: The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
@@ -250,6 +250,7 @@ class Evaluator ():
             
           
         # Generating signals
+        ## Data shape: (N_PostSamp, SigDim)
         self.GenSamp = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
             
 
