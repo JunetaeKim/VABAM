@@ -250,7 +250,7 @@ class Evaluator ():
             
           
         # Generating signals
-        ## Data shape: (N_PostSamp, SigDim)
+        ## Return shape of data: (N_PostSamp, SigDim)
         self.GenSamp = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
             
 
