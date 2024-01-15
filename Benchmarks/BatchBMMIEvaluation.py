@@ -164,6 +164,8 @@ if __name__ == "__main__":
     
             # Saving the instance's objects to a file
             SerializeObjects(Eval, Params['Common_Info']+Params['Spec_Info'], ObjSavePath)
+
+            del Eval
             
 
 
