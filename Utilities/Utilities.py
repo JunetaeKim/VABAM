@@ -120,13 +120,15 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['NMiniBat'] = EvalConfigSet['NMiniBat']            # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     Params['SimSize'] = EvalConfigSet['SimSize']              # The number of generations (i.e., samplings) within the mini-batch.
     Params['NGen'] = EvalConfigSet['NGen']                    # The number of generations (i.e., samplings) within the mini-batch.
-    Params['NParts'] = EvalConfigSet['NParts']                    # The number of partitions (i.e., samplings) in generations within a sample.
     Params['NSelZ'] = EvalConfigSet['NSelZ']                  # The size of js to be selected at the same time (default: 1).
     Params['SelMetricType'] = EvalConfigSet['SelMetricType']  # The type of metric used for selecting Zs and ancillary data. 
     Params['SelMetricCut'] = EvalConfigSet['SelMetricCut']    # The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
+    if 'NParts' in EvalConfigSet:
+        Params['NParts'] = EvalConfigSet['NParts']            # The number of partitions (i.e., samplings) in generations within a sample.
         
     ### Functional parameters
+    Params['EvalDataSize'] = EvalConfigSet['EvalDataSize']    # The number of observations in the evaluation data.
     Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
     Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
     Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).

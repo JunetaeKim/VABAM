@@ -99,6 +99,7 @@ if __name__ == "__main__":
 
             # Loading data
             AnalData = np.load('./Data/ProcessedData/Val'+str(Params['SigType'])+'.npy')
+            AnalData = np.random.permutation(AnalData)[:Params['EvalDataSize']]
 
         # Intermediate parameters 
         SigDim = AnalData.shape[1]

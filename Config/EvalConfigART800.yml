@@ -13,9 +13,10 @@ FACFC_ART_30_800:          # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -36,9 +37,10 @@ FACFC_ART_50_800:          # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -59,9 +61,10 @@ SKZFC_ART_30_800:          # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -82,9 +85,10 @@ SKZFC_ART_50_800:          # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -106,9 +110,10 @@ SKZ_ART_30_800:            # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -129,9 +134,10 @@ SKZ_ART_50_800:            # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -153,9 +159,10 @@ TCMIDKZFC_ART_30_800: # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
@@ -176,9 +183,10 @@ TCMIDKZFC_ART_50_800: # SigType_LatDim_CompSize
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
     NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 500              # The number of generations (i.e., samplings) within the mini-batch.
     NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
