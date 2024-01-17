@@ -1,45 +1,45 @@
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4
 
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_30_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 4
 
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZ_ART_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZ_ART_50_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZ_ART_30_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec SKZ_ART_50_800  --GPUID 4
 
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec TCMIDKZFC_ART_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART800 --ConfigSpec TCMIDKZFC_ART_50_800  --GPUID 4
-
-
-
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZFC_ART_30_500  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZFC_ART_50_500  --GPUID 4
-
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec FACFC_ART_30_500  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec FACFC_ART_50_500  --GPUID 4
-
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZ_ART_30_500  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZ_ART_50_500  --GPUID 4
-
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec TCMIDKZFC_ART_30_500  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec TCMIDKZFC_ART_50_500  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec TCMIDKZFC_ART_30_800  --GPUID 4
+G python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec TCMIDKZFC_ART_50_800  --GPUID 4
 
 
+
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZFC_ART_30_500  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZFC_ART_50_500  --GPUID 4
+
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec FACFC_ART_30_500  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec FACFC_ART_50_500  --GPUID 4
+
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZ_ART_30_500  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec SKZ_ART_50_500  --GPUID 4
+
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec TCMIDKZFC_ART_30_500  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigART500 --ConfigSpec TCMIDKZFC_ART_50_500  --GPUID 4
 
 
 
 
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4
+
+
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4
 
 python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec FACFC_II_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec FACFC_II_50_800  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec FACFC_II_50_800  --GPUID 4
 
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZ_II_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZ_II_50_800  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZ_II_30_800  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec SKZ_II_50_800  --GPUID 4
 
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec TCMIDKZFC_II_30_800  --GPUID 4
-python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec TCMIDKZFC_II_50_800  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec TCMIDKZFC_II_30_800  --GPUID 4
+ python .\BatchEvaluation.py --Config EvalConfigII800 --ConfigSpec TCMIDKZFC_II_50_800  --GPUID 4
 
 
 

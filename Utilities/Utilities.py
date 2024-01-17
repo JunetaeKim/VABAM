@@ -118,14 +118,13 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['MaxFreq'] = EvalConfigSet['MaxFreq']              # The maximum frequency value within the analysis range (default = 51).
     Params['MinFreq'] = EvalConfigSet['MinFreq']              # The minimum frequency value within the analysis range (default = 1).
     Params['NMiniBat'] = EvalConfigSet['NMiniBat']            # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
-    Params['SimSize'] = EvalConfigSet['SimSize']              # The number of generations (i.e., samplings) within the mini-batch.
-    Params['NGen'] = EvalConfigSet['NGen']                    # The number of generations (i.e., samplings) within the mini-batch.
+    Params['SimSize'] = EvalConfigSet['SimSize']              # The number of repetition (i.e., samplings) within the mini-batch.
+    Params['SubGen'] = EvalConfigSet['SubGen']                # The number of generations (i.e., samplings) within a sample.
     Params['NSelZ'] = EvalConfigSet['NSelZ']                  # The size of js to be selected at the same time (default: 1).
     Params['SelMetricType'] = EvalConfigSet['SelMetricType']  # The type of metric used for selecting Zs and ancillary data. 
     Params['SelMetricCut'] = EvalConfigSet['SelMetricCut']    # The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
     Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
-    if 'NParts' in EvalConfigSet:
-        Params['NParts'] = EvalConfigSet['NParts']            # The number of partitions (i.e., samplings) in generations within a sample.
+    Params['NParts'] = EvalConfigSet['NParts']                # The number of partitions (i.e., samplings) in generations within a sample.
         
     ### Functional parameters
     Params['EvalDataSize'] = EvalConfigSet['EvalDataSize']    # The number of observations in the evaluation data.

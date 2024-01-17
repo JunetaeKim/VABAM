@@ -15,7 +15,34 @@ from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, 
 # python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0
 # python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0 --SpecNZs 40 50
 
-    
+
+
+#### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
+
+def SetModel():
+    # Calling Modesl
+    SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath)
+
+    # Intermediate parameters 
+    NFCs = SigRepModel.get_layer('FCs').output.shape[-1]
+
+
+    # Setting Model Specifications and Sub-models
+    if Params['LossType'] =='Default':
+        EncModel, FeatExtModel, FeatGenModel, ReconModel = ModelParts
+    elif Params['LossType'] =='FACLosses':
+        EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel = ModelParts
+
+    ## The generation model for evaluation
+    RecOut = ReconModel(FeatGenModel.output)
+    GenModel = Model(FeatGenModel.input, RecOut)
+
+    ## The sampling model for evaluation
+    Zs_Out = SigRepModel.get_layer('Zs').output
+    SampModel = Model(EncModel.input, Zs_Out)
+    return SampModel, GenModel          
+
+
 if __name__ == "__main__":
 
     
@@ -64,9 +91,9 @@ if __name__ == "__main__":
     # Checking whether the path to save the SampZj exists or not.
     if not os.path.exists('./Data/IntermediateData/') :
         os.makedirs('./Data/IntermediateData/')
-    
-                 
-                 
+
+       
+             
                  
     #### -----------------------------------------------------  Conducting batch evaluation --------------------------------------------------------------
                  
@@ -107,30 +134,6 @@ if __name__ == "__main__":
 
 
 
-        #### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
-        # Calling Modesl
-        SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath)
-
-        # Intermediate parameters 
-        NFCs = SigRepModel.get_layer('FCs').output.shape[-1]
-
-
-        # Setting Model Specifications and Sub-models
-        if Params['LossType'] =='Default':
-            EncModel, FeatExtModel, FeatGenModel, ReconModel = ModelParts
-        elif Params['LossType'] =='FACLosses':
-            EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel = ModelParts
-
-        ## The generation model for evaluation
-        RecOut = ReconModel(FeatGenModel.output)
-        GenModel = Model(FeatGenModel.input, RecOut)
-
-        ## The sampling model for evaluation
-        Zs_Out = SigRepModel.get_layer('Zs').output
-        SampModel = Model(EncModel.input, Zs_Out)
-
-
-
         #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------          # Is the value assigned by ArgumentParser or assigned by YML?
         if SpecNZs == None:
             NSelZs = Params['NSelZ']
@@ -138,6 +141,8 @@ if __name__ == "__main__":
             NSelZs = SpecNZs
 
         for NZs in NSelZs:
+            
+            SampModel, GenModel = SetModel()
 
             # Object save path
             ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'.pkl'
@@ -145,7 +150,7 @@ if __name__ == "__main__":
         
             # Instantiation 
             Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], NParts = Params['NParts'],
-                   NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'], 
+                   SubGen = Params['SubGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'], 
                    SelMetricType = Params['SelMetricType'], SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], Name=ConfigName+'_Nj'+str(NZs))
     
             

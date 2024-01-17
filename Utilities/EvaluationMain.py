@@ -9,13 +9,13 @@ from tensorflow.keras import Model
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj, SamplingFCs, Partition3D
+from Utilities.AncillaryFunctions import FFT_PSD, ProbPermutation, MeanKLD, Sampler, SamplingZ, SamplingZj, SamplingFCs
 from Utilities.Utilities import CompResource
 
        
 class Evaluator ():
     
-    def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  NGen=100, NParts=10, ReparaStdZj = 1, NSelZ = 1, 
+    def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  SubGen=100, NParts=5, ReparaStdZj = 1, NSelZ = 1, 
                   SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=False, Name=None):
 
         
@@ -24,7 +24,7 @@ class Evaluator ():
         self.MaxFreq = MaxFreq               # The maximum frequency value within the analysis range (default = 51).
         self.SimSize = SimSize               # Then umber of simulation repetitions for aggregating metrics (default: 1)
         self.NMiniBat = NMiniBat             # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
-        self.NGen = NGen                     # The number of generations (i.e., samplings) within the mini-batch.
+        self.SubGen = SubGen                 # The number of generations (i.e., samplings) within a sample.
         self.NParts = NParts                 # The number of partitions (i.e., samplings) in generations within a sample.
         self.ReparaStdZj = ReparaStdZj       # The size of the standard deviation when sampling Zj (Samp_Zjb ~ N(0, ReparaStdZj)).
         self.NSelZ = NSelZ                   # The size of js to be selected at the same time (default: 1).
@@ -34,7 +34,7 @@ class Evaluator ():
         self.SelMetricCut = SelMetricCut     # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
         self.SelMetricType = SelMetricType   # The type of metric used for selecting Zs and ancillary data. 
         self.Name = Name                     # Model name.
-
+        self.NGen = SubGen * NParts          # The number of generations (i.e., samplings) within the mini-batch.
     
     
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
@@ -359,14 +359,18 @@ class Evaluator ():
 
             
             # Sampling FCs
+            ## Return shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
             # Generating FC values randomly across all axes (i.e., the batch, generation, and fc axes).
             self.FCbm = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='ARand', FcLimit = self.FcLimit)
-
+            # Generating FC values randomly across the batch and fc axes, and then repeat them NGen times.
+            self.FCb = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='BRpt', FcLimit = self.FcLimit)
             # Sorting the arranged FC values in ascending order at the generation index.
-            ## Return shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
-            self.FCbm_Sort, self.PartIDX  =Partition3D(self.FCbm.reshape(self.NMiniBat, self.NGen, -1), self.NParts)
-            self.FCbm_Sort = self.FCbm_Sort.reshape(self.NMiniBat*self.NGen, -1)
+            self.FCbm_Ext = self.FCbm.reshape(self.NMiniBat, self.NParts, self.SubGen, -1)
+            self.FCbm_Sort = np.sort(self.FCbm_Ext , axis=2).reshape(self.NMiniBat*self.NGen, self.NFCs)
 
+            
+
+            
 
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
             '''
@@ -429,14 +433,21 @@ class Evaluator ():
                                                    - H() or KLD()
                 
             '''
+
+
             
             
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
             # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
             self.QV_Zjb_FCbm_ = FFT_PSD(self.Sig_Zjb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
             self.QV_Zjb_FCbmSt_ = FFT_PSD(self.Sig_Zjb_FCbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+
+            # Reshape 
+            # Return shape: (NMiniBat, NParts, N_frequency, SubGen)
+            self.QV_Zjb_FCbm_Ext = self.QV_Zjb_FCbm_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
+            self.QV_Zjb_FCbmSt_Ext = self.QV_Zjb_FCbmSt_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
             
-            
+
             # Q(v)s
             ## Return shape: (NMiniBat, N_frequency)
             self.QV_Zb_FCbm = FFT_PSD(self.Sig_Zb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
@@ -455,34 +466,22 @@ class Evaluator ():
 
 
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
+            
             # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
             self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
-            
-            # for QS_Zjb_FCbm and QS_Zjb_FCbmSt
-            SumPer_Zjb_FCbmSt = []
-            SumPer_Zjb_FCbm = []
 
-            # Iterate over each observation in the two metrics and their corresponding partition index
-            for Obs_Zjb_FCbm, Obs_Zjb_FCbmSt, idx in zip(self.QV_Zjb_FCbm_, self.QV_Zjb_FCbmSt_, self.PartIDX):
-                SubSumPer_Zjb_FCbmSt = 0
-                SubSumPer_Zjb_FCbm = 0
+            # Calculating permutation density in power spectral density for each partition.
+            # Return shape: (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QS_Zjb_FCbm_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_FCbm_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            self.QS_Zjb_FCbmSt_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_FCbmSt_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+                        
+            # Calculating the mean across the partition dimension
+            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
+            self.QS_Zjb_FCbm = np.mean(self.QS_Zjb_FCbm_Ext, axis=1)
+            self.QS_Zjb_FCbmSt = np.mean(self.QS_Zjb_FCbmSt_Ext, axis=1)
+            
+
                 
-                for part in range(self.NParts):
-                    # Return shape for each: (1, N_frequency, N_permutation_cases)    
-                    SubSumPer_Zjb_FCbm += ProbPermutation(Obs_Zjb_FCbm[idx == part].T[None], WindowSize=WindowSize)
-                    SubSumPer_Zjb_FCbmSt += ProbPermutation(Obs_Zjb_FCbmSt[idx == part].T[None], WindowSize=WindowSize)
-
-                # The average is calculated by dividing the sum by the number of partitions
-                SumPer_Zjb_FCbm.append(SubSumPer_Zjb_FCbm/self.NParts) 
-                SumPer_Zjb_FCbmSt.append(SubSumPer_Zjb_FCbmSt/self.NParts) 
-            
-            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)                
-            self.QS_Zjb_FCbm = np.concatenate(SumPer_Zjb_FCbm, axis=0)
-            self.QS_Zjb_FCbmSt = np.concatenate(SumPer_Zjb_FCbmSt, axis=0)
-            
-
-          
-            
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
             I_V_Z_ = MeanKLD(self.QV_Zb_FCbm, self.QV_Pop[None] ) # I(V;z)
             I_V_ZjZ_ = MeanKLD(self.QV_Zjb_FCbm, self.QV_Zb_FCbm )  # I(V;z'|z)
@@ -556,7 +555,6 @@ class Evaluator ():
         self.AggResDic['I_S_FCsZj'].append(self.I_S_FCsZj)
         self.MI_S_FCsZj = self.I_S_Zj + self.I_S_FCsZj
         self.AggResDic['MI_S_FCsZj'].append(self.MI_S_FCsZj)
-
 
         
         
