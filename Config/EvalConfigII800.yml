@@ -11,11 +11,12 @@ FACFC_II_30_800:          # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -33,11 +34,12 @@ FACFC_II_50_800:          # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -55,11 +57,12 @@ SKZFC_II_30_800:          # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -77,11 +80,12 @@ SKZFC_II_50_800:          # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -100,11 +104,12 @@ SKZ_II_30_800:            # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -122,11 +127,12 @@ SKZ_II_50_800:            # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -145,11 +151,12 @@ TCMIDKZFC_II_30_800: # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -167,11 +174,12 @@ TCMIDKZFC_II_50_800: # SigType_LatDim_CompSize
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
     FcLimit: 0.05          # The threshold value of the max of the FC value input into the generation model (default: 0.05, i.e., frequency 5 Hertz).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
     SampBatchSize: 10000  # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NGen: 400              # The number of generations (i.e., samplings) within the mini-batch.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 

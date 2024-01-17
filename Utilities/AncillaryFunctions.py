@@ -204,6 +204,34 @@ def SamplingFCs (NMiniBat, NGen, NFCs, SampFCType='ARand', FcLimit= 0.05):
     return FCs
     
 
+def Partition3D(Mat, NParts):
+    B, M, F = Mat.shape
+    PartSize = M // NParts
+    Remainder = M % NParts
+
+    NewMat = np.zeros_like(Mat)
+    # ReturnIDX will store the partition ID and local position for each element
+    ReturnIDX = np.zeros((B, M, 2), dtype=int)  # Adding an extra dimension for partition ID and local position
+
+    for b in range(B):
+        CumulativeIndex = 0
+        for i in range(NParts):
+            PartSizeAdjusted = PartSize + (1 if i < Remainder else 0)
+            Slice = Mat[b, CumulativeIndex:CumulativeIndex + PartSizeAdjusted, :]
+            SortedIndices = np.argsort(Slice, axis=0)
+            SortedSlice = np.take_along_axis(Slice, SortedIndices, axis=0)
+
+            NewMat[b, CumulativeIndex:CumulativeIndex + PartSizeAdjusted, :] = SortedSlice
+            # Store partition ID and local position
+            ReturnIDX[b, CumulativeIndex:CumulativeIndex + PartSizeAdjusted, 0] = i
+            for f in range(F):
+                ReturnIDX[b, CumulativeIndex:CumulativeIndex + PartSizeAdjusted, 1] = np.arange(PartSizeAdjusted)
+
+            CumulativeIndex += PartSizeAdjusted
+
+    return NewMat, ReturnIDX[:,:,0]
+
+
 def GenConArange (ConData, NGen):
     # Processing Conditional information 
     ## Finding the column index of the max value in each row of ConData and sort the indices
