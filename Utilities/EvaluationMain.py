@@ -831,20 +831,13 @@ class Evaluator ():
             ### Generating random indices for selecting true conditions
             RandSelIDX = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NGen)
             ### Selecting the true conditions using the generated indices
-            SelTrueCond = self.TrueCond[RandSelIDX]
-            ### Identifying the index of maximum frequency for each selected condition
-            MaxFreqSelCond = np.argmax(SelTrueCond, axis=-1)
-            ### Sorting the selected conditions by their maximum frequency
-            Idx_MaxFreqSelCond = np.argsort(MaxFreqSelCond)
-            self.CONbm_Sort = SelTrueCond[Idx_MaxFreqSelCond]
+            self.CONbm = self.TrueCond[RandSelIDX]
+            
+            # Sorting the arranged conditions in ascending order at the generation index.
+            self.CONbm_Ext = self.CONbm.reshape(self.NMiniBat, self.NParts, self.SubGen, -1)
+            self.CONbm_Sort = np.sort(self.CONbm_Ext , axis=2).reshape(self.NMiniBat*self.NGen, self.TrueCond.shape[-1])
 
-
-            ## Generating CONbm (NMiniBat x NGen, CondDim) by random Shuffling on both axes 
-            ### Selecting elements (NMiniBat x NGen) randomly.
-            self.CONbm = self.TrueCond[np.random.choice(self.Ndata, self.NMiniBat*self.NGen)]
-
-
-
+            
 
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
             '''
@@ -912,35 +905,55 @@ class Evaluator ():
             
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
             # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
-            QV_Zjb_CONbm_ = FFT_PSD(self.Sig_Zjb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            QV_Zjb_CONbmSt_ = FFT_PSD(self.Sig_Zjb_CONbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            
+            self.QV_Zjb_CONbm_ = FFT_PSD(self.Sig_Zjb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            self.QV_Zjb_CONbmSt_ = FFT_PSD(self.Sig_Zjb_CONbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
 
+            # Reshape 
+            # Return shape: (NMiniBat, NParts, N_frequency, SubGen)
+            self.QV_Zjb_CONbm_Ext = self.QV_Zjb_CONbm_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
+            self.QV_Zjb_CONbmSt_Ext = self.QV_Zjb_CONbmSt_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
+
+            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
+            self.QV_Zjb_CONbm_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_CONbm_Ext.shape))
+            self.QV_Zjb_CONbm_Ext = np.maximum(self.QV_Zjb_CONbm_Ext, 1e-7)
+            self.QV_Zjb_CONbmSt_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_CONbmSt_Ext.shape))
+            self.QV_Zjb_CONbmSt_Ext = np.maximum(self.QV_Zjb_CONbmSt_Ext, 1e-7)
+            
             # Q(v)s
             ## Return shape: (NMiniBat, N_frequency)
             self.QV_Zb_CONbm = FFT_PSD(self.Sig_Zb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.QV_Zjb_CONbm = QV_Zjb_CONbm_.mean(axis=1)
-            self.QV_Zjb_CONbmSt = QV_Zjb_CONbmSt_.mean(axis=1)
-
-            
+            self.QV_Zjb_CONbm = self.QV_Zjb_CONbm_.mean(axis=1)
+            self.QV_Zjb_CONbmSt = self.QV_Zjb_CONbmSt_.mean(axis=1)
+           
             # Intermediate objects for Q(s) and H(')
             ## Return shape: (NMiniBat, N_frequency, NGen)
-            self.QV_Zjb_CONbm_T = QV_Zjb_CONbm_.transpose(0,2,1)
-            self.QV_Zjb_CONbmSt_T = QV_Zjb_CONbmSt_.transpose(0,2,1)
             self.QV_Zjbm_CONbm_T = FFT_PSD(self.Sig_Zjbm_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
-
             
+                    
             ## Return shape: (1, N_frequency, NMiniBat)
             ### Since it is the true PSD, there are no M generations. 
             self.QV_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
 
+            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
+            self.QV_Batch += np.random.normal(0, 1e-7, (self.QV_Batch.shape))
+            self.QV_Batch = np.maximum(self.QV_Batch, 1e-7)
 
+            
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
-            self.QS_Zjb_CONbm = ProbPermutation(self.QV_Zjb_CONbm_T, WindowSize=WindowSize)
-            self.QS_Zjb_CONbmSt = ProbPermutation(self.QV_Zjb_CONbmSt_T, WindowSize=WindowSize)
             self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
+            
+            # Calculating permutation density in power spectral density for each partition.
+            # Return shape: (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QS_Zjb_CONbm_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_CONbm_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            self.QS_Zjb_CONbmSt_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_CONbmSt_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            
+            # Calculating the mean across the partition dimension
+            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
+            self.QS_Zjb_CONbm = np.mean(self.QS_Zjb_CONbm_Ext, axis=1)
+            self.QS_Zjb_CONbmSt = np.mean(self.QS_Zjb_CONbmSt_Ext, axis=1)
 
+            
                 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
             I_V_Z_ = MeanKLD(self.QV_Zb_CONbm, self.QV_Pop[None] ) # I(V;z)
