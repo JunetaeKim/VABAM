@@ -447,7 +447,7 @@ class Evaluator ():
             self.QV_Zjb_FCbm_Ext = self.QV_Zjb_FCbm_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
             self.QV_Zjb_FCbmSt_Ext = self.QV_Zjb_FCbmSt_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
 
-            # Adding/subtracting epsilon to prevent low entropy due to non-variational identical value generation.
+            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
             self.QV_Zjb_FCbm_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_FCbm_Ext.shape))
             self.QV_Zjb_FCbm_Ext = np.maximum(self.QV_Zjb_FCbm_Ext, 1e-7)
             self.QV_Zjb_FCbmSt_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_FCbmSt_Ext.shape))
@@ -458,7 +458,6 @@ class Evaluator ():
             self.QV_Zb_FCbm = FFT_PSD(self.Sig_Zb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
             self.QV_Zjb_FCbm = self.QV_Zjb_FCbm_.mean(axis=1)
             self.QV_Zjb_FCbmSt = self.QV_Zjb_FCbmSt_.mean(axis=1)
-
             
             # Intermediate objects for Q(s) and H(')
             ## Return shape: (NMiniBat, N_frequency, NGen)
@@ -469,7 +468,7 @@ class Evaluator ():
             ### Since it is the true PSD, there are no M generations. 
             self.QV_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
             
-            # Adding/subtracting epsilon to prevent low entropy due to non-variational identical value generation.
+            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
             self.QV_Batch += np.random.normal(0, 1e-7, (self.QV_Batch.shape))
             self.QV_Batch = np.maximum(self.QV_Batch, 1e-7)
 
