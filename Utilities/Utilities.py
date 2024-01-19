@@ -1,4 +1,5 @@
 import os
+import gc
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import backend as K
@@ -18,7 +19,13 @@ def ReName (layer, name):
     return Lambda(lambda x: x, name=name)(layer)
 
 
-
+def GenBatches(data_list, batch_size):
+    max_length = len(data_list[0])
+    for i in range(0, max_length, batch_size):
+        yield [data[i:i + batch_size] for data in data_list]
+        
+'''
+#The 'predict' function in TensorFlow version 2.10 may cause memory leak issues.
 def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
 
     if GPU==False:
@@ -29,6 +36,28 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
 
     return PredVal
 
+'''
+def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
+    
+    PredVal = []
+    TotalBatches = len(Data[0]) // BatchSize + (len(Data[0]) % BatchSize != 0)
+    if GPU==False:
+        
+        with tf.device('/CPU:0'):
+            for i, Batch in enumerate(GenBatches(Data, BatchSize)):
+                BatchPred = PredModel.predict_on_batch(Batch)
+                print(f"Processing batch {i+1}/{TotalBatches}", end='\r')
+                PredVal.extend(BatchPred)
+                gc.collect()
+
+    else:
+        for i, Batch in enumerate(GenBatches(Data, BatchSize)):
+            BatchPred = PredModel.predict_on_batch(Batch)
+            print(f"Processing batch {i+1}/{TotalBatches}", end='\r')
+            PredVal.extend(BatchPred)
+            gc.collect()
+    
+    return np.array(PredVal)
 
 
 def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, RootDirRes=None):

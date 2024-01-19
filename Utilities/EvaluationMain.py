@@ -467,10 +467,7 @@ class Evaluator ():
             ## Return shape: (1, N_frequency, NMiniBat)
             ### Since it is the true PSD, there are no M generations. 
             self.QV_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
-            
-            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
-            self.QV_Batch += np.random.normal(0, 1e-7, (self.QV_Batch.shape))
-            self.QV_Batch = np.maximum(self.QV_Batch, 1e-7)
+
 
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
             
@@ -933,10 +930,6 @@ class Evaluator ():
             ## Return shape: (1, N_frequency, NMiniBat)
             ### Since it is the true PSD, there are no M generations. 
             self.QV_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
-
-            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
-            self.QV_Batch += np.random.normal(0, 1e-7, (self.QV_Batch.shape))
-            self.QV_Batch = np.maximum(self.QV_Batch, 1e-7)
 
             
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###

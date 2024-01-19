@@ -2,14 +2,14 @@ import numpy as np
 from scipy.stats import mode
 import itertools
 from tqdm import trange, tqdm
-
+import gc
 import tensorflow as tf
 from tensorflow.keras import Model
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+from Utilities.Utilities import GenBatches
 
 
 # For the dimensional Kullback-Leibler Divergence of the Z distribution
@@ -91,7 +91,8 @@ def MeanKLD(P,Q):
     return np.mean(np.sum(P*np.log(P/Q), axis=-1))
 
 
-
+'''
+# The 'predict' function in TensorFlow version 2.10 may cause memory leak issues.
 def Sampler (Data, SampModel,BatchSize=100, GPU=True):
     if GPU==False:
         with tf.device('/CPU:0'):
@@ -101,6 +102,27 @@ def Sampler (Data, SampModel,BatchSize=100, GPU=True):
 
     return PredVal
 
+'''
+def Sampler (Data, SampModel,BatchSize=100, GPU=True):
+    Data = [Data]
+    PredVal = []
+    TotalBatches = len(Data[0]) // BatchSize + (len(Data[0]) % BatchSize != 0)
+
+    if GPU==False:
+        with tf.device('/CPU:0'):
+            for i, Batch in enumerate(GenBatches(Data, BatchSize)):
+                BatchPred = SampModel.predict_on_batch(Batch[0])
+                print(f"Processing batch {i+1}/{TotalBatches}", end='\r')
+                PredVal.extend(BatchPred)
+                gc.collect()
+    else:
+        for i, Batch in enumerate(GenBatches(Data, BatchSize)):
+            BatchPred = SampModel.predict_on_batch(Batch[0])
+            print(f"Processing batch {i+1}/{TotalBatches}", end='\r')
+            PredVal.extend(BatchPred)
+            gc.collect()
+            
+    return np.array(PredVal)
 
 
 def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, SampZType='GaussBRpt', SecDataType=None, ReparaStdZj=1.):
@@ -131,7 +153,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
     
     # Sampling Samp_Z
     if SampZType =='ModelBRpt': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) 
-        UniqSamp_Z = Sampler(Data, SampModel, GPU=GPU)
+        UniqSamp_Z = Sampler(Data, SampModel, BatchSize=BatchSize, GPU=GPU)
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
     
     elif SampZType =='ModelARand': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ)
@@ -140,7 +162,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, Samp
             DataRpt = [np.repeat(arr, NGen, axis=0) for arr in Data]
         else:
             DataRpt = np.repeat(Data, NGen, axis=0)
-        Samp_Z = Sampler(DataRpt, SampModel, GPU=GPU)
+        Samp_Z = Sampler(DataRpt, SampModel, BatchSize=BatchSize, GPU=GPU)
         
     elif SampZType =='Gauss': # Z ~ N(0, ReparaStdZj)
         Samp_Z = np.random.normal(0, ReparaStdZj, (NMiniBat*NGen , SampModel.output.shape[-1]))
