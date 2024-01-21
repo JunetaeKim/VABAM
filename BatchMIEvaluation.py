@@ -1,5 +1,6 @@
 import os
 import re
+import gc
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
@@ -18,7 +19,6 @@ from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, 
 
 
 #### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
-
 def SetModel():
     # Calling Modesl
     SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath)
@@ -134,16 +134,18 @@ if __name__ == "__main__":
 
 
 
-        #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------          # Is the value assigned by ArgumentParser or assigned by YML?
+        #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------          
+        # Is the value assigned by ArgumentParser or assigned by YML?
         if SpecNZs == None:
             NSelZs = Params['NSelZ']
         else:
             NSelZs = SpecNZs
 
         for NZs in NSelZs:
-            
-            SampModel, GenModel = SetModel()
 
+            # Setting the model
+            SampModel, GenModel = SetModel()
+            
             # Object save path
             ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'.pkl'
             SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(NZs)+'.npy'
@@ -151,7 +153,8 @@ if __name__ == "__main__":
             # Instantiation 
             Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], NParts = Params['NParts'],
                    SubGen = Params['SubGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'], 
-                   SelMetricType = Params['SelMetricType'], SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], Name=ConfigName+'_Nj'+str(NZs))
+                   SelMetricType = Params['SelMetricType'], SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], 
+                   Name=ConfigName+'_Nj'+str(NZs))
     
             
             ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
@@ -168,6 +171,10 @@ if __name__ == "__main__":
             # Saving the instance's objects to a file
             SerializeObjects(Eval, Params['Common_Info'], ObjSavePath)
 
-            del Eval
-    
-    
+            # Clearing the current TensorFlow session and running garbage collection
+            # This helps to reduce unnecessary memory usage after each iteration
+            tf.keras.backend.clear_session()
+            del Eval, SelPostSamp, SampModel, GenModel
+            _ = gc.collect()
+            
+            
