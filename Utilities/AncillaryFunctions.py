@@ -91,7 +91,7 @@ def MeanKLD(P,Q):
     return np.mean(np.sum(P*np.log(P/Q), axis=-1))
 
 
-'''
+
 # The 'predict' function in TensorFlow version 2.10 may cause memory leak issues.
 def Sampler (Data, SampModel,BatchSize=100, GPU=True):
     if GPU==False:
@@ -123,80 +123,58 @@ def Sampler (Data, SampModel,BatchSize=100, GPU=True):
             gc.collect()
             
     return np.array(PredVal)
+'''
 
-
-def SamplingZ (Data, SampModel, NMiniBat, NGen, BatchSize = 1000, GPU=True, SampZType='GaussBRpt', SecDataType=None, ReparaStdZj=1.):
+def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampZType='Modelbd',  SecDataType=None, ReparaStdZj=1.):
     
     '''
     Sampling Samp_Z 
-
-    - Shape of UniqSamp_Z: (NMiniBat, LatDim)
-    - UniqSamp_Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) for Type =='Model*'
-    - UniqSamp_Z ~ N(Zμ|y, cond, σ) for Type =='Model*' and when there are ancillary (i.e., Conditional VAE) data inputs 
-    - RandSamp_Z ~ N(0, ReparaStdZj) for Type =='Gauss*'
-
-    - Samp_Z is a 3D tensor expanded by repeating the first axis (i.e., 0) of UniqSamp_Z or RandSamp_Z by NGen times.
-    - Shape of Samp_Z: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+    - Return shape of Samp_Z: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
+    - NGen = NParts * NSubGen
     
-    - ModelBRpt:  The predicted values are repeated NGen times after the prediction. 
-                  It is strongly recommended in cases where there are variations in the ancillary data inputs.  
-    - ModelARand: The data is repeated NGen times before the prediction (i.e., All random sampling).
-                  It is strongly recommended when there is no ancillary data inputs or variations in the ancillary data.     
-    - Gauss:      The data is sampled NMiniBat*NGen times. 
-                  It is recommended to detect the influence of changes in the value of j on the performance metrics, 
-                  when the same ancillary data input is repeated NGen times (i.e., for Conditional VAE).
-    - GaussBRpt:  The data sampled from the Gaussian distribution is repeated NGen times.
-                  It is recommended for both cases: when there are no ancillary data inputs and when there is ancillary data input.
-                  
+    - Modelbd: The predicted values are repeated NGen times after the prediction. 
+    - Modelbr: The data is repeated NParts times before the prediction. Then, The predicted values are repeated NSubGen times .
+    - Gaussbr: The data sampled (NMiniBat, NParts, LatDim) from the Gaussian distribution is repeated NSubGen times. 
     '''
-    assert SampZType in ['ModelBRpt','ModelARand','Gauss', 'GaussBRpt'], "Please verify the value of 'SampZType'. Only 'ModelBRpt','ModelARand','Gauss', 'GaussBRpt' are valid."
+    
+    assert SampZType in ['Modelbd','Modelbr','Gaussbr'], "Please verify the value of 'SampZType'. Only 'Modelbd','Modelbr','Gaussbr' are valid."
+    NGen = NParts * NSubGen
     
     # Sampling Samp_Z
-    if SampZType =='ModelBRpt': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) 
+    if SampZType =='Modelbd': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ) 
+        # Shape of UniqSamp_Z: (NMiniBat, LatDim) 
         UniqSamp_Z = Sampler(Data, SampModel, BatchSize=BatchSize, GPU=GPU)
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
-    
-    elif SampZType =='ModelARand': # Z ~ N(Zμ|y, σ) or N(Zμ|y, cond, σ)
         
-        if SecDataType == 'CONDIN' : # For the CondVAE
-            DataRpt = [np.repeat(arr, NGen, axis=0) for arr in Data]
-        else:
-            DataRpt = np.repeat(Data, NGen, axis=0)
-        Samp_Z = Sampler(DataRpt, SampModel, BatchSize=BatchSize, GPU=GPU)
-        
-    elif SampZType =='Gauss': # Z ~ N(0, ReparaStdZj)
-        Samp_Z = np.random.normal(0, ReparaStdZj, (NMiniBat*NGen , SampModel.output.shape[-1]))
-        
-    elif SampZType =='GaussBRpt': # Z ~ N(0, ReparaStdZj)
-        UniqSamp_Z = np.random.normal(0, ReparaStdZj, (NMiniBat , SampModel.output.shape[-1]))
-        Samp_Z = np.repeat(UniqSamp_Z, NGen, axis=0)
-    
+    elif SampZType =='Modelbr':
+        DataExt = np.repeat(Data, NParts, axis=0)
+        # Shape of UniqSamp_Z: (NMiniBat, NParts, LatDim) 
+        UniqSamp_Z = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(NMiniBat, NParts, -1)
+        Samp_Z =  np.broadcast_to(UniqSamp_Z[:, :, None], (NMiniBat, NParts, NSubGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
+
+    elif SampZType =='Gaussbr': # Z ~ N(0, ReparaStdZj)
+        # Shape of UniqSamp_Z: (NMiniBat, NParts, LatDim) 
+        UniqSamp_Z = np.random.normal(0, ReparaStdZj, (NMiniBat, NParts , SampModel.output.shape[-1]))
+        Samp_Z =  np.broadcast_to(UniqSamp_Z[:, :, None], (NMiniBat, NParts, NSubGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
+
+    # Return shape of Samp_Z: (NMiniBat*NGen, LatDim)
     return Samp_Z
 
 
-
-def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='ARand' ):
+def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='bd' ):
     
     '''
      Sampling Samp_Zj 
-
+    - Return shape of Samp_Zj: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
     - Masking is applied to select Samp_Zj from Samp_Z 
       by assuming that the Samp_Z with indices other than j have a fixed mean value of '0' following a Gaussian distribution.
-
-    - Shape of Samp_Zj: (NMiniBat, NGen, LatDim) -> (NMiniBat*NGen, LatDim) for optimal use of GPU 
-
     - Samp_Zj ~ N(Zμj|y, σj), j∼U(1,LatDim)
     - In the expression j∼U(1,LatDim), j corresponds to LatDim and all js are selected randomly.
 
     '''
     
     # Masking for selecting Samp_Zj from Samp_Z 
-    if ZjType =='ARand': # All random masking
-        Mask_Z = np.zeros((NMiniBat*NGen, LatDim))
-        for i in range(NMiniBat*NGen):
-            Mask_Z[i, np.random.choice(LatDim, NSelZ,replace=False )] = 1
-            
-    elif ZjType =='BRpt': # Random masking at the batch-sample level
+    if ZjType =='bd': 
         Mask_Z = np.zeros((NMiniBat, NGen, LatDim))
         for i in range(NMiniBat):
             Mask_Z[i, :, np.random.choice(LatDim, NSelZ,replace=False )] = 1
@@ -204,7 +182,8 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='ARand' ):
     # Selecting Samp_Zj from Samp_Z 
     Mask_Z = Mask_Z.reshape(NMiniBat*NGen, LatDim)
     Samp_Zj = Samp_Z * Mask_Z
-    
+
+    # Return shape of Samp_Zj: (NMiniBat*NGen, LatDim)
     return Samp_Zj
 
 
