@@ -102,28 +102,6 @@ def Sampler (Data, SampModel,BatchSize=100, GPU=True):
 
     return PredVal
 
-'''
-def Sampler (Data, SampModel,BatchSize=100, GPU=True):
-    Data = [Data]
-    PredVal = []
-    TotalBatches = len(Data[0]) // BatchSize + (len(Data[0]) % BatchSize != 0)
-
-    if GPU==False:
-        with tf.device('/CPU:0'):
-            for i, Batch in enumerate(GenBatches(Data, BatchSize)):
-                BatchPred = SampModel.predict_on_batch(Batch[0])
-                print(f"Processing batch {i+1}/{TotalBatches}", end='\r')
-                PredVal.extend(BatchPred)
-                gc.collect()
-    else:
-        for i, Batch in enumerate(GenBatches(Data, BatchSize)):
-            BatchPred = SampModel.predict_on_batch(Batch[0])
-            print(f"Processing batch {i+1}/{TotalBatches}", end='\r')
-            PredVal.extend(BatchPred)
-            gc.collect()
-            
-    return np.array(PredVal)
-'''
 
 def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampZType='Modelbd',  SecDataType=None, ReparaStdZj=1.):
     
@@ -133,11 +111,11 @@ def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU
     - NGen = NParts * NSubGen
     
     - Modelbd: The predicted values are repeated NGen times after the prediction. 
-    - Modelbr: The data is repeated NParts times before the prediction. Then, The predicted values are repeated NSubGen times .
+    - Modelbr: The data is repeated NParts times before the prediction. Then, The predicted values are repeated NSubGen times.
     - Gaussbr: The data sampled (NMiniBat, NParts, LatDim) from the Gaussian distribution is repeated NSubGen times. 
     '''
     
-    assert SampZType in ['Modelbd','Modelbr','Gaussbr'], "Please verify the value of 'SampZType'. Only 'Modelbd','Modelbr','Gaussbr' are valid."
+    assert SampZType in ['Modelbd','Modelbdr', 'Gaussbr'], "Please verify the value of 'SampZType'. Only 'Modelbd','Modelbdr', and 'Gaussbr' are valid."
     NGen = NParts * NSubGen
     
     # Sampling Samp_Z
@@ -145,13 +123,13 @@ def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU
         # Shape of UniqSamp_Z: (NMiniBat, LatDim) 
         UniqSamp_Z = Sampler(Data, SampModel, BatchSize=BatchSize, GPU=GPU)
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
-        
-    elif SampZType =='Modelbr':
+    
+    elif SampZType =='Modelbdr':
         DataExt = np.repeat(Data, NParts, axis=0)
         # Shape of UniqSamp_Z: (NMiniBat, NParts, LatDim) 
         UniqSamp_Z = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(NMiniBat, NParts, -1)
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, :, None], (NMiniBat, NParts, NSubGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
-
+    
     elif SampZType =='Gaussbr': # Z ~ N(0, ReparaStdZj)
         # Shape of UniqSamp_Z: (NMiniBat, NParts, LatDim) 
         UniqSamp_Z = np.random.normal(0, ReparaStdZj, (NMiniBat, NParts , SampModel.output.shape[-1]))
@@ -161,7 +139,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU
     return Samp_Z
 
 
-def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='bd' ):
+def SamplingZj (Samp_Z, NMiniBat,  NParts, NSubGen, LatDim, NSelZ, ZjType='bd' ):
     
     '''
      Sampling Samp_Zj 
@@ -170,8 +148,8 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='bd' ):
       by assuming that the Samp_Z with indices other than j have a fixed mean value of '0' following a Gaussian distribution.
     - Samp_Zj ~ N(Zμj|y, σj), j∼U(1,LatDim)
     - In the expression j∼U(1,LatDim), j corresponds to LatDim and all js are selected randomly.
-
     '''
+    NGen = NParts * NSubGen
     
     # Masking for selecting Samp_Zj from Samp_Z 
     if ZjType =='bd': 
@@ -188,21 +166,26 @@ def SamplingZj (Samp_Z, NMiniBat, NGen, LatDim, NSelZ, ZjType='bd' ):
 
 
 
-def SamplingFCs (NMiniBat, NGen, NFCs, SampFCType='ARand', FcLimit= 0.05):
+def SamplingFCs (SubData, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='bdrm', FcLimit= 0.05):
 
     # Check for valid SampFCType values
-    if SampFCType not in ['ARand', 'BRpt']:
-        raise ValueError(f"Invalid SampFCType: {SampFCType}. Expected one of: 'ARand', 'BRpt' ")
+    assert SampFCType in ['bdrm', 'bdm'], "Please verify the value of 'SampFCType'. Only 'bdrm', and 'bdm' are valid."
     
     # Sampling FCs
-    ## Return shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
-    if SampFCType =='ARand':
-        FCs = np.random.rand(NMiniBat*NGen, NFCs) * FcLimit
-    elif SampFCType == 'BRpt' :
-        FCs = np.random.rand(NMiniBat,  NFCs) * FcLimit
-        FCs = np.repeat(FCs, NGen, axis=0)
+    if SampFCType =='bdrm':
+        DataExt = np.repeat(Data, NParts*NSubGen, axis=0)
+        ## Return shape of FCs: (NMiniBat*NParts*NSubGen, NFCs) for optimal use of GPU
+        Samp_FC = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(-1, SampModel.output.shape[-1])
 
-    return FCs
+    elif SampFCType =='bdm':
+        DataExt = np.repeat(Data, NSubGen, axis=0)
+        # Shape of UniqSamp_Z: (NMiniBat, 1, NSubGen, LatDim) 
+        UniqSamp_FC = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(NMiniBat, 1, NSubGen, -1)
+        Samp_FC =  np.broadcast_to(UniqSamp_FC, (NMiniBat, NParts, NSubGen, UniqSamp_FC.shape[-1])).reshape(-1, UniqSamp_FC.shape[-1])
+
+    # Return shape of Samp_Z: (NMiniBat*NParts*NSubGen, LatDim)
+    return Samp_FC * FcLimit
+    
     
 
 def Partition3D(Mat, NParts):
