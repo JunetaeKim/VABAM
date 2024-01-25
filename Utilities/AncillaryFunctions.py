@@ -37,12 +37,13 @@ def SplitBatch (Vec, HalfBatchIdx1, HalfBatchIdx2, mode='Both'):
 # Power spectral density 
 def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
     # Dimension check; this part operates with 3D tensors.
+    # (NMiniBat, NGen, SigDim)
     Data = Data[:,None] if len(Data.shape) < 3 else Data
 
     # Power Spectral Density
     HalfLen = Data.shape[-1]//2
     FFTRes = np.abs(np.fft.fft(Data, axis=-1)[..., :HalfLen])[..., MinFreq:MaxFreq]
-    # (N, M, N_frequency)
+    # (NMiniBat, NGen, N_frequency)
     PSD = (FFTRes**2)/Data.shape[-1]
 
     # Probability Density Function
@@ -50,12 +51,6 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
         AggPSD = np.mean(PSD, axis=(0,1))
         # (N_frequency,)
         AggPSPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
-    
-    elif ReducedAxis =='Sample':
-        AggPSD = np.mean(PSD, axis=(1))
-        # (NMiniBat, N_frequency)
-        AggPSPDF = AggPSD / np.sum(AggPSD, axis=(-1),keepdims=True)
-    
     elif ReducedAxis == 'None':
         # (NMiniBat, NGen, N_frequency)
         AggPSPDF = PSD / np.sum(PSD, axis=(-1),keepdims=True)    
@@ -65,6 +60,9 @@ def FFT_PSD (Data, ReducedAxis, MinFreq = 1, MaxFreq = 51):
 
 # Permutation given PSD over each generation
 def ProbPermutation(Data, WindowSize=3):
+    # To make the data have the shape: (NMiniBat, N_frequency, NGen)
+    Data = np.transpose(Data, (0,2,1))
+    
     # For the M generation vectors, Data shape: (NMiniBat, N_frequency, NGen)
     # For the true PSD, Data shape: (1, N_frequency, NMiniBat)
     
@@ -77,11 +75,12 @@ def ProbPermutation(Data, WindowSize=3):
 
     CountPerms = 1- (TruePerms[None,None,None] == PermsTable[:,:,:, None])
     CountPerms = 1-np.sum(CountPerms, axis=-1).astype('bool')
+
     # Reducing the window axis
     CountPerms = np.sum(CountPerms, axis=(2))
     
     # Data shape: (NMiniBat, N_frequency, N_permutation_cases)
-    ProbCountPerms = CountPerms / np.sum(CountPerms, axis=-1, keepdims=True)
+    ProbCountPerms = CountPerms / np.sum(CountPerms, axis=(1,2), keepdims=True)
     
     return np.maximum(ProbCountPerms, 1e-7)    
 
@@ -135,7 +134,7 @@ def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU
         UniqSamp_Z = np.random.normal(0, ReparaStdZj, (NMiniBat, NParts , SampModel.output.shape[-1]))
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, :, None], (NMiniBat, NParts, NSubGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
 
-    # Return shape of Samp_Z: (NMiniBat*NGen, LatDim)
+    # Return shape of Samp_Z: (NMiniBat*NParts*NSubGen, LatDim)
     return Samp_Z
 
 
@@ -165,25 +164,24 @@ def SamplingZj (Samp_Z, NMiniBat,  NParts, NSubGen, LatDim, NSelZ, ZjType='bd' )
     return Samp_Zj
 
 
-
-def SamplingFCs (SubData, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='bdrm', FcLimit= 0.05):
+def SamplingFCs (SubData, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='Modelbdrm', FcLimit= 0.05):
 
     # Check for valid SampFCType values
-    assert SampFCType in ['bdrm', 'bdm'], "Please verify the value of 'SampFCType'. Only 'bdrm', and 'bdm' are valid."
+    assert SampFCType in ['Modelbdrm', 'Modelbdm'], "Please verify the value of 'SampFCType'. Only 'Modelbdrm', and 'Modelbdm' are valid."
     
     # Sampling FCs
-    if SampFCType =='bdrm':
+    if SampFCType =='Modelbdrm':
         DataExt = np.repeat(Data, NParts*NSubGen, axis=0)
-        ## Return shape of FCs: (NMiniBat*NParts*NSubGen, NFCs) for optimal use of GPU
+        ## Return shape of Samp_FC: (NMiniBat*NParts*NSubGen, NFCs) for optimal use of GPU
         Samp_FC = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(-1, SampModel.output.shape[-1])
 
-    elif SampFCType =='bdm':
+    elif SampFCType =='Modelbdm':
         DataExt = np.repeat(Data, NSubGen, axis=0)
-        # Shape of UniqSamp_Z: (NMiniBat, 1, NSubGen, LatDim) 
+        # Shape of UniqSamp_FC: (NMiniBat, 1, NSubGen, LatDim) 
         UniqSamp_FC = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(NMiniBat, 1, NSubGen, -1)
         Samp_FC =  np.broadcast_to(UniqSamp_FC, (NMiniBat, NParts, NSubGen, UniqSamp_FC.shape[-1])).reshape(-1, UniqSamp_FC.shape[-1])
 
-    # Return shape of Samp_Z: (NMiniBat*NParts*NSubGen, LatDim)
+    # Return shape of Samp_FC: (NMiniBat*NParts*NSubGen, LatDim)
     return Samp_FC * FcLimit
     
     
