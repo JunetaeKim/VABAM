@@ -164,7 +164,7 @@ def SamplingZj (Samp_Z, NMiniBat,  NParts, NSubGen, LatDim, NSelZ, ZjType='bd' )
     return Samp_Zj
 
 
-def SamplingFCs (SubData, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='Modelbdrm', FcLimit= 0.05):
+def SamplingFCs (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='Modelbdrm', FcLimit= 0.05):
 
     # Check for valid SampFCType values
     assert SampFCType in ['Modelbdrm', 'Modelbdm'], "Please verify the value of 'SampFCType'. Only 'Modelbdrm', and 'Modelbdm' are valid."

@@ -24,7 +24,7 @@ def GenBatches(data_list, batch_size):
     for i in range(0, max_length, batch_size):
         yield [data[i:i + batch_size] for data in data_list]
         
-'''
+
 #The 'predict' function in TensorFlow version 2.10 may cause memory leak issues.
 def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
 
@@ -58,7 +58,7 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
             gc.collect()
     
     return np.array(PredVal)
-
+'''
 
 def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, RootDirRes=None):
     
@@ -148,7 +148,7 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params['MinFreq'] = EvalConfigSet['MinFreq']              # The minimum frequency value within the analysis range (default = 1).
     Params['NMiniBat'] = EvalConfigSet['NMiniBat']            # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     Params['SimSize'] = EvalConfigSet['SimSize']              # The number of repetition (i.e., samplings) within the mini-batch.
-    Params['SubGen'] = EvalConfigSet['SubGen']                # The number of generations (i.e., samplings) within a sample.
+    Params['NSubGen'] = EvalConfigSet['NSubGen']                # The number of generations (i.e., samplings) within a sample.
     Params['NSelZ'] = EvalConfigSet['NSelZ']                  # The size of js to be selected at the same time (default: 1).
     Params['SelMetricType'] = EvalConfigSet['SelMetricType']  # The type of metric used for selecting Zs and ancillary data. 
     Params['SelMetricCut'] = EvalConfigSet['SelMetricCut']    # The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.

@@ -15,7 +15,7 @@ from Utilities.Utilities import CompResource
        
 class Evaluator ():
     
-    def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  SubGen=100, NParts=5, ReparaStdZj = 1, NSelZ = 1, 
+    def __init__ (self, MinFreq=1, MaxFreq=51,  SimSize = 1, NMiniBat=100,  NSubGen=100, NParts=5, ReparaStdZj = 1, NSelZ = 1, 
                   SampBatchSize = 1000, GenBatchSize = 1000, SelMetricCut = 1., SelMetricType = 'KLD', GPU=False, Name=None):
 
         
@@ -24,7 +24,7 @@ class Evaluator ():
         self.MaxFreq = MaxFreq               # The maximum frequency value within the analysis range (default = 51).
         self.SimSize = SimSize               # Then umber of simulation repetitions for aggregating metrics (default: 1)
         self.NMiniBat = NMiniBat             # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
-        self.SubGen = SubGen                 # The number of generations (i.e., samplings) within a sample.
+        self.NSubGen = NSubGen                 # The number of generations (i.e., samplings) within a sample.
         self.NParts = NParts                 # The number of partitions (i.e., samplings) in generations within a sample.
         self.ReparaStdZj = ReparaStdZj       # The size of the standard deviation when sampling Zj (Samp_Zjb ~ N(0, ReparaStdZj)).
         self.NSelZ = NSelZ                   # The size of js to be selected at the same time (default: 1).
@@ -34,7 +34,7 @@ class Evaluator ():
         self.SelMetricCut = SelMetricCut     # The threshold for Zs and ancillary data where the metric value is below SelMetricCut.
         self.SelMetricType = SelMetricType   # The type of metric used for selecting Zs and ancillary data. 
         self.Name = Name                     # Model name.
-        self.NGen = SubGen * NParts          # The number of generations (i.e., samplings) within the mini-batch.
+        self.NGen = NSubGen * NParts          # The number of generations (i.e., samplings) within the mini-batch.
     
     
     ''' ------------------------------------------------------ Ancillary Functions ------------------------------------------------------'''
@@ -283,12 +283,13 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalSig, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType='FCIN',  Continue=True ):
+    def Eval_ZFC (self, AnalSig, SampZModel, SampFCModel, GenModel,  FcLimit=0.05,  WindowSize=3,  SecDataType='FCIN',  Continue=True ):
         
         ## Required parameters
-        self.AnalSig = AnalSig             # The data to be used for analysis.
-        self.SampModel = SampModel           # The model that samples Zs.
-        self.GenModel = GenModel             # The model that generates signals based on given Zs and FCs.
+        self.AnalSig = AnalSig              # The data to be used for analysis.
+        self.SampZModel = SampZModel        # The model that samples Zs.
+        self.SampFCModel = SampFCModel      # The model that samples FCs.
+        self.GenModel = GenModel            # The model that generates signals based on given Zs and FCs.
         
         assert SecDataType in ['FCIN','CONDIN', False], "Please verify the value of 'SecDataType'. Only 'FCIN', 'CONDIN'  or False are valid."
         
@@ -304,7 +305,7 @@ class Evaluator ():
         ## Intermediate variables
         self.Ndata = len(AnalSig) # The dimension size of the data.
         self.NFCs = GenModel.get_layer('Inp_FCEach').output.shape[-1] + GenModel.get_layer('Inp_FCCommon').output.shape[-1] # The dimension size of FCs.
-        self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
+        self.LatDim = SampZModel.output.shape[-1] # The dimension size of Z.
         self.SigDim = AnalSig.shape[-1] # The dimension (i.e., length) size of the raw signal.
         self.SubIterSize = self.Ndata//self.NMiniBat
         self.TotalIterSize = self.SubIterSize * self.SimSize
@@ -340,89 +341,109 @@ class Evaluator ():
             # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
             self.NMiniBat = len(SubData) 
 
-            # Sampling Samp_Z 
-            ## The values are repeated NGen times after the sampling. 
-            self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
-
-            self.Zbm = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, 
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelARand', ReparaStdZj=self.ReparaStdZj)
-                        
-            # Selecting Samp_Zjs from Samp_Z 
-            ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
-            self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
-
-            # Sampling Samp_Zjs by fixing j            
-            self.Zjbm = self.Zjb.copy()  
-            # Replacing values where Zj is 0 with Zbm
-            self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
-
             
-            # Sampling FCs
-            ## Return shape of FCs: (NMiniBat*NGen, NFCs) instead of (NMiniBat, NGen, NFCs) for optimal use of GPU
-            # Generating FC values randomly across all axes (i.e., the batch, generation, and fc axes).
-            self.FCbm = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='ARand', FcLimit = self.FcLimit)
-            # Generating FC values randomly across the batch and fc axes, and then repeat them NGen times.
-            self.FCb = SamplingFCs(self.NMiniBat,  self.NGen, self.NFCs, SampFCType='BRpt', FcLimit = self.FcLimit)
+            # Sampling Samp_Z and Samp_Zj
+            # Please note that the tensor is maintained in a reduced number of dimensions for computational efficiency in practice.
+            ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, j: LatDim; 
+            # The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimensions r and m.
+            self.Zbd = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
+                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbd', ReparaStdZj=self.ReparaStdZj)
+            
+            # The values of z are randomly sampled at dimensions b, d, r, and j, while remaining constant across dimension m.
+            self.Zbdr = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
+                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbdr', ReparaStdZj=self.ReparaStdZj)
+            
+            # Selecting Samp_Zjs from Zbd 
+            self.Zjbd = SamplingZj (self.Zbd, self.NMiniBat, self.NParts, self.NSubGen, self.LatDim, self.NSelZ, ZjType='bd' )
+            
+            # Selecting sub-Zjbd from Zjbd for I_V_FCsZj
+            self.Zjbd_Ext = self.Zjbd.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            # Return shape of Zjbd_Red1 : (NMiniBat*NSubGen, LatDim)
+            ## The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimension m.
+            self.Zjbd_Red1 = self.Zjbd_Ext[:, 0].reshape(self.NMiniBat*self.NSubGen, -1).copy()
+            # Return shape of Zjbd_Red2 : (NMiniBat, LatDim)
+            ## The values of z are randomly sampled at dimensions b, d, and j.
+            self.Zjbd_Red2 = self.Zjbd_Ext[:, 0, 0].copy()
+            
+            
+            # Sampling Samp_FC
+            ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, k: LatDim; 
+            # The values of FC are randomly sampled at the dimensions b, d, m, and k, and constant across dimension r.
+            self.FCbdm = SamplingFCs (SubData, self.SampFCModel, self.NMiniBat, self.NParts, self.NSubGen, 
+                                      BatchSize = self.SampBatchSize, GPU=self.GPU, SampFCType='Modelbdm', FcLimit= 0.05)
+            
+            # The values of FC are randomly sampled across all dimensions b, d, r, m, and k.
+            self.FCbdrm = SamplingFCs (SubData, self.SampFCModel, self.NMiniBat, self.NParts, self.NSubGen, 
+                                      BatchSize = self.SampBatchSize, GPU=self.GPU, SampFCType='Modelbdrm', FcLimit= 0.05)
+            
             # Sorting the arranged FC values in ascending order at the generation index.
-            self.FCbm_Ext = self.FCbm.reshape(self.NMiniBat, self.NParts, self.SubGen, -1)
-            self.FCbm_Sort = np.sort(self.FCbm_Ext , axis=2).reshape(self.NMiniBat*self.NGen, self.NFCs)
+            self.FCbdm_Ext = self.FCbdm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            # Return shape of FCbdm_Sort : (NMiniBat*NSubGen, LatDim)
+            ## The values of FC are sorted at the generation index after being randomly sampled across the dimensions b, d, m, and k.
+            self.FCbdm_Sort = np.sort(self.FCbdm_Ext , axis=2)[:,0].reshape(self.NMiniBat*self.NSubGen, self.NFCs)
+            # Return shape of FCbd_Sort : (NMiniBat, LatDim)
+            ## The values of FC are sorted at the dimension d after being randomly sampled across the dimensions b, d and k.
+            self.FCbd_Sort = np.sort(self.FCbdm_Ext[:, 0, 0], axis=0).copy() 
+
 
             
-
-            
-
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
             '''
             - To maximize the efficiency of GPU utilization, 
-              we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, NFCs) for FCs, respectively, 
-              transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, NFCs). 
+              we performed a binding operation transforming tensors to (NMiniBat * NParts * NSubGen, LatDim) for Zs or (NMiniBat * NParts * NSubGen, NFCs) for FCs. 
               After the computation, we then reverted them back to their original dimensions.
                        
-                                ## Variable cases for the signal generation ##
-                                
-              # Cases                               # Signal name                   # Target metric
-              1) Zb + FCbm               ->         Sig_Zb_FCbm         ->          MI() 
-              2) Zjb + FCbm              ->         Sig_Zjb_FCbm        ->          MI()
-              3) Zjb + FCbm_Sort         ->         Sig_Zjb_FCbmSt       ->          MI()
-              4) Zjbm + FCbm             ->         Sig_Zjbm_FCbm       ->          H() or KLD()
-                                                    * bm = ARand, b=BRpt, St=Sort *
-            ''' 
+                                        ## Variable cases for the signal generation ##
+                    
+              # Cases                             # Super Signal                    # Sub-Signal                # Target metric
+              1) Zbdr + FCbdrm         ->         Sig_Zbdr_FCbdrm        ->         Sig_Zbd_FCbdm               I() // H() or KLD ()
+              2) Zjbd + FCbdrm         ->         Sig_Zjbd_FCbdrm        ->         Sig_Zjbd_FCbdm              I() 
+              3) Zjbd + FCbdm_Sort     ->         Sig_Zjbd_FCbdmSt       ->                                     I() 
+              4) Zjbd + FCbd_Sort      ->         Sig_Zjbd_FCbdSt        ->                                     I()  
+                                                  * St=Sort 
+             '''
+
+            # Binding the samples together, generate signals through the model 
+            ListZs = [ self.Zbdr,   self.Zjbd,    self.Zjbd_Red1,       self.Zjbd_Red2]
+            Set_Zs = np.concatenate(ListZs)            
+            Set_FCs = np.concatenate([self.FCbdrm, self.FCbdrm,  self.FCbdm_Sort,  self.FCbd_Sort]) 
+            Set_Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
             
-            ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Zjb,  self.Zjb,        self.Zjbm])            
-            Set_FCs = np.concatenate([self.FCbm, self.FCbm_Sort,  self.FCbm]) 
-            Data = [Set_FCs[:, :2], Set_FCs[:, 2:], Set_Zs]
-
-
+            # Gneraing indices for Re-splitting predictions for each case
+            CaseLens = np.array([item.shape[0] for item in ListZs])
+            DataCaseIDX = [0] + list(np.cumsum(CaseLens))
+            
             # Choosing GPU or CPU and generating signals
-            Set_Pred = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
-
-
+            Set_Pred = CompResource (self.GenModel, Set_Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
+            
             # Re-splitting predictions for each case
-            Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zjb_FCbm, self.Sig_Zjb_FCbmSt, self.Sig_Zjbm_FCbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
-            # Approximating Sig_Zb_FCbm using Sig_Zjbm_FCbm
-            self.Sig_Zb_FCbm = self.Sig_Zjbm_FCbm.copy()
+            self.Sig_Zbdr_FCbdrm, self.Sig_Zjbd_FCbdrm, self.Sig_Zjbd_FCbdmSt, self.Sig_Zjbd_FCbdSt  = [Set_Pred[DataCaseIDX[i]:DataCaseIDX[i+1]] for i in range(len(DataCaseIDX)-1)] 
+            
+            self.Sig_Zbdr_FCbdrm = self.Sig_Zbdr_FCbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            self.Sig_Zjbd_FCbdrm = self.Sig_Zjbd_FCbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            self.Sig_Zjbd_FCbdmSt = self.Sig_Zjbd_FCbdmSt.reshape(self.NMiniBat, self.NSubGen, -1)
+            self.Sig_Zjbd_FCbdSt = self.Sig_Zjbd_FCbdSt.reshape(self.NMiniBat, -1)
+            
+            self.Sig_Zbd_FCbdm = self.Sig_Zbdr_FCbdrm[:, 0]
+            self.Sig_Zjbd_FCbdm = self.Sig_Zjbd_FCbdrm[:, 0]
 
 
- 
 
             ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
             
             '''                                        ## Sub-Metric list ##
                 ------------------------------------------------------------------------------------------------------------- 
-                # Sub-metrics   # Function            # Code                       # Function           # Code 
-                1) I_V_Z        q(v|Sig_Zb_FCbm)      <QV_Zb_FCbm>          vs     p(v)                 <QV_Pop>
-                2) I_V_ZjZ      q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     q(v|Sig_Zb_FCbm)     <QV_Zb_FCbm>
+                # Sub-metrics   # Function             # Code                           # Function            # Code 
+                1) I_V_Z        q(v|Sig_Zbd_FCbdm)     <QV_Zbd_FCbdm>           vs      p(v)                  <QV_Pop>
+                2) I_V_ZjZ      q(v|Sig_Zjbd_FCbdm)    <QV_Zjbd_FCbdm>          vs      q(v|Sig_Zbd_FCbdm)    <QV_Zbd_FCbdm>
                 
-                3) I_V_Zj       q(v|Sig_Zjb_FCbm)     <QV_Zjb_FCbm>         vs     p(v)                 <QV_Pop>
-                4) I_V_FCsZj    q(v|Sig_Zjb_FCbmSt)   <QV_Zjb_FCbmSt>       vs     q(v|Sig_Zjb_FCbm)    <QV_Zjb_FCbm>
+                3) I_V_Zj       q(v|Sig_Zjbd_FCbdm)    <QV_Zjbd_FCbdm>          vs      p(v)                  <QV_Pop>
+                4) I_V_FCsZj    q(v|Sig_Zjbd_FCbdSt)   <QV_Zjbd_FCbdSt>         vs      q(v|Sig_Zjbd_FCbdm)   <QV_Zjbd_FCbdm>
                 
-                5) I_S_Zj       q(s|Sig_Zjb_FCbm)     <QV//QS_Zjb_FCbm>     vs     p(s)                 <QV//QS_Batch>
-                6) I_S_FCsZj    q(s|Sig_Zjb_FCbmSt)   <QV//QS_Zjb_FCbmSt>   vs     q(s|Sig_Zjb_FCbm)    <QV//QS_Zjb_FCbm>
-
-                7) H()//KLD()   q(v|Sig_Zjbm_FCbm)    <QV_Zjbm_FCbm>       
+                5) I_S_Zj       q(s|Sig_Zjbd_FCbdrm)   <QV//QS_Zjbd_FCbdrm>     vs      p(s|Sig_Zbdr_FCbdrm)  <QV//QS_Zbdr_FCbdrm>
+                6) I_S_FCsZj    q(s|Sig_Zjbd_FCbdmSt)  <QV//QS_Zjbd_FCbdmSt>    vs      q(s|Sig_Zjbd_FCbdrm)  <QV//QS_Zjbd_FCbdrm>
+            
+                7) H()//KLD()   q(v|Sig_Zbdr_FCbdrm)   <QV_Zbdr_FCbdrm>                 q(v)                  <QV_Batch>       
                 
                                                        
                                                        ## Metric list ##
@@ -434,65 +455,56 @@ class Evaluator ():
                 
             '''
 
-
-            
-            
+      
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
-            self.QV_Zjb_FCbm_ = FFT_PSD(self.Sig_Zjb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.QV_Zjb_FCbmSt_ = FFT_PSD(self.Sig_Zjb_FCbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-            # Reshape 
-            # Return shape: (NMiniBat, NParts, N_frequency, SubGen)
-            self.QV_Zjb_FCbm_Ext = self.QV_Zjb_FCbm_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
-            self.QV_Zjb_FCbmSt_Ext = self.QV_Zjb_FCbmSt_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
-
-            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
-            self.QV_Zjb_FCbm_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_FCbm_Ext.shape))
-            self.QV_Zjb_FCbm_Ext = np.maximum(self.QV_Zjb_FCbm_Ext, 1e-7)
-            self.QV_Zjb_FCbmSt_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_FCbmSt_Ext.shape))
-            self.QV_Zjb_FCbmSt_Ext = np.maximum(self.QV_Zjb_FCbmSt_Ext, 1e-7)
-
-            # Q(v)s
-            ## Return shape: (NMiniBat, N_frequency)
-            self.QV_Zb_FCbm = FFT_PSD(self.Sig_Zb_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.QV_Zjb_FCbm = self.QV_Zjb_FCbm_.mean(axis=1)
-            self.QV_Zjb_FCbmSt = self.QV_Zjb_FCbmSt_.mean(axis=1)
+            # Return shape of MQV_Zbd_FCbdm : (NMiniBat, N_frequency)
+            self.MQV_Zbd_FCbdm = FFT_PSD(self.Sig_Zbd_FCbdm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(1)
+            # Return shape of MQV_Zjbd_FCbdm : (NMiniBat, N_frequency)
+            self.MQV_Zjbd_FCbdm = FFT_PSD(self.Sig_Zjbd_FCbdm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(1)
+            # Return shape of QV_Zjbd_FCbdSt : (NMiniBat, N_frequency)
+            self.QV_Zjbd_FCbdSt = FFT_PSD(self.Sig_Zjbd_FCbdSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)[:,0]
             
-            # Intermediate objects for Q(s) and H(')
-            ## Return shape: (NMiniBat, N_frequency, NGen)
-            self.QV_Zjbm_FCbm_T = FFT_PSD(self.Sig_Zjbm_FCbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
-
+            # Return shape of QV_Zbdr_FCbdrm : (NMiniBat, NParts, NSubGen, N_frequency)
+            self.QV_Zbdr_FCbdrm = FFT_PSD(self.Sig_Zbdr_FCbdrm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape of QV_Zjbd_FCbdrm : (NMiniBat, NParts, NSubGen, N_frequency)
+            self.QV_Zjbd_FCbdrm = FFT_PSD(self.Sig_Zjbd_FCbdrm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape of QV_Zjbd_FCbdmSt : (NMiniBat, NSubGen, N_frequency)
+            self.QV_Zjbd_FCbdmSt = FFT_PSD(self.Sig_Zjbd_FCbdmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            #print(self.MQV_Zbd_FCbdm.shape, self.MQV_Zjbd_FCbdm.shape, self.QV_Zjbd_FCbdSt.shape, self.QV_Zbdr_FCbdrm.shape, self.QV_Zjbd_FCbdrm.shape, self.QV_Zjbd_FCbdmSt.shape)
             
-            ## Return shape: (1, N_frequency, NMiniBat)
-            ### Since it is the true PSD, there are no M generations. 
-            self.QV_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
-
-
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
+            # Calculating PD-PSD over v and s.
+            ## Return shape of QSV_Zbdr_FCbdrm : (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QSV_Zbdr_FCbdrm = np.concatenate([ProbPermutation(self.QV_Zbdr_FCbdrm[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            ## Return shape of QSV_Zjbd_FCbdrm : (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QSV_Zjbd_FCbdrm = np.concatenate([ProbPermutation(self.QV_Zjbd_FCbdrm[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            ## Return shape of QSV_Zjbd_FCbdmSt : (NMiniBat, N_frequency, N_permutation_cases)
+            self.QSV_Zjbd_FCbdmSt = ProbPermutation(self.QV_Zjbd_FCbdmSt, WindowSize=WindowSize)
             
-            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
-            self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
-
-            # Calculating permutation density in power spectral density for each partition.
-            # Return shape: (NMiniBat, NParts, N_frequency, N_permutation_cases)
-            self.QS_Zjb_FCbm_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_FCbm_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
-            self.QS_Zjb_FCbmSt_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_FCbmSt_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
-                        
-            # Calculating the mean across the partition dimension
-            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
-            self.QS_Zjb_FCbm = np.mean(self.QS_Zjb_FCbm_Ext, axis=1)
-            self.QS_Zjb_FCbmSt = np.mean(self.QS_Zjb_FCbmSt_Ext, axis=1)
+            # Marginalizing v to obtain PD-PSD(s).
+            ## Return shape of QS_Zbdr_FCbdrm : (NMiniBat, NParts, N_permutation_cases)
+            self.QS_Zbdr_FCbdrm = np.sum(self.QSV_Zbdr_FCbdrm, axis=2)
+            ## Return shape of QS_Zjbd_FCbdrm : (NMiniBat, NParts, N_permutation_cases)
+            self.QS_Zjbd_FCbdrm = np.sum(self.QSV_Zjbd_FCbdrm, axis=2)
+            ## Return shape of QS_Zjbd_FCbdmSt : (NMiniBat, N_permutation_cases)
+            self.QS_Zjbd_FCbdmSt = np.sum(self.QSV_Zjbd_FCbdmSt, axis=1)
+            #print(self.QSV_Zbdr_FCbdrm.shape,  self.QSV_Zjbd_FCbdrm.shape, self.QSV_Zjbd_FCbdmSt.shape, self.QS_Zbdr_FCbdrm.shape, self.QS_Zjbd_FCbdrm.shape, self.QS_Zjbd_FCbdmSt.shape)
             
-
-                
+            # Averaging PD-PSD(s) over the Dimension m: Effect of Monte Carlo Simulation
+            ## Return shape of MQS_Zjbd_FCbdrm : (NMiniBat, N_permutation_cases)
+            self.MQS_Zjbd_FCbdrm = np.mean(self.QS_Zjbd_FCbdrm, axis=1)
+            ## Return shape of MQS_Zbdr_FCbdrm : (NMiniBat, N_permutation_cases)
+            self.MQS_Zbdr_FCbdrm = np.mean(self.QS_Zbdr_FCbdrm, axis=1)
+            #print(self.MQS_Zjbd_FCbdrm.shape, self.MQS_Zbdr_FCbdrm.shape )
+            
+            
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            I_V_Z_ = MeanKLD(self.QV_Zb_FCbm, self.QV_Pop[None] ) # I(V;z)
-            I_V_ZjZ_ = MeanKLD(self.QV_Zjb_FCbm, self.QV_Zb_FCbm )  # I(V;z'|z)
-            I_V_Zj_ =  MeanKLD(self.QV_Zjb_FCbm, self.QV_Pop[None] ) # I(V;z')
-            I_V_FCsZj_ = MeanKLD(self.QV_Zjb_FCbmSt, self.QV_Zjb_FCbm ) # I(V;fc'|z')
-            I_S_Zj_ = MeanKLD(self.QS_Zjb_FCbm, self.QS_Batch) # I(S;z')
-            I_S_FCsZj_ = MeanKLD(self.QS_Zjb_FCbmSt, self.QS_Zjb_FCbm) # I(S;fc'|z')
+            I_V_Z_ = MeanKLD(self.MQV_Zbd_FCbdm, self.QV_Pop[None] ) # I(V;z)
+            I_V_ZjZ_ = MeanKLD(self.MQV_Zjbd_FCbdm, self.MQV_Zbd_FCbdm )  # I(V;z'|z)
+            I_V_Zj_ =  MeanKLD(self.MQV_Zjbd_FCbdm, self.QV_Pop[None] ) # I(V;z')
+            I_V_FCsZj_ = MeanKLD(self.QV_Zjbd_FCbdSt, self.MQV_Zjbd_FCbdm ) # I(V;fc'|z')
+            I_S_Zj_ = MeanKLD(self.MQS_Zjbd_FCbdrm, self.MQS_Zbdr_FCbdrm ) # I(S;z')
+            I_S_FCsZj_ = MeanKLD(self.QS_Zjbd_FCbdmSt, self.MQS_Zjbd_FCbdrm ) # I(S;fc'|z')
 
 
             print('I(V;z) :', I_V_Z_)
@@ -521,7 +533,16 @@ class Evaluator ():
             
             
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            self.LocCandZsMaxFreq ( self.QV_Zjbm_FCbm_T, self.Zjbm,  self.FCbm)
+            ## Return shape: (1, N_frequency, NMiniBat)
+            ### Since it is the true PSD, there are no M generations. 
+            self.QV_Batch = FFT_PSD(SubData[:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
+            
+            # Intermediate objects for Q(s) and H(')
+            ## Return shape: (NMiniBat, N_frequency, NGen)
+            #self.QV_Zjbd_FCbdrm_T = self.QV_Zjbd_FCbdrm.reshape(self.NMiniBat, self.NGen, -1).transpose(0,2,1)
+            #self.LocCandZsMaxFreq ( self.QV_Zjbd_FCbdrm_T, self.Zjbd,  self.FCbdrm)
+            self.QV_Zbdr_FCbdrm_T = self.QV_Zbdr_FCbdrm.reshape(self.NMiniBat, self.NGen, -1).transpose(0,2,1)
+            self.LocCandZsMaxFreq ( self.QV_Zbdr_FCbdrm_T, self.Zbdr,  self.FCbdrm)
  
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
@@ -560,9 +581,8 @@ class Evaluator ():
         self.MI_S_FCsZj = self.I_S_Zj + self.I_S_FCsZj
         self.AggResDic['MI_S_FCsZj'].append(self.MI_S_FCsZj)
 
-        
-        
-        
+
+    
     
     
     ### -------------------------- Evaluating the performance of the model using only Z inputs  -------------------------- ###
