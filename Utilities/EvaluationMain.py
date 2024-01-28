@@ -763,10 +763,10 @@ class Evaluator ():
         
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_ZCON (self, AnalData, SampModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType=None,  Continue=True ):
+    def Eval_ZCON (self, AnalData, SampZModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType=None,  Continue=True ):
         
         ## Required parameters
-        self.SampModel = SampModel           # The model that samples Zs.
+        self.SampZModel = SampZModel         # The model that samples Zs.
         self.GenModel = GenModel             # The model that generates signals based on given Zs and Cons.
         
         assert SecDataType in ['FCIN','CONDIN', False], "Please verify the value of 'SecDataType'. Only 'FCIN', 'CONDIN'  or False are valid."
@@ -784,7 +784,7 @@ class Evaluator ():
         self.AnalSig = AnalData[0]  # The raw true signals to be used for analysis.
         self.TrueCond = AnalData[1] # The raw true PSD to be used for analysis.
         self.Ndata = len(self.AnalSig) # The dimension size of the data.
-        self.LatDim = SampModel.output.shape[-1] # The dimension size of Z.
+        self.LatDim = SampZModel.output.shape[-1] # The dimension size of Z.
         self.SigDim =  self.AnalSig.shape[-1] # The dimension (i.e., length) size of the raw signal.
         self.CondDim = self.TrueCond.shape[-1] # The dimension size of the conditional inputs.
         self.SubIterSize = self.Ndata//self.NMiniBat
@@ -824,90 +824,120 @@ class Evaluator ():
             self.NMiniBat = len(SubData[0]) 
             self.SubCond = SubData[1]
 
-            # Sampling Samp_Z 
-            ## The values are repeated NGen times after the sampling. 
-            self.Zb = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, SecDataType='CONDIN',
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelBRpt', ReparaStdZj=self.ReparaStdZj)
-
-            self.Zbm = SamplingZ(SubData, self.SampModel, self.NMiniBat, self.NGen, SecDataType='CONDIN',
-                               BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='ModelARand', ReparaStdZj=self.ReparaStdZj)
-                        
-            # Selecting Samp_Zjs from Samp_Z 
-            ## For Samp_Zjs, the same j is selected in all generations within a mini-batch.
-            self.Zjb = SamplingZj (self.Zb, self.NMiniBat, self.NGen, self.LatDim, self.NSelZ, ZjType='BRpt')
-
-            # Sampling Samp_Zjs by fixing j            
-            self.Zjbm = self.Zjb.copy()  
-            # Replacing values where Zj is 0 with Zbm
-            self.Zjbm[self.Zjb == 0] = self.Zbm[self.Zjb == 0]
-
-
+            
+            # Sampling Samp_Z and Samp_Zj
+            # Please note that the tensor is maintained in a reduced number of dimensions for computational efficiency in practice.
+            ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, j: LatDim; 
+            # The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimensions r and m.
+            self.Zbd = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
+                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbd', ReparaStdZj=self.ReparaStdZj)
+            
+            # The values of z are randomly sampled at dimensions b, d, r, and j, while remaining constant across dimension m.
+            self.Zbdr = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
+                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbdr', SecDataType='CONDIN', ReparaStdZj=self.ReparaStdZj)
+            
+            # Selecting Samp_Zjs from Zbd 
+            self.Zjbd = SamplingZj (self.Zbd, self.NMiniBat, self.NParts, self.NSubGen, self.LatDim, self.NSelZ, ZjType='bd' )
+            
+            # Selecting sub-Zjbd from Zjbd for I_V_FCsZj
+            self.Zjbd_Ext = self.Zjbd.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            # Return shape of Zjbd_Red1 : (NMiniBat*NSubGen, LatDim)
+            ## The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimension m.
+            self.Zjbd_Red1 = self.Zjbd_Ext[:, 0].reshape(self.NMiniBat*self.NSubGen, -1).copy()
+            # Return shape of Zjbd_Red2 : (NMiniBat, LatDim)
+            ## The values of z are randomly sampled at dimensions b, d, and j.
+            self.Zjbd_Red2 = self.Zjbd_Ext[:, 0, 0].copy()
+            
             
             # Processing Conditional information 
-            ## Generating CONbm_Sort (NMiniBat x NGen, CondDim)
             ### Generating random indices for selecting true conditions
-            RandSelIDX = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NGen)
-            ### Selecting the true conditions using the generated indices
-            self.CONbm = self.TrueCond[RandSelIDX]
+            RandSelIDXbdm = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NSubGen)
+            RandSelIDXbdrm = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NParts* self.NSubGen)
             
-            # Sorting the arranged conditions in ascending order at the generation index.
-            self.CONbm_Ext = self.CONbm.reshape(self.NMiniBat, self.NParts, self.SubGen, -1)
-            self.CONbm_Sort = np.sort(self.CONbm_Ext , axis=2).reshape(self.NMiniBat*self.NGen, self.TrueCond.shape[-1])
+            ### Selecting the true conditions using the generated indices
+            # True conditions are randomly sampled at the dimensions b, d, m, and k, and constant across dimension r.
+            self.CONbdm = self.TrueCond[RandSelIDXbdm]
+            self.CONbdm = np.broadcast_to(self.CONbdm.reshape(self.NMiniBat, self.NSubGen, -1)[:,None], (self.NMiniBat, self.NParts, self.NSubGen, self.CondDim))
+            
+            # True conditions are randomly sampled across all dimensions b, d, r, m, and k.
+            self.CONbdrm = self.TrueCond[RandSelIDXbdrm]
+            
+            
+            # Sorting the arranged condition values in ascending order at the generation index.
+            self.CONbdm_Ext = self.CONbdm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            # Return shape of CONbdm_Sort : (NMiniBat*NSubGen, LatDim)
+            ## The conditions are sorted at the generation index after being randomly sampled across the dimensions b, d, m, and k.
+            self.CONbdm_Sort = np.sort(self.CONbdm_Ext , axis=2)[:,0].reshape(self.NMiniBat*self.NSubGen, self.CondDim)
+            # Return shape of CONbd_Sort : (NMiniBat, LatDim)
+            ## The conditions are sorted at the dimension d after being randomly sampled across the dimensions b, d and k.
+            self.CONbd_Sort = np.sort(self.CONbdm_Ext[:, 0, 0], axis=0).copy() 
 
             
 
             ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
             '''
             - To maximize the efficiency of GPU utilization, 
-              we performed a binding operation on (NMiniBat, NGen, LatDim) for Zs and (NMiniBat, NGen, CondDim) for CONs, respectively, 
-              transforming them to (NMiniBat * NGen, LatDim) and (NMiniBat * NGen, CondDim). 
+              we performed a binding operation transforming tensors to (NMiniBat * NParts * NSubGen, LatDim) for Zs or (NMiniBat * NParts * NSubGen, CondDim) for CON. 
               After the computation, we then reverted them back to their original dimensions.
                        
-                                ## Variable cases for the signal generation ##
-                                
-              # Cases                               # Signal name                   # Target metric
-              1) Zb + CONbm               ->         Sig_Zb_CONbm         ->          MI() 
-              2) Zjb + CONbm              ->         Sig_Zjb_CONbm        ->          MI()
-              3) Zjb + CONbm_Sort         ->         Sig_Zjb_CONbmSt      ->          MI()
-              4) Zjbm + CONbm             ->         Sig_Zjbm_CONbm       ->          H() or KLD()
-                                                    * bm = ARand, b=BRpt, St=Sort *
-            ''' 
+                                        ## Variable cases for the signal generation ##
+                    
+              # Cases                             # Super Signal                    # Sub-Signal                # Target metric
+              1) Zbdr + CONbdrm         ->         Sig_Zbdr_CONbdrm        ->        Sig_Zbd_CONbdm              I() // H() or KLD ()
+              2) Zjbd + CONbdrm         ->         Sig_Zjbd_CONbdrm        ->        Sig_Zjbd_CONbdm             I() 
+              3) Zjbd + CONbdm_Sort     ->         Sig_Zjbd_CONbdmSt       ->                                    I() 
+              4) Zjbd + CONbd_Sort      ->         Sig_Zjbd_CONbdSt        ->                                    I()  
+                                                  * St=Sort 
+             '''
+
+                        
+            # Binding the samples together, generate signals through the model 
+            ListZs = [ self.Zbdr,   self.Zjbd,    self.Zjbd_Red1,       self.Zjbd_Red2]
+            Set_Zs = np.concatenate(ListZs)            
+            Set_CONs = np.concatenate([self.CONbdrm, self.CONbdrm,  self.CONbdm_Sort,  self.CONbd_Sort]) 
+            Set_Data = [Set_Zs, Set_CONs]
             
-            ## Binding the samples together, generate signals through the model 
-            Set_Zs = np.concatenate([self.Zjb,  self.Zjb,        self.Zjbm])            
-            Set_CONs = np.concatenate([self.CONbm, self.CONbm_Sort,  self.CONbm]) 
-            Data = [Set_Zs, Set_CONs]
-
-
+            # Gneraing indices for Re-splitting predictions for each case
+            CaseLens = np.array([item.shape[0] for item in ListZs])
+            DataCaseIDX = [0] + list(np.cumsum(CaseLens))
+            
             # Choosing GPU or CPU and generating signals
-            Set_Pred = CompResource (self.GenModel, Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
-
-
+            Set_Pred = CompResource (self.GenModel, Set_Data, BatchSize=self.GenBatchSize, GPU=self.GPU)
+            
             # Re-splitting predictions for each case
-            Set_Pred = Set_Pred.reshape(-1, self.NMiniBat, self.NGen, self.SigDim)
-            self.Sig_Zjb_CONbm, self.Sig_Zjb_CONbmSt, self.Sig_Zjbm_CONbm = [np.squeeze(SubPred) for SubPred in np.split(Set_Pred, 3)]  
-            # Approximating Sig_Zb_CONbm using Sig_Zjbm_CONbm
-            self.Sig_Zb_CONbm = self.Sig_Zjbm_CONbm.copy()
+            self.Sig_Zbdr_CONbdrm, self.Sig_Zjbd_CONbdrm, self.Sig_Zjbd_CONbdmSt, self.Sig_Zjbd_CONbdSt  = [Set_Pred[DataCaseIDX[i]:DataCaseIDX[i+1]] for i in range(len(DataCaseIDX)-1)] 
+            
+            self.Sig_Zbdr_CONbdrm = self.Sig_Zbdr_CONbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            self.Sig_Zjbd_CONbdrm = self.Sig_Zjbd_CONbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            self.Sig_Zjbd_CONbdmSt = self.Sig_Zjbd_CONbdmSt.reshape(self.NMiniBat, self.NSubGen, -1)
+            self.Sig_Zjbd_CONbdSt = self.Sig_Zjbd_CONbdSt.reshape(self.NMiniBat, -1)
+            
+            self.Sig_Zbd_CONbdm = self.Sig_Zbdr_CONbdrm[:, 0]
+            self.Sig_Zjbd_CONbdm = self.Sig_Zjbd_CONbdrm[:, 0]
+
+
+
+            ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
 
 
 
  
-
+            
             ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
             
             '''                                        ## Sub-Metric list ##
                 ------------------------------------------------------------------------------------------------------------- 
-                # Sub-metrics   # Function            # Code                       # Function            # Code 
-                1) I_V_Z        q(v|Sig_Zb_CONbm)      <QV_Zb_CONbm>          vs     p(v)                 <QV_Pop>
-                2) I_V_ZjZ      q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     q(v|Sig_Zb_CONbm)    <QV_Zb_CONbm>
+                # Sub-metrics   # Function             # Code                           # Function            # Code 
+                1) I_V_Z        q(v|Sig_Zbd_CONbdm)     <QV_Zbd_CONbdm>           vs      p(v)                  <QV_Pop>
+                2) I_V_ZjZ      q(v|Sig_Zjbd_CONbdm)    <QV_Zjbd_CONbdm>          vs      q(v|Sig_Zbd_CONbdm)    <QV_Zbd_CONbdm>
                 
-                3) I_V_Zj       q(v|Sig_Zjb_CONbm)     <QV_Zjb_CONbm>         vs     p(v)                 <QV_Pop>
-                4) I_V_CONsZj   q(v|Sig_Zjb_CONbmSt)   <QV_Zjb_CONbmSt>       vs     q(v|Sig_Zjb_CONbm)   <QV_Zjb_CONbm>
+                3) I_V_Zj       q(v|Sig_Zjbd_CONbdm)    <QV_Zjbd_CONbdm>          vs      p(v)                  <QV_Pop>
+                4) I_V_CONsZj    q(v|Sig_Zjbd_CONbdSt)   <QV_Zjbd_CONbdSt>         vs      q(v|Sig_Zjbd_CONbdm)   <QV_Zjbd_CONbdm>
                 
-                5) I_S_Zj       q(s|Sig_Zjb_CONbm)     <QV//QS_Zjb_CONbm>     vs     p(s)                 <QV//QS_Batch>
-                6) I_S_CONsZj   q(s|Sig_Zjb_CONbmSt)   <QV//QS_Zjb_CONbmSt>   vs     q(s|Sig_Zjb_CONbm)   <QV//QS_Zjb_CONbm>
-
-                7) H()//KLD()   q(v|Sig_Zjbm_CONbm)    <QV_Zjbm_CONbm>       
+                5) I_S_Zj       q(s|Sig_Zjbd_CONbdrm)   <QV//QS_Zjbd_CONbdrm>     vs      p(s|Sig_Zbdr_CONbdrm)  <QV//QS_Zbdr_CONbdrm>
+                6) I_S_CONsZj    q(s|Sig_Zjbd_CONbdmSt)  <QV//QS_Zjbd_CONbdmSt>    vs      q(s|Sig_Zjbd_CONbdrm)  <QV//QS_Zjbd_CONbdrm>
+            
+                7) H()//KLD()   q(v|Sig_Zbdr_CONbdrm)   <QV_Zbdr_CONbdrm>                 q(v)                  <QV_Batch>       
                 
                                                        
                                                        ## Metric list ##
@@ -921,90 +951,92 @@ class Evaluator ():
             
             
             ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
-            # Temporal objects with the shape : (NMiniBat, NGen, N_frequency)
-            self.QV_Zjb_CONbm_ = FFT_PSD(self.Sig_Zjb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-            self.QV_Zjb_CONbmSt_ = FFT_PSD(self.Sig_Zjb_CONbmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
-
-            # Reshape 
-            # Return shape: (NMiniBat, NParts, N_frequency, SubGen)
-            self.QV_Zjb_CONbm_Ext = self.QV_Zjb_CONbm_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
-            self.QV_Zjb_CONbmSt_Ext = self.QV_Zjb_CONbmSt_.reshape(self.NMiniBat, self.NParts, self.SubGen, -1).transpose((0,1,3,2))
-
-            # Adding/subtracting epsilon to prevent low PDPSD due to non-variational identical value generation.
-            self.QV_Zjb_CONbm_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_CONbm_Ext.shape))
-            self.QV_Zjb_CONbm_Ext = np.maximum(self.QV_Zjb_CONbm_Ext, 1e-7)
-            self.QV_Zjb_CONbmSt_Ext += np.random.normal(0, 1e-7, (self.QV_Zjb_CONbmSt_Ext.shape))
-            self.QV_Zjb_CONbmSt_Ext = np.maximum(self.QV_Zjb_CONbmSt_Ext, 1e-7)
+            # Return shape of MQV_Zbd_CONbdm : (NMiniBat, N_frequency)
+            self.MQV_Zbd_CONbdm = FFT_PSD(self.Sig_Zbd_CONbdm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(1)
+            # Return shape of MQV_Zjbd_CONbdm : (NMiniBat, N_frequency)
+            self.MQV_Zjbd_CONbdm = FFT_PSD(self.Sig_Zjbd_CONbdm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(1)
+            # Return shape of QV_Zjbd_CONbdSt : (NMiniBat, N_frequency)
+            self.QV_Zjbd_CONbdSt = FFT_PSD(self.Sig_Zjbd_CONbdSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)[:,0]
             
-            # Q(v)s
-            ## Return shape: (NMiniBat, N_frequency)
-            self.QV_Zb_CONbm = FFT_PSD(self.Sig_Zb_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(axis=1)
-            self.QV_Zjb_CONbm = self.QV_Zjb_CONbm_.mean(axis=1)
-            self.QV_Zjb_CONbmSt = self.QV_Zjb_CONbmSt_.mean(axis=1)
-           
-            # Intermediate objects for Q(s) and H(')
-            ## Return shape: (NMiniBat, N_frequency, NGen)
-            self.QV_Zjbm_CONbm_T = FFT_PSD(self.Sig_Zjbm_CONbm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose(0,2,1)
-            
-                    
-            ## Return shape: (1, N_frequency, NMiniBat)
-            ### Since it is the true PSD, there are no M generations. 
-            self.QV_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
-
+            # Return shape of QV_Zbdr_CONbdrm : (NMiniBat, NParts, NSubGen, N_frequency)
+            self.QV_Zbdr_CONbdrm = FFT_PSD(self.Sig_Zbdr_CONbdrm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape of QV_Zjbd_CONbdrm : (NMiniBat, NParts, NSubGen, N_frequency)
+            self.QV_Zjbd_CONbdrm = FFT_PSD(self.Sig_Zjbd_CONbdrm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape of QV_Zjbd_CONbdmSt : (NMiniBat, NSubGen, N_frequency)
+            self.QV_Zjbd_CONbdmSt = FFT_PSD(self.Sig_Zjbd_CONbdmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            #print(self.MQV_Zbd_CONbdm.shape, self.MQV_Zjbd_CONbdm.shape, self.QV_Zjbd_CONbdSt.shape, self.QV_Zbdr_CONbdrm.shape, self.QV_Zjbd_CONbdrm.shape, self.QV_Zjbd_CONbdmSt.shape)
             
             ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
-            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
-            self.QS_Batch = ProbPermutation(self.QV_Batch, WindowSize=WindowSize)
+            # Calculating PD-PSD over v and s.
+            ## Return shape of QSV_Zbdr_CONbdrm : (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QSV_Zbdr_CONbdrm = np.concatenate([ProbPermutation(self.QV_Zbdr_CONbdrm[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            ## Return shape of QSV_Zjbd_CONCbdrm : (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QSV_Zjbd_CONbdrm = np.concatenate([ProbPermutation(self.QV_Zjbd_CONbdrm[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            ## Return shape of QSV_Zjbd_CONbdmSt : (NMiniBat, N_frequency, N_permutation_cases)
+            self.QSV_Zjbd_CONbdmSt = ProbPermutation(self.QV_Zjbd_CONbdmSt, WindowSize=WindowSize)
             
-            # Calculating permutation density in power spectral density for each partition.
-            # Return shape: (NMiniBat, NParts, N_frequency, N_permutation_cases)
-            self.QS_Zjb_CONbm_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_CONbm_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
-            self.QS_Zjb_CONbmSt_Ext  = np.concatenate([ProbPermutation(self.QV_Zjb_CONbmSt_Ext[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            # Marginalizing v to obtain PD-PSD(s).
+            ## Return shape of QS_Zbdr_CONbdrm : (NMiniBat, NParts, N_permutation_cases)
+            self.QS_Zbdr_CONbdrm = np.sum(self.QSV_Zbdr_CONbdrm, axis=2)
+            ## Return shape of QS_Zjbd_CONbdrm : (NMiniBat, NParts, N_permutation_cases)
+            self.QS_Zjbd_CONbdrm = np.sum(self.QSV_Zjbd_CONbdrm, axis=2)
+            ## Return shape of QS_Zjbd_CONbdmSt : (NMiniBat, N_permutation_cases)
+            self.QS_Zjbd_CONbdmSt = np.sum(self.QSV_Zjbd_CONbdmSt, axis=1)
+            #print(self.QSV_Zbdr_CONbdrm.shape,  self.QSV_Zjbd_CONbdrm.shape, self.QSV_Zjbd_CONbdmSt.shape, self.QS_Zbdr_CONbdrm.shape, self.QS_Zjbd_CONbdrm.shape, self.QS_Zjbd_CONbdmSt.shape)
             
-            # Calculating the mean across the partition dimension
-            # Return shape: (NMiniBat, N_frequency, N_permutation_cases)
-            self.QS_Zjb_CONbm = np.mean(self.QS_Zjb_CONbm_Ext, axis=1)
-            self.QS_Zjb_CONbmSt = np.mean(self.QS_Zjb_CONbmSt_Ext, axis=1)
+            # Averaging PD-PSD(s) over the Dimension m: Effect of Monte Carlo Simulation
+            ## Return shape of MQS_Zjbd_CONbdrm : (NMiniBat, N_permutation_cases)
+            self.MQS_Zjbd_CONbdrm = np.mean(self.QS_Zjbd_CONbdrm, axis=1)
+            ## Return shape of MQS_Zbdr_CONbdrm : (NMiniBat, N_permutation_cases)
+            self.MQS_Zbdr_CONbdrm = np.mean(self.QS_Zbdr_CONbdrm, axis=1)
+            #print(self.MQS_Zjbd_CONbdrm.shape, self.MQS_Zbdr_CONbdrm.shape )
 
             
                 
             ### ---------------------------------------- Mutual information ---------------------------------------- ###
-            I_V_Z_ = MeanKLD(self.QV_Zb_CONbm, self.QV_Pop[None] ) # I(V;z)
-            I_V_ZjZ_ = MeanKLD(self.QV_Zjb_CONbm, self.QV_Zb_CONbm )  # I(V;z'|z)
-            I_V_Zj_ =  MeanKLD(self.QV_Zjb_CONbm, self.QV_Pop[None] ) # I(V;z')
-            I_V_CONsZj_ = MeanKLD(self.QV_Zjb_CONbmSt, self.QV_Zjb_CONbm ) # I(V;con'|z')
-            I_S_Zj_ = MeanKLD(self.QS_Zjb_CONbm, self.QS_Batch) # I(S;z')
-            I_S_CONsZj_ = MeanKLD(self.QS_Zjb_CONbmSt, self.QS_Zjb_CONbm) # I(S;con'|z')
+            I_V_Z_ = MeanKLD(self.MQV_Zbd_CONbdm, self.QV_Pop[None] ) # I(V;z)
+            I_V_ZjZ_ = MeanKLD(self.MQV_Zjbd_CONbdm, self.MQV_Zbd_CONbdm )  # I(V;z'|z)
+            I_V_Zj_ =  MeanKLD(self.MQV_Zjbd_CONbdm, self.QV_Pop[None] ) # I(V;z')
+            I_V_CONsZj_ = MeanKLD(self.QV_Zjbd_CONbdSt, self.MQV_Zjbd_CONbdm ) # I(V;Con'|z')
+            I_S_Zj_ = MeanKLD(self.MQS_Zjbd_CONbdrm, self.MQS_Zbdr_CONbdrm ) # I(S;z')
+            I_S_CONsZj_ = MeanKLD(self.QS_Zjbd_CONbdmSt, self.MQS_Zjbd_CONbdrm ) # I(S;Con'|z')
 
 
             print('I(V;z) :', I_V_Z_)
             self.SubResDic['I_V_Z'].append(I_V_Z_)
             self.I_V_Z += I_V_Z_
-
+            
             print("I(V;z'|z) :", I_V_ZjZ_)
             self.SubResDic['I_V_ZjZ'].append(I_V_ZjZ_)
             self.I_V_ZjZ += I_V_ZjZ_
-
+            
             print("I(V;z') :", I_V_Zj_)
             self.SubResDic['I_V_Zj'].append(I_V_Zj_)
             self.I_V_Zj += I_V_Zj_
-
-            print("I(V;con'|z') :", I_V_CONsZj_)
+            
+            print("I(V;Con'|z') :", I_V_CONsZj_)
             self.SubResDic['I_V_CONsZj'].append(I_V_CONsZj_)
             self.I_V_CONsZj += I_V_CONsZj_
-
+            
             print("I(S;z') :", I_S_Zj_)
             self.SubResDic['I_S_Zj'].append(I_S_Zj_)
             self.I_S_Zj += I_S_Zj_
-
-            print("I(S;con'|z') :", I_S_CONsZj_)
+            
+            print("I(S;Con'|z') :", I_S_CONsZj_)
             self.SubResDic['I_S_CONsZj'].append(I_S_CONsZj_)
             self.I_S_CONsZj += I_S_CONsZj_
-            
+                        
             
             ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
-            self.LocCandZsMaxFreq ( self.QV_Zjbm_CONbm_T, self.Zjbm,  self.CONbm)
- 
+            ## Return shape: (1, N_frequency, NMiniBat)
+            ### Since it is the true PSD, there are no M generations. 
+            self.QV_Batch = FFT_PSD(SubData[0][:,None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
+            
+            # Intermediate objects for Q(s) and H(')
+            ## Return shape: (NMiniBat, N_frequency, NGen)
+            self.QV_Zbdr_CONbdrm_T = self.QV_Zbdr_CONbdrm.reshape(self.NMiniBat, self.NGen, -1).transpose(0,2,1)
+            self.LocCandZsMaxFreq ( self.QV_Zbdr_CONbdrm_T, self.Zbdr,  self.CONbdrm)
+            
             # Restructuring TrackerCand
             ## item[0] contains frequency domains
             ## item[1] contains tracked Z values, 2nd data, and metrics
