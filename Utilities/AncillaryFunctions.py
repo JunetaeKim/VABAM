@@ -124,7 +124,10 @@ def SamplingZ (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, None], (NMiniBat, NGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
     
     elif SampZType =='Modelbdr':
-        DataExt = np.repeat(Data, NParts, axis=0)
+        if SecDataType == 'CONDIN' : # For the CondVAE
+            DataExt = [np.repeat(arr, NParts, axis=0) for arr in Data]
+        else:
+            DataExt = np.repeat(Data, NParts, axis=0)
         # Shape of UniqSamp_Z: (NMiniBat, NParts, LatDim) 
         UniqSamp_Z = Sampler(DataExt, SampModel, BatchSize=BatchSize, GPU=GPU).reshape(NMiniBat, NParts, -1)
         Samp_Z =  np.broadcast_to(UniqSamp_Z[:, :, None], (NMiniBat, NParts, NSubGen, UniqSamp_Z.shape[-1])).reshape(-1, UniqSamp_Z.shape[-1])
