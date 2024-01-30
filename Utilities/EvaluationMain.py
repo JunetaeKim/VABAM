@@ -345,16 +345,16 @@ class Evaluator ():
             # Sampling Samp_Z and Samp_Zj
             # Please note that the tensor is maintained in a reduced number of dimensions for computational efficiency in practice.
             ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, j: LatDim; 
-            # The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimensions r and m.
-            self.Zbd = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
-                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbd', ReparaStdZj=self.ReparaStdZj)
-            
             # The values of z are randomly sampled at dimensions b, d, r, and j, while remaining constant across dimension m.
             self.Zbdr = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
                                 BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbdr', ReparaStdZj=self.ReparaStdZj)
+            self.Zbdr_Ext = self.Zbdr.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            
+            # The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimensions r and m.
+            self.Zbd = np.broadcast_to(self.Zbdr_Ext[:,0,0][:,None,None], (self.NMiniBat, self.NParts, self.NSubGen, self.LatDim)).reshape(-1, self.LatDim)
             
             # Selecting Samp_Zjs from Zbd 
-            self.Zjbd = SamplingZj (self.Zbd, self.NMiniBat, self.NParts, self.NSubGen, self.LatDim, self.NSelZ, ZjType='bd' )
+            self.Zjbd = SamplingZj (self.Zbd, self.NMiniBat, self.NParts, self.NSubGen, self.LatDim, self.NSelZ, ZjType='bd' ).copy()
             
             # Selecting sub-Zjbd from Zjbd for I_V_FCsZj
             self.Zjbd_Ext = self.Zjbd.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
