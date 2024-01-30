@@ -19,6 +19,29 @@ from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, 
 # python .\BatchBMMIEvaluation.py --Config EvalConfigART --ConfigSpec BaseVAE_ART_30 --GPUID 4    
 # python .\BatchBMMIEvaluation.py --Config EvalConfigII --ConfigSpec ConVAE_II_50 --GPUID 4 --SpecNZs 40 50
 
+
+#### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
+def SetModel():
+    # Calling Modesl
+    BenchModel, _, AnalData = ModelCall (ModelConfigSet, ConfigName, TrData, TestData, LoadWeight=True,  
+                                             Reparam=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath) 
+    
+    
+    ## The generation model for evaluation
+    GenModel = BenchModel.get_layer('ReconModel')
+    
+    ## The sampling model for evaluation
+    Inp_Enc = BenchModel.get_layer('Inp_Enc')
+    Zs = BenchModel.get_layer('Zs').output
+    
+    if Params['SecDataType'] == 'CONDIN':
+        Inp_Cond = BenchModel.get_layer('Inp_Cond')
+        SampZModel = Model([Inp_Enc.input, Inp_Cond.input], Zs)
+    else:
+        SampZModel = Model(Inp_Enc.input, Zs)
+    return SampZModel, GenModel, AnalData
+    
+
 if __name__ == "__main__":
 
     
@@ -102,32 +125,12 @@ if __name__ == "__main__":
 
             # Loading data
             TrData = np.load('../Data/ProcessedData/Tr'+str(Params['SigType'])+'.npy').astype('float32')
-            VallData = np.load('../Data/ProcessedData/Val'+str(Params['SigType'])+'.npy').astype('float32')
+            TestData = np.load('../Data/ProcessedData/Test'+str(Params['SigType'])+'.npy').astype('float32')
 
         # Intermediate parameters 
-        SigDim = VallData.shape[1]
-        DataSize = VallData.shape[0]
+        SigDim = TestData.shape[1]
+        DataSize = TestData.shape[0]
 
-
-        
-        #### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
-        # Calling Modesl
-        BenchModel, _, AnalData = ModelCall (ModelConfigSet, ConfigName, TrData, VallData, LoadWeight=True,  
-                                                 Reparam=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath) 
-        
-        
-        ## The generation model for evaluation
-        GenModel = BenchModel.get_layer('ReconModel')
-        
-        ## The sampling model for evaluation
-        Inp_Enc = BenchModel.get_layer('Inp_Enc')
-        Zs = BenchModel.get_layer('Zs').output
-        
-        if Params['SecDataType'] == 'CONDIN':
-            Inp_Cond = BenchModel.get_layer('Inp_Cond')
-            SampModel = Model([Inp_Enc.input, Inp_Cond.input], Zs)
-        else:
-            SampModel = Model(Inp_Enc.input, Zs)
 
 
         #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------    
@@ -136,16 +139,22 @@ if __name__ == "__main__":
             NSelZs = Params['NSelZ']
         else:
             NSelZs = SpecNZs
-            
+
+        # Setting the model
+        SampModel, GenModel, AnalData = SetModel()
+                    
         for NZs in NSelZs:
+            
+            # Clearing the session before building the model
+            tf.keras.backend.clear_session()
 
             # Object save path
             ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'.pkl'
             SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(NZs)+'.npy'
                 
             # Instantiation 
-            Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], 
-                   NGen = Params['NGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'],  SelMetricType = Params['SelMetricType'],
+            Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], NParts = Params['NParts'], 
+                   NSubGen = Params['NSubGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'],  SelMetricType = Params['SelMetricType'],
                    SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], Name=ConfigName+'_Nj'+str(NZs))
             
             if Params['SecDataType'] == 'CONDIN':
