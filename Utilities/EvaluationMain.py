@@ -368,13 +368,13 @@ class Evaluator ():
             
             # Sampling Samp_FC
             ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, k: LatDim; 
-            # The values of FC are randomly sampled at the dimensions b, d, m, and k, and constant across dimension r.
-            self.FCbdm = SamplingFCs (SubData, self.SampFCModel, self.NMiniBat, self.NParts, self.NSubGen, 
-                                      BatchSize = self.SampBatchSize, GPU=self.GPU, SampFCType='Modelbdm', FcLimit= 0.05)
-            
             # The values of FC are randomly sampled across all dimensions b, d, r, m, and k.
             self.FCbdrm = SamplingFCs (SubData, self.SampFCModel, self.NMiniBat, self.NParts, self.NSubGen, 
                                       BatchSize = self.SampBatchSize, GPU=self.GPU, SampFCType='Modelbdrm', FcLimit= 0.05)
+            self.FCbdrm_Ext = self.FCbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            
+            # The values of FC are randomly sampled at the dimensions b, d, m, and k, and constant across dimension r.
+            self.FCbdm = np.broadcast_to(self.FCbdrm_Ext[:, 0][:,None], (self.NMiniBat, self.NParts, self.NSubGen, self.NFCs)).reshape(-1, self.NFCs)
             
             # Sorting the arranged FC values in ascending order at the generation index.
             self.FCbdm_Ext = self.FCbdm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
@@ -812,16 +812,16 @@ class Evaluator ():
             # Sampling Samp_Z and Samp_Zj
             # Please note that the tensor is maintained in a reduced number of dimensions for computational efficiency in practice.
             ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, j: LatDim; 
-            # The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimensions r and m.
-            self.Zbd = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
-                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbd', ReparaStdZj=self.ReparaStdZj)
-            
             # The values of z are randomly sampled at dimensions b, d, r, and j, while remaining constant across dimension m.
             self.Zbdr = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
-                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbdr', SecDataType='CONDIN', ReparaStdZj=self.ReparaStdZj)
+                                BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbdr', ReparaStdZj=self.ReparaStdZj)
+            self.Zbdr_Ext = self.Zbdr.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            
+            # The values of z are randomly sampled at dimensions b, d, and j, while remaining constant across dimensions r and m.
+            self.Zbd = np.broadcast_to(self.Zbdr_Ext[:,0,0][:,None,None], (self.NMiniBat, self.NParts, self.NSubGen, self.LatDim)).reshape(-1, self.LatDim)
             
             # Selecting Samp_Zjs from Zbd 
-            self.Zjbd = SamplingZj (self.Zbd, self.NMiniBat, self.NParts, self.NSubGen, self.LatDim, self.NSelZ, ZjType='bd' )
+            self.Zjbd = SamplingZj (self.Zbd, self.NMiniBat, self.NParts, self.NSubGen, self.LatDim, self.NSelZ, ZjType='bd' ).copy()
             
             # Selecting sub-Zjbd from Zjbd for I_V_FCsZj
             self.Zjbd_Ext = self.Zjbd.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
