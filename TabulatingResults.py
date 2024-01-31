@@ -21,7 +21,8 @@ from Utilities.AncillaryFunctions import Denorm, MAPECal, MSECal
 def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
 
     print()
-    print(ConfigName)
+    print(ConfigName+'_Nj:'+str(NJ))
+    
     
     # Configuration and Object part
     print('-----------------------------------------------------' )
@@ -142,17 +143,21 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--ConfigPath', '-CP', type=str, required=True, help='Set the path of the configuration to load (the name of the YAML file).')
-    parser.add_argument('--SpecNZ','-NJ', type=int, required=False, default=1, help='The size of js to be selected at the same time (default: 1).')
+    parser.add_argument('--SpecNZs', '-NJ', nargs='+', type=int, required=False, 
+                        default=None, help='Set the size of js to be selected at the same time with the list.')
     parser.add_argument('--MetricCut', '-MC',type=int, required=False, default=1, help='The threshold for Zs and ancillary data where the metric value is below SelMetricCut (default: 1)')
     parser.add_argument('--BatSize', '-BS',type=int, required=False, default=5000, help='The batch size during prediction.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     YamlPath = args.ConfigPath
-    NJ = args.SpecNZ
     MetricCut = args.MetricCut
     BatSize = args.BatSize
     GPU_ID = args.GPUID
+    if args.SpecNZs ==None:
+        NJs = [1,10,20,30,40,50]
+    else:
+        NJs = args.SpecNZs
    
 
     ## GPU selection
@@ -184,8 +189,7 @@ if __name__ == "__main__":
     
     # Iterate through each filtered configuration file.
     for EvalConfig in EvalConfigList:
-        print(EvalConfig)  
-        
+        print(EvalConfig)
         # Read the configuration file's contents.
         ModelConfigs = ReadYaml(YamlPath + EvalConfig) 
         # Filter the configurations to include only those with 'ART' or 'II'.
@@ -202,8 +206,10 @@ if __name__ == "__main__":
         
         # Iterate through each filtered configuration name.
         for ConfigName in ConfigNames:
-            # Perform aggregation (custom function) and retrieve results.
-            MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
+            for NJ in NJs:
+                  
+                # Perform aggregation (custom function) and retrieve results.
+                MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
 
             if MSEnorm is None:  # If 'LatDim' is less than 'NJ', stop executing the remaining code within this loop.
                 continue;
