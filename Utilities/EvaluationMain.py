@@ -813,7 +813,7 @@ class Evaluator ():
             # Please note that the tensor is maintained in a reduced number of dimensions for computational efficiency in practice.
             ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, j: LatDim; 
             # The values of z are randomly sampled at dimensions b, d, r, and j, while remaining constant across dimension m.
-            self.Zbdr = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, 
+            self.Zbdr = SamplingZ(SubData, self.SampZModel, self.NMiniBat, self.NParts, self.NSubGen, SecDataType='CONDIN',
                                 BatchSize = self.SampBatchSize, GPU=self.GPU, SampZType='Modelbdr', ReparaStdZj=self.ReparaStdZj)
             self.Zbdr_Ext = self.Zbdr.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
             
