@@ -48,13 +48,13 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     print('-----------------------------------------------------' )
     print('Loading data')
     ## Loading data
-    VallData = np.load('../Data/ProcessedData/Val'+str(Params['SigType'])+'.npy')
+    TestData = np.load('../Data/ProcessedData/Test'+str(Params['SigType'])+'.npy')
     TrData = np.load('../Data/ProcessedData/Tr'+str(Params['SigType'])+'.npy')
     
     
     ## Intermediate parameters 
-    SigDim = VallData.shape[1]
-    DataSize = VallData.shape[0]
+    SigDim = TestData.shape[1]
+    DataSize = TestData.shape[0]
     
     with open('../Data/ProcessedData/SigMax.pkl', 'rb') as f:
         SigMax = pickle.load(f)
@@ -73,7 +73,7 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     print('-----------------------------------------------------' )
     print('Loading model structures')
     ## Calling Modesl
-    BenchModel, _, AnalData = ModelCall (ModelConfigSet, ConfigName, TrData, VallData, LoadWeight=True, Reparam=False, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadName)
+    BenchModel, _, AnalData = ModelCall (ModelConfigSet, ConfigName, TrData, TestData, LoadWeight=True, Reparam=False, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadName)
     
     
     ## The generation model for evaluation
