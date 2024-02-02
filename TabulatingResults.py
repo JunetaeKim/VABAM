@@ -21,8 +21,7 @@ from Utilities.AncillaryFunctions import Denorm, MAPECal, MSECal
 def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
 
     print()
-    print(ConfigName+'_Nj:'+str(NJ))
-    
+    print(ConfigName)
     
     # Configuration and Object part
     print('-----------------------------------------------------' )
@@ -48,7 +47,7 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     print('-----------------------------------------------------' )
     print('Loading data')
     ## Loading data
-    AnalData = np.load('./Data/ProcessedData/Val'+str(Params['SigType'])+'.npy')
+    AnalData = np.load('./Data/ProcessedData/Test'+str(Params['SigType'])+'.npy')
     
     ## Intermediate parameters 
     SigDim = AnalData.shape[1]
@@ -187,53 +186,54 @@ if __name__ == "__main__":
     EvalConfigList = os.listdir(YamlPath) # Retrieve a list of all files in the YamlPath directory.
     EvalConfigList = [i for i in EvalConfigList if 'Eval' in i] # Filter the list to include only files that contain 'Eval' in their names.
     
-    # Iterate through each filtered configuration file.
-    for EvalConfig in EvalConfigList:
-        print(EvalConfig)
-        # Read the configuration file's contents.
-        ModelConfigs = ReadYaml(YamlPath + EvalConfig) 
-        # Filter the configurations to include only those with 'ART' or 'II'.
-        ConfigNames = [i for i in ModelConfigs if 'ART' in i or 'II' in i]
-    
-        # Initialize lists to store results.
-        ModelName = []
-        MSEnormRes = []
-        MSEdenormRes = []
-        MAPEnormRes = []
-        MAPEdenormRes = []
-        MeanKldRes = []
-        MItables = pd.DataFrame()  # Initialize an empty DataFrame for MI tables.
+    # Iterate through each NJ.
+    for NJ in NJs:
+        # Iterate through each filtered configuration file.
+        for EvalConfig in EvalConfigList:
+            print(EvalConfig)  
+            
+            # Read the configuration file's contents.
+            ModelConfigs = ReadYaml(YamlPath + EvalConfig) 
+            # Filter the configurations to include only those with 'ART' or 'II'.
+            ConfigNames = [i for i in ModelConfigs if 'ART' in i or 'II' in i]
         
-        # Iterate through each filtered configuration name.
-        for ConfigName in ConfigNames:
-            for NJ in NJs:
-                  
+            # Initialize lists to store results.
+            ModelName = []
+            MSEnormRes = []
+            MSEdenormRes = []
+            MAPEnormRes = []
+            MAPEdenormRes = []
+            MeanKldRes = []
+            MItables = pd.DataFrame()  # Initialize an empty DataFrame for MI tables.
+            
+            # Iterate through each filtered configuration name.
+            for ConfigName in ConfigNames:
                 # Perform aggregation (custom function) and retrieve results.
                 MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
-
-            if MSEnorm is None:  # If 'LatDim' is less than 'NJ', stop executing the remaining code within this loop.
-                continue;
-             
-            # Append the results to their respective lists.
-            ModelName.append(ConfigName)
-            MSEnormRes.append(MSEnorm)
-            MSEdenormRes.append(MSEdenorm) 
-            MAPEnormRes.append(MAPEnorm)
-            MAPEdenormRes.append(MAPEdenorm) # it's reported for reference, it is not used as an official metric in this paper. 
-            MeanKldRes.append(MeanKld_GTTG)
-            
-            # Concatenate the current longMI DataFrame to the MItables DataFrame.
-            MItables = pd.concat([MItables, longMI]).copy()
-        
-        # Extract relevant parts from EvalConfig to name the table.
-        TableName = re.findall(Exp, EvalConfig)
-        TableName = ''.join(TableName)  # Concatenate the extracted parts.
-        
-        # Save the MItables to a CSV file.
-        MItables.to_csv('./EvalResults/Tables/MI_' + str(TableName) +'_Nj'+str(NJ) + '.csv', index=False)
     
-        # Save the AccKLDtables to a CSV file.
-        DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
-        AccKLDtables = pd.DataFrame(DicRes)
-        AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(TableName) + '_Nj'+str(NJ) +'.csv', index=False)
+                if MSEnorm is None:  # If 'LatDim' is less than 'NJ', stop executing the remaining code within this loop.
+                    continue;
+                 
+                # Append the results to their respective lists.
+                ModelName.append(ConfigName)
+                MSEnormRes.append(MSEnorm)
+                MSEdenormRes.append(MSEdenorm) 
+                MAPEnormRes.append(MAPEnorm)
+                MAPEdenormRes.append(MAPEdenorm) # it's reported for reference, it is not used as an official metric in this paper. 
+                MeanKldRes.append(MeanKld_GTTG)
+                
+                # Concatenate the current longMI DataFrame to the MItables DataFrame.
+                MItables = pd.concat([MItables, longMI]).copy()
+            
+            # Extract relevant parts from EvalConfig to name the table.
+            TableName = re.findall(Exp, EvalConfig)
+            TableName = ''.join(TableName)  # Concatenate the extracted parts.
+            
+            # Save the MItables to a CSV file.
+            MItables.to_csv('./EvalResults/Tables/MI_' + str(TableName) +'_Nj'+str(NJ) + '.csv', index=False)
+        
+            # Save the AccKLDtables to a CSV file.
+            DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
+            AccKLDtables = pd.DataFrame(DicRes)
+            AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(TableName) + '_Nj'+str(NJ) +'.csv', index=False)
         
