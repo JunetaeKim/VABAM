@@ -310,7 +310,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 CurrentLoss = np.min(SubLosses)
             elif self.SaveWay == 'mean':
                 CurrentLoss = np.mean(SubLosses)
-            else:
+            elif self.SaveWay == 'max':
                 CurrentLoss = np.max(SubLosses)
             
             if CurrentLoss <= self.CheckLoss and (epoch+self.StartEpoch) > 0:
