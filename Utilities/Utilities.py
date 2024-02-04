@@ -269,6 +269,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.Buffer = Buffer
         self.CheckPoint = CheckPoint
 
+
+
         if Resume == True:
             with open(self.LogsPath, "r") as file:
                 self.Logs = file.read().split('\n')
@@ -314,7 +316,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             elif self.SaveWay == 'max':
                 CurrentLoss = np.max(SubLosses)
             
-            if CurrentLoss <= self.CheckLoss and (epoch+self.StartEpoch+self.Buffer) > 0:
+            if CurrentLoss <= self.CheckLoss and (epoch+self.StartEpoch) > 0 and (epoch+self.StartEpoch) > (self.StartEpoch+self.Buffer):
                 self.model.save(self.SavePath)
                 print()
                 print('The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
