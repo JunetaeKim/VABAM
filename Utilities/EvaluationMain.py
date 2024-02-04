@@ -209,7 +209,7 @@ class Evaluator ():
     
         
     ### -------------- Evaluating the KLD between the PSD of the true signals and the generated signals ---------------- ###
-    def KLD_TrueGen (self, PostSamp=None, AnalSig=None, SecDataType=None, PlotDist=True):
+    def KLD_TrueGen (self, PostSamp=None, AnalSig=None, SecDataType=None, PlotDist=True): # Filtering Quality Index
     
         ## Required parameters
         # PostSamp: The post-sampled data for generating signals with the shape of ({'FreqID': {'SubKeys': {'TrackZs': Zs, 'TrackSecData': Secondary-data}}}).

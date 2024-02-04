@@ -247,7 +247,7 @@ class Anneal(tf.keras.callbacks.Callback):
 
         
 class RelLossWeight(tf.keras.callbacks.Callback):
-    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , SavePath, verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True,  CheckPoint=False, Resume=False):
+    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , SavePath, verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True,  CheckPoint=False, Buffer=0, Resume=False):
             
         if type(ToSaveLoss) != list and ToSaveLoss is not None:
             ToSaveLoss = [ToSaveLoss]
@@ -266,6 +266,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.ModelName = PathInfo[-1].split('.')[0]
         self.SaveLogOnly = SaveLogOnly
         self.LogsPath = './Logs/'+PathInfo[2]+'/Logs_'+self.ModelName+ '.txt'
+        self.Buffer = Buffer
         self.CheckPoint = CheckPoint
 
         if Resume == True:
@@ -313,7 +314,7 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             elif self.SaveWay == 'max':
                 CurrentLoss = np.max(SubLosses)
             
-            if CurrentLoss <= self.CheckLoss and (epoch+self.StartEpoch) > 0:
+            if CurrentLoss <= self.CheckLoss and (epoch+self.StartEpoch+self.Buffer) > 0:
                 self.model.save(self.SavePath)
                 print()
                 print('The model has been saved since loss decreased from '+ str(self.CheckLoss)+ ' to ' + str(CurrentLoss))
