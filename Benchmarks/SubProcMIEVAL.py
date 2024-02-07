@@ -3,7 +3,7 @@ import time
 import argparse
 
 # Refer to the execution code
-# python .\SubProcMIEVAL.py --Config EvalConfigART500 --ConfigSpec TCMIDKZFC_ART_30_500  --GPUID 4 --SpecNZs 10 20
+# python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 5 --SpecNZs 10 20
 def run_script(Config, ConfigSpec, SpecNZs, GPUID):
     ConfigArg = f"--Config={Config}"
     GPUIDArg = f"--GPUID={GPUID}"
