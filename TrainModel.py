@@ -11,7 +11,19 @@ from Utilities.Utilities import ReadYaml, LoadModelConfigs
 from Models.Caller import *
 
 # Refer to the execution code        
-# python .\TrainModel.py --Config TCMIDKZFC_II_50_500 --GPUID 0     
+# python .\TrainModel.py --Config TCMIDKZFC_II_50_500 --GPUID 0 --Resume True    
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 
 if __name__ == "__main__":
 
@@ -22,14 +34,14 @@ if __name__ == "__main__":
     # Add Experiment-related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
     parser.add_argument('--GPUID', type=int, required=False, default=0)
-    parser.add_argument('--Resume', type=bool, required=False, default=False)
+    parser.add_argument('--Resume', type=str2bool, required=False, default=False)
     
     # Parsing the arguments
     args = parser.parse_args() 
     ConfigName = args.Config
     GPU_ID = args.GPUID
     Resume = args.Resume
-    
+
     
     ## GPU selection
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
