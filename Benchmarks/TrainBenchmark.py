@@ -14,7 +14,18 @@ warnings.filterwarnings('ignore')
 
 # Refer to the execution code
 # python .\TrainBenchmark.py --Config FACVAE_ART_30 --GPUID 0
-   
+
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 
 if __name__ == "__main__":
 
@@ -25,7 +36,7 @@ if __name__ == "__main__":
     # Add Experiment-related parameters
     parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the config in the YAML file).')
     parser.add_argument('--GPUID', type=int, required=False, default=0)
-    parser.add_argument('--Resume', type=bool, required=False, default=False)
+    parser.add_argument('--Resume', type=str2bool, required=False, default=False)
     
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
