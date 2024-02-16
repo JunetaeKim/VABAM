@@ -370,7 +370,7 @@ class Evaluator ():
             ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, k: LatDim; 
             # The values of FC are randomly sampled across all dimensions b, d, r, m, and k.
             self.FCbdrm = SamplingFCs (SubData, self.SampFCModel, self.NMiniBat, self.NParts, self.NSubGen, 
-                                      BatchSize = self.SampBatchSize, GPU=self.GPU, SampFCType='Modelbdrm', FcLimit= 0.05)
+                                      BatchSize = self.SampBatchSize, GPU=self.GPU, SampFCType='Modelbdrm', FcLimit= self.FcLimit)
             self.FCbdrm_Ext = self.FCbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
             
             # The values of FC are randomly sampled at the dimensions b, d, m, and k, and constant across dimension r.
