@@ -113,7 +113,7 @@ if __name__ == "__main__":
                 continue
                 
         print()
-        print('Test ConfigName size : ', ConfigName)
+        print('Test ConfigName: ', ConfigName)
                 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
@@ -139,8 +139,7 @@ if __name__ == "__main__":
         DataSize = AnalData.shape[0]
 
         print('Test observation size : ', DataSize)
-        print()
-
+        
 
         #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------          
         # Is the value assigned by ArgumentParser or assigned by YML?
@@ -153,9 +152,13 @@ if __name__ == "__main__":
             FcLimits = Params['FcLimit']
         else:
             FcLimits = SpecFCs
-
-        for NZs, FC in product(NSelZs, FcLimits):
         
+        print('NZs : ', NSelZs)
+        print('FC : ', FcLimits)
+        print()
+        
+        for NZs, FC in product(NSelZs, FcLimits):
+       
             # Setting the model
             SampZModel, SampFCModel, GenModel = SetModel()
             
