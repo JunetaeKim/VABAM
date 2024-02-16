@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import mode
 import itertools
+import pickle
 from tqdm import trange, tqdm
 
 import tensorflow as tf
@@ -203,6 +204,13 @@ class Evaluator ():
 
         print('The total number of sets in NestedZs:', NPostZs)
 
+        '''
+        # Saving intermedicate results into the hard disk
+        if SavePath is not None:
+            np.save(SavePath, PostSamp_Zj) # Save data
+        '''
+        with open(SavePath, 'wb') as handle:
+            pickle.dump(self.PostSamp, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
         return self.PostSamp
     

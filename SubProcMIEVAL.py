@@ -2,19 +2,41 @@ import subprocess
 import time
 import argparse
 
-
-
+# Refer to the execution code
+# python .\SubProcMIEVAL.py --Config EvalConfigART500 --ConfigSpec TCMIDKZFC_ART_30_500  --GPUID 4 --SpecNZs 10 20
 def run_script(Config, ConfigSpec, SpecNZs, GPUID):
     ConfigArg = f"--Config={Config}"
-    ConfigSpecArgs = [f"--ConfigSpec={spec}" for spec in ConfigSpec]
-    GPUIDArg = f"--GPUID={GPUID}"  # 올바른 인자 이름을 사용합니다.
+    GPUIDArg = f"--GPUID={GPUID}"
 
-    for NZs in SpecNZs:
-        ArgNZs = f"--SpecNZs={NZs}"
-        subprocess.run(["python", 'BatchMIEvaluation.py', ConfigArg, GPUIDArg] + ConfigSpecArgs + [ArgNZs])
+    # When SpecNZs is not None
+    if SpecNZs is not None:
+        for NZs in SpecNZs:
+            command = ["python", 'BatchMIEvaluation.py', ConfigArg, GPUIDArg]
+
+            # Include ConfigSpec arguments if they are not None
+            if ConfigSpec is not None:
+                ConfigSpecArgs = [f"--ConfigSpec={spec}" for spec in ConfigSpec]
+                command += ConfigSpecArgs
+
+            ArgNZs = f"--SpecNZs={NZs}"
+            command.append(ArgNZs)
+
+            subprocess.run(command)
+            time.sleep(1)
+    # When SpecNZs is None
+    else:
+        command = ["python", 'BatchMIEvaluation.py', ConfigArg, GPUIDArg]
+
+        # Include ConfigSpec arguments if they are not None
+        if ConfigSpec is not None:
+            ConfigSpecArgs = [f"--ConfigSpec={spec}" for spec in ConfigSpec]
+            command += ConfigSpecArgs
+
+        subprocess.run(command)
         time.sleep(1)
 
-# argparse를 사용하여 인자를 파싱합니다.
+
+# Parse arguments using argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--Config', type=str, required=True, help='Set the name of the configuration to load (the name of the YAML file).')
 parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, 
@@ -25,5 +47,5 @@ parser.add_argument('--GPUID', type=int, required=False, default=1)
 
 args = parser.parse_args()
 
-# 스크립트 실행
+# Execute the script
 run_script(args.Config, args.ConfigSpec, args.SpecNZs, args.GPUID)

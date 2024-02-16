@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import copy
 from argparse import ArgumentParser
+from itertools import product
 
 from Models.Caller import *
 from Utilities.EvaluationMain import *
@@ -39,8 +40,9 @@ def SetModel():
 
     ## The sampling model for evaluation
     Zs_Out = SigRepModel.get_layer('Zs').output
-    SampModel = Model(EncModel.input, Zs_Out)
-    return SampModel, GenModel          
+    SampZModel = Model(EncModel.input, Zs_Out)
+    SampFCModel = Model(EncModel.input, SigRepModel.get_layer('FCs').output) 
+    return SampZModel, SampFCModel, GenModel          
 
 
 if __name__ == "__main__":
@@ -55,12 +57,15 @@ if __name__ == "__main__":
                         default=None, help='Set the name of the specific configuration to load (the name of the model config in the YAML file).')
     parser.add_argument('--SpecNZs', nargs='+', type=int, required=False, 
                         default=None, help='Set the size of js to be selected at the same time with the list.')
+    parser.add_argument('--SpecFCs', nargs='+', type=float, required=False, default=None,
+                    help='Set the frequency cutoff range(s) for signal synthesis. Multiple ranges can be provided.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     ConfigName = args.Config
     ConfigSpecName = args.ConfigSpec
     SpecNZs = args.SpecNZs
+    SpecFCs = args.SpecFCs
     GPU_ID = args.GPUID
     
     YamlPath = './Config/'+ConfigName+'.yml'
@@ -108,8 +113,7 @@ if __name__ == "__main__":
                 continue
                 
         print()
-        print(ConfigName)
-        print()
+        print('Test ConfigName size : ', ConfigName)
                 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
@@ -124,14 +128,18 @@ if __name__ == "__main__":
         if SigTypePrev != Params['SigType']:
             SigTypePrev = Params['SigType'] # To change data type: ART, II, PLETH
 
+            print('SigType:', Params['SigType'])
+            
             # Loading data
-            AnalData = np.load('./Data/ProcessedData/Val'+str(Params['SigType'])+'.npy')
+            AnalData = np.load('./Data/ProcessedData/Test'+str(Params['SigType'])+'.npy')
             AnalData = np.random.permutation(AnalData)[:Params['EvalDataSize']]
 
         # Intermediate parameters 
         SigDim = AnalData.shape[1]
         DataSize = AnalData.shape[0]
 
+        print('Test observation size : ', DataSize)
+        print()
 
 
         #### -----------------------------------------------------  Conducting Evalution -----------------------------------------------------------------          
@@ -140,25 +148,30 @@ if __name__ == "__main__":
             NSelZs = Params['NSelZ']
         else:
             NSelZs = SpecNZs
+            
+        if SpecFCs == None:
+            FcLimits = Params['FcLimit']
+        else:
+            FcLimits = SpecFCs
 
-        for NZs in NSelZs:
-
+        for NZs, FC in product(NSelZs, FcLimits):
+        
             # Setting the model
-            SampModel, GenModel = SetModel()
+            SampZModel, SampFCModel, GenModel = SetModel()
             
             # Object save path
-            ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'.pkl'
-            SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(NZs)+'.npy'
+            ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'_FC'+str(FC)+'.pkl'
+            SampZjSavePath = './Data/IntermediateData/'+ConfigName+'_Nj'+str(NZs)+'_FC'+str(FC)+'.pickle'
         
             # Instantiation 
             Eval = Evaluator(MinFreq = Params['MinFreq'], MaxFreq = Params['MaxFreq'], SimSize = Params['SimSize'], NMiniBat = Params['NMiniBat'], NParts = Params['NParts'],
-                   SubGen = Params['SubGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'], 
+                   NSubGen = Params['NSubGen'], ReparaStdZj = Params['ReparaStdZj'], NSelZ = NZs, SampBatchSize = Params['SampBatchSize'], 
                    SelMetricType = Params['SelMetricType'], SelMetricCut = Params['SelMetricCut'], GenBatchSize = Params['GenBatchSize'], GPU = Params['GPU'], 
-                   Name=ConfigName+'_Nj'+str(NZs))
+                   Name=ConfigName+'_Nj'+str(NZs)+'_FC'+str(FC))
     
             
-            ## SampZType: Z~ N(Zμ|y, σ) (SampZType = 'ModelRptA' or 'ModelRptB') vs. Z ~ N(0, ReparaStdZj) (SampZType = 'Gauss' or 'GaussRptA')
-            Eval.Eval_ZFC(AnalData[:], SampModel, GenModel, FcLimit=Params['FcLimit'], WindowSize=Params['WindowSize'], Continue=False)
+            ## Executing evaluation
+            Eval.Eval_ZFC(AnalData[:],  SampZModel, SampFCModel, GenModel, FcLimit=FC, WindowSize=Params['WindowSize'], Continue=False)
     
     
             # Selecting post Samp_Zj for generating plausible signals
@@ -174,7 +187,7 @@ if __name__ == "__main__":
             # Clearing the current TensorFlow session and running garbage collection
             # This helps to reduce unnecessary memory usage after each iteration
             tf.keras.backend.clear_session()
-            del Eval, SelPostSamp, SampModel, GenModel
+            
             _ = gc.collect()
             
             
