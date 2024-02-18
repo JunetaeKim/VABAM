@@ -17,7 +17,6 @@ from Utilities.AncillaryFunctions import Denorm, MAPECal, MSECal
 
 # Refer to the execution code
 # python .\TabulatingBMResults.py -CP ./Config/ --GPUID 0
-# python .\TabulatingBMResults.py -CP ./Config/ -NJ 10 -MC 1 -BS 3000  --GPUID 0 
 
 
 def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
@@ -144,16 +143,19 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, MetricCut = 1., BatSize=3000):
     
     MIVals = pd.DataFrame(NewEval.SubResDic)
     if Params['SecDataType'] == 'CONDIN':
-        MIVals.columns = [r'(1) I(V;Z)',r'(2) $I(V; \acute{Z} \mid Z)$',  r'(3) $I(V;\acute{Z})$', r'(4) $I(V;\acute{\Theta} \mid \acute{Z})$', r'(5) $I(S;\acute{Z})$', r'(6) $I(S;\acute{\Theta} \mid \acute{Z})$']
+        MIVals.columns = [r'(i) I(V;Z)',r'(ii) $I(V; \acute{Z} \mid Z)$',  r'(iii) $I(V;\acute{Z})$', r'(iv) $I(V;\acute{\Theta} \mid \acute{Z})$', r'(v) $I(S;\acute{Z})$', r'(vi) $I(S;\acute{\Theta} \mid \acute{Z})$']
     else:
-        MIVals.columns = [r'(1) I(V;Z)',r'(2) $I(V; \acute{Z} \mid Z)$']
+        MIVals.columns = [r'(i) I(V;Z)',r'(ii) $I(V; \acute{Z} \mid Z)$']
         
     MIVals['Model'] = ConfigName
     longMI = MIVals.melt(id_vars='Model', var_name='Metrics', value_name='Values')
 
     return MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG
     
-
+# Function to extract Nj value from filename
+def ExtractNj(Filename):
+    Match = re.search(r'Nj(\d+)\.', Filename)
+    return int(Match.group(1)) if Match else None
 
 if __name__ == "__main__":
 
@@ -163,14 +165,12 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--ConfigPath', '-CP', type=str, required=True, help='Set the path of the configuration to load (the name of the YAML file).')
-    parser.add_argument('--SpecNZ','-NJ', type=int, required=False, default=1, help='The size of js to be selected at the same time (default: 1).')
     parser.add_argument('--MetricCut', '-MC',type=int, required=False, default=1, help='The threshold for Zs and ancillary data where the metric value is below SelMetricCut (default: 1)')
     parser.add_argument('--BatSize', '-BS',type=int, required=False, default=5000, help='The batch size during prediction.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
     
     args = parser.parse_args() # Parse the arguments
     YamlPath = args.ConfigPath
-    NJ = args.SpecNZ
     MetricCut = args.MetricCut
     BatSize = args.BatSize
     GPU_ID = args.GPUID
@@ -198,57 +198,33 @@ if __name__ == "__main__":
                  
     #### -----------------------------------------------------  Conducting tabulation --------------------------------------------------------------
                  
-    Exp = r'ART|II|\d+'  # Regular expression pattern for 'ART' and 'II'.
-   
+    # Object part
+    print('-----------------------------------------------------' )
+    print('Scanning objects' )
+    print('-----------------------------------------------------' )
+    ObjLoadPath = './EvalResults/Instances/'
+    FileList = os.listdir(ObjLoadPath)
+    
+    ## Loading the model configuration lists
     EvalConfigList = os.listdir(YamlPath) # Retrieve a list of all files in the YamlPath directory.
     EvalConfigList = [i for i in EvalConfigList if 'Eval' in i] # Filter the list to include only files that contain 'Eval' in their names.
-    
-    # Iterate through each filtered configuration file.
-    for EvalConfig in EvalConfigList:
-        print(EvalConfig)  
-        
-        # Read the configuration file's contents.
-        ModelConfigs = ReadYaml(YamlPath + EvalConfig) 
-        # Filter the configurations to include only those with 'ART' or 'II'.
-        ConfigNames = [i for i in ModelConfigs if 'ART' in i or 'II' in i]
-    
-        # Initialize lists to store results.
-        ModelName = []
-        MSEnormRes = []
-        MSEdenormRes = []
-        MAPEnormRes = []
-        MAPEdenormRes = []
-        MeanKldRes = []
-        MItables = pd.DataFrame()  # Initialize an empty DataFrame for MI tables.
-        
-        # Iterate through each filtered configuration name.
-        for ConfigName in ConfigNames:
-            # Perform aggregation (custom function) and retrieve results.
-            MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
 
-            if MSEnorm is None:  # If 'LatDim' is less than 'NJ', stop executing the remaining code within this loop.
-                continue;
-                         
-            # Append the results to their respective lists.
-            ModelName.append(ConfigName)
-            MSEnormRes.append(MSEnorm)
-            MSEdenormRes.append(MSEdenorm) 
-            MAPEnormRes.append(MAPEnorm)
-            MAPEdenormRes.append(MAPEdenorm) # it's reported for reference, it is not used as an official metric in this paper. 
-            MeanKldRes.append(MeanKld_GTTG)
-            
-            # Concatenate the current longMI DataFrame to the MItables DataFrame.
-            MItables = pd.concat([MItables, longMI]).copy()
-        
-        # Extract relevant parts from EvalConfig to name the table.
-        TableName = re.findall(Exp, EvalConfig)
-        TableName = ''.join(TableName)  # Concatenate the extracted parts.
-        
+       
+    # loop
+    for Filename in FileList:
+        # Extracts the string between 'Obj_' and '_Nj'
+        ConfigName =re.search(r'Obj_(.*?)_Nj', Filename).group(1)  
+        ConfigPath = [EvalConfig for EvalConfig in EvalConfigList if ConfigName.split('_')[1] in EvalConfig ][0]
+        ConfigPath = YamlPath + ConfigPath
+        NJ = ExtractNj(Filename)
+        # Perform aggregation (custom function) and retrieve results.
+        MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, ConfigPath, NJ=NJ, MetricCut=MetricCut, BatSize=BatSize)
+    
         # Save the MItables to a CSV file.
-        MItables.to_csv('./EvalResults/Tables/BMMI_' + str(TableName) +'_Nj'+str(NJ) + '.csv', index=False)
+        longMI.to_csv('./EvalResults/Tables/MI_' + str(ConfigName) +'_Nj'+str(NJ)+'.csv', index=False)
     
         # Save the AccKLDtables to a CSV file.
-        DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
+        DicRes = {'Model': [ConfigName] , 'MeanKldRes': [MeanKld_GTTG], 'MSEnorm':[MSEnorm] , 'MSEdenorm': [MSEdenorm], 'MAPEnorm': [MAPEnorm], 'MAPEdenorm': [MAPEdenorm] }
         AccKLDtables = pd.DataFrame(DicRes)
-        AccKLDtables.to_csv('./EvalResults/Tables/BMAccKLD_' + str(TableName) + '_Nj'+str(NJ) +'.csv', index=False)
+        AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(ConfigName) + '_Nj'+str(NJ)+'.csv', index=False)
         

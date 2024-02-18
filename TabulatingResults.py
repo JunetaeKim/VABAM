@@ -16,7 +16,6 @@ from Utilities.AncillaryFunctions import Denorm, MAPECal, MSECal
 
 # Refer to the execution code
 # python .\TabulatingResults.py -CP ./Config/ --GPUID 0
-# python .\TabulatingResults.py -CP ./Config/ -NJ 10 -MC 1 -BS 3000  --GPUID 0 
 
 
 def Aggregation (ConfigName, ConfigPath, NJ=1, FC=1.0, MetricCut = 1., BatSize=3000):
@@ -125,12 +124,23 @@ def Aggregation (ConfigName, ConfigPath, NJ=1, FC=1.0, MetricCut = 1., BatSize=3
     # r'I(S;\acute{\Theta} \mid \acute{Z})'
     
     MIVals = pd.DataFrame(NewEval.SubResDic)
-    MIVals.columns = [r'(1) I(V;Z)',r'(2) $I(V; \acute{Z} \mid Z)$',  r'(3) $I(V;\acute{Z})$', r'(4) $I(V;\acute{\Theta} \mid \acute{Z})$', r'(5) $I(S;\acute{Z})$', r'(6) $I(S;\acute{\Theta} \mid \acute{Z})$']
+    MIVals.columns = [r'(i) I(V;Z)',r'(ii) $I(V; \acute{Z} \mid Z)$',  r'(iii) $I(V;\acute{Z})$', r'(iv) $I(V;\acute{\Theta} \mid \acute{Z})$', r'(v) $I(S;\acute{Z})$', r'(vi) $I(S;\acute{\Theta} \mid \acute{Z})$']
     MIVals['Model'] = ConfigName
     longMI = MIVals.melt(id_vars='Model', var_name='Metrics', value_name='Values')
 
     return MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG
     
+
+
+def ExtractFC(Filename):
+    Match = re.search(r'FC(\d+\.?\d*)', Filename)
+    return Match.group(1) if Match else None
+
+# Function to extract Nj value from filename
+def ExtractNj(Filename):
+    Match = re.search(r'Nj(\d+)\_', Filename)
+    return int(Match.group(1)) if Match else None
+
 
 
 if __name__ == "__main__":
@@ -141,32 +151,23 @@ if __name__ == "__main__":
     
     # Add Experiment-related parameters
     parser.add_argument('--ConfigPath', '-CP', type=str, required=True, help='Set the path of the configuration to load (the name of the YAML file).')
-    parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, 
-                        default=None, help='Set the name of the specific configuration to load (the name of the model config in the YAML file).')
-    parser.add_argument('--SpecNZs', '-NJ', nargs='+', type=int, required=False, 
-                        default=None, help='Set the size of js to be selected at the same time with the list.')
-    parser.add_argument('--SpecFCs', nargs='+', type=float, required=False, default=None,
-                    help='Set the frequency cutoff range(s) for signal synthesis. Multiple ranges can be provided.')
+    parser.add_argument('--ConfigSpec', nargs='+', type=str, required=False, default=None, help='Set the name of the specific configuration to load (the name of the model config in the YAML file).')
     parser.add_argument('--MetricCut', '-MC',type=int, required=False, default=1, help='The threshold for Zs and ancillary data where the metric value is below SelMetricCut (default: 1)')
     parser.add_argument('--BatSize', '-BS',type=int, required=False, default=5000, help='The batch size during prediction.')
     parser.add_argument('--GPUID', type=int, required=False, default=1)
-    
+    parser.add_argument('--SpecNZs', '-NJ', nargs='+', type=int, required=False, default=None, help='Set the size of js to be selected at the same time with the list.')
+    parser.add_argument('--SpecFCs', nargs='+', type=float, required=False, default=None, help='Set the frequency cutoff range(s) for signal synthesis. Multiple ranges can be provided.')
+
     args = parser.parse_args() # Parse the arguments
     YamlPath = args.ConfigPath
-    ConfigSpecName = args.ConfigSpec
     MetricCut = args.MetricCut
     BatSize = args.BatSize
     GPU_ID = args.GPUID
+    SpecNZs = args.SpecNZs
+    SpecFCs = args.SpecFCs
+    ConfigSpec = args.ConfigSpec
 
-    if args.SpecNZs ==None:
-        NJs = [1,10,20,30,40,50]
-    else:
-        NJs = args.SpecNZs
-    if args.SpecFCs ==None:
-        FcLimits = [1.]
-    else:
-        FcLimits = args.SpecFCs
-   
+  
 
     ## GPU selection
     os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
@@ -190,79 +191,49 @@ if __name__ == "__main__":
                  
     #### -----------------------------------------------------  Conducting tabulation --------------------------------------------------------------
                  
-    Exp = r'ART|II|\d+'  # Regular expression pattern for 'ART' and 'II'.
+    # Object part
+    print('-----------------------------------------------------' )
+    print('Scanning objects' )
+    print('-----------------------------------------------------' )
+    ObjLoadPath = './EvalResults/Instances/'
+    FileList = os.listdir(ObjLoadPath)
     
+    ## Loading the model configuration lists
     EvalConfigList = os.listdir(YamlPath) # Retrieve a list of all files in the YamlPath directory.
     EvalConfigList = [i for i in EvalConfigList if 'Eval' in i] # Filter the list to include only files that contain 'Eval' in their names.
 
-    print('-----------------------------------------------------' )
-    print('-----------------------------------------------------' )
-    print('Parameters')
-    print('NJs: ', NJs, ' FcLimits: ', FcLimits)
-
     
-    # Iterate through each NJ.
-    for NJ, FC in product(NJs, FcLimits):
-        # Iterate through each filtered configuration file.
-        for EvalConfig in EvalConfigList:
-            
-            print('-----------------------------------------------------' )
-            print(EvalConfig)  
-            print('NJ: ', NJ, ' FC: ', FC)
-            print('-----------------------------------------------------' )
-            print('-----------------------------------------------------' )
-            print()
-            
-            # Read the configuration file's contents.
-            ModelConfigs = ReadYaml(YamlPath + EvalConfig) 
-            # Filter the configurations to include only those with 'ART' or 'II'.
-            ConfigNames = [i for i in ModelConfigs if 'ART' in i or 'II' in i]
-        
-            # Initialize lists to store results.
-            ModelName = []
-            MSEnormRes = []
-            MSEdenormRes = []
-            MAPEnormRes = []
-            MAPEdenormRes = []
-            MeanKldRes = []
-            MItables = pd.DataFrame()  # Initialize an empty DataFrame for MI tables.
-            
-            # Iterate through each filtered configuration name.
-            for ConfigName in ConfigNames:
+    # Filter the files to include only those in ConfigSpec
+    if ConfigSpec is not None:
+        FileList = [Filename for Filename in FileList if any(Config in Filename for Config in ConfigSpec) ]
+    
+    # Filter the files to include only those with FC values in SpecFCs
+    if SpecFCs is not None:
+        FileList = [Filename for Filename in FileList if any(f'FC{fc}' in Filename for fc in SpecFCs)]
+    
+    # Filter the files to include only those with Nz in SpecNZs
+    if SpecNZs is not None:
+        FileList = [Filename for Filename in FileList if any(f'Nj{Nj}' in Filename for Nj in SpecNZs)]
 
-                if ConfigSpecName is not None: 
-                    if ConfigName not in ConfigSpecName:
-                        continue
-                    
-                # Perform aggregation (custom function) and retrieve results.
-                MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, YamlPath + EvalConfig, NJ=NJ, FC=FC, MetricCut=MetricCut, BatSize=BatSize)
-
-                if MSEnorm is None:  # If 'LatDim' is less than 'NJ', stop executing the remaining code within this loop.
-                    continue;
-                 
-                # Append the results to their respective lists.
-                ModelName.append(ConfigName)
-                MSEnormRes.append(MSEnorm)
-                MSEdenormRes.append(MSEdenorm) 
-                MAPEnormRes.append(MAPEnorm)
-                MAPEdenormRes.append(MAPEdenorm) # it's reported for reference, it is not used as an official metric in this paper. 
-                MeanKldRes.append(MeanKld_GTTG)
-
-                # Concatenate the current longMI DataFrame to the MItables DataFrame.
-                MItables = pd.concat([MItables, longMI]).copy()
-
-            if len(MItables) <1: # Skip the code below in case of an empty table
-                continue;
-                
-            # Extract relevant parts from EvalConfig to name the table.
-            TableName = re.findall(Exp, EvalConfig)
-            TableName = ''.join(TableName)  # Concatenate the extracted parts.
+    print(FileList)
+    
+    
+    # loop
+    for Filename in FileList:
+        # Extracts the string between 'Obj_' and '_Nj'
+        ConfigName =re.search(r'Obj_(.*?)_Nj', Filename).group(1)  
+        ConfigPath = [EvalConfig for EvalConfig in EvalConfigList if ConfigName.split('_')[1] in EvalConfig and ConfigName.split('_')[-1] in EvalConfig][0]
+        ConfigPath = YamlPath + ConfigPath
+        NJ = ExtractNj(Filename)
+        FC = ExtractFC(Filename)
+        # Perform aggregation (custom function) and retrieve results.
+        MSEnorm, MSEdenorm, MAPEnorm, MAPEdenorm, longMI, MeanKld_GTTG = Aggregation(ConfigName, ConfigPath, NJ=NJ, FC=FC, MetricCut=MetricCut, BatSize=BatSize)
+    
+        # Save the MItables to a CSV file.
+        longMI.to_csv('./EvalResults/Tables/MI_' + str(ConfigName) +'_Nj'+str(NJ)+'_FC'+str(FC) + '.csv', index=False)
+    
+        # Save the AccKLDtables to a CSV file.
+        DicRes = {'Model': [ConfigName] , 'MeanKldRes': [MeanKld_GTTG], 'MSEnorm':[MSEnorm] , 'MSEdenorm': [MSEdenorm], 'MAPEnorm': [MAPEnorm], 'MAPEdenorm': [MAPEdenorm] }
+        AccKLDtables = pd.DataFrame(DicRes)
+        AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(ConfigName) + '_Nj'+str(NJ)+'_FC'+str(FC) +'.csv', index=False)
             
-            # Save the MItables to a CSV file.
-            MItables.to_csv('./EvalResults/Tables/MI_' + str(TableName) +'_Nj'+str(NJ)+'_FC'+str(FC) + '.csv', index=False)
-        
-            # Save the AccKLDtables to a CSV file.
-            DicRes = {'Model': ModelName , 'MeanKldRes': MeanKldRes, 'MSEnorm':MSEnormRes , 'MSEdenorm': MSEdenormRes, 'MAPEnorm': MAPEnormRes, 'MAPEdenorm': MAPEdenormRes }
-            AccKLDtables = pd.DataFrame(DicRes)
-            AccKLDtables.to_csv('./EvalResults/Tables/AccKLD_' + str(TableName) + '_Nj'+str(NJ)+'_FC'+str(FC) +'.csv', index=False)
-        
