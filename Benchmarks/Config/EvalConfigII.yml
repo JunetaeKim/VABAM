@@ -3,16 +3,18 @@ Common_Info: ['SubResDic', 'AggResDic', 'BestZsMetrics', 'TrackerCand', 'CandFre
               'PostSamp', 'LatDim', 'NSelZ', 'GenBatchSize', 'GPU'] 
 
 BaseVAE_II_30:             # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 1             # The number of generations (i.e., samplings) within a sample; For models without ancillary input, it means the number of generations within a minibatch.
+    NParts: 1              # The number of partitions (i.e., samplings) in generations within a sample. For models without ancillary input, assign a value of 1.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -22,16 +24,18 @@ BaseVAE_II_30:             # SigType_LatDim_CompSize
      
      
 BaseVAE_II_50:             # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 1             # The number of generations (i.e., samplings) within a sample; For models without ancillary input, it means the number of generations within a minibatch.
+    NParts: 1              # The number of partitions (i.e., samplings) in generations within a sample. For models without ancillary input, assign a value of 1.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -41,16 +45,18 @@ BaseVAE_II_50:             # SigType_LatDim_CompSize
 
 
 FACVAE_II_30:             # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 1             # The number of generations (i.e., samplings) within a sample; For models without ancillary input, it means the number of generations within a minibatch.
+    NParts: 1              # The number of partitions (i.e., samplings) in generations within a sample. For models without ancillary input, assign a value of 1.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -60,16 +66,18 @@ FACVAE_II_30:             # SigType_LatDim_CompSize
 
 
 FACVAE_II_50:             # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 1             # The number of generations (i.e., samplings) within a sample; For models without ancillary input, it means the number of generations within a minibatch.
+    NParts: 1              # The number of partitions (i.e., samplings) in generations within a sample. For models without ancillary input, assign a value of 1.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -80,16 +88,18 @@ FACVAE_II_50:             # SigType_LatDim_CompSize
     
     
 ConVAE_II_30:             # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 50             # The number of generations (i.e., samplings) within a sample.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -100,16 +110,18 @@ ConVAE_II_30:             # SigType_LatDim_CompSize
 
 
 ConVAE_II_50:             # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 50             # The number of generations (i.e., samplings) within a sample.
+    NParts: 10             # The number of partitions (i.e., samplings) in generations within a sample.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -120,16 +132,18 @@ ConVAE_II_50:             # SigType_LatDim_CompSize
     
     
 TCVAE_II_30:              # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 1             # The number of generations (i.e., samplings) within a sample; For models without ancillary input, it means the number of generations within a minibatch.
+    NParts: 1              # The number of partitions (i.e., samplings) in generations within a sample. For models without ancillary input, assign a value of 1.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 
@@ -140,16 +154,18 @@ TCVAE_II_30:              # SigType_LatDim_CompSize
 
 
 TCVAE_II_50:              # SigType_LatDim_CompSize
-    NSelZ: [1,10,20,30,40,50]    # The size of js to be selected at the same time (default: 1).
+    NSelZ: [1]    # The size of js to be selected at the same time (default: 1).
     ReparaStd: 1           # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
     ReparaStdZj: 1         # The size of the standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
     MaxFreq: 100           # The maximum frequency value within the analysis range (default = 51).
     MinFreq: 1             # The minimum frequency value within the analysis range (default = 1).
-    NMiniBat: 100          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    NMiniBat: 50          # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
     SimSize: 1             # The number of generations (i.e., samplings) within the mini-batch.
-    SampBatchSize: 10000  # The batch size during prediction of the sampling model.
+    EvalDataSize: 20000    # The number of observations in the evaluation data
+    SampBatchSize: 10000   # The batch size during prediction of the sampling model.
     GenBatchSize: 10000    # The batch size during prediction of the generation model.
-    NGen: 100              # The number of generations (i.e., samplings) within the mini-batch.
+    NSubGen: 1             # The number of generations (i.e., samplings) within a sample; For models without ancillary input, it means the number of generations within a minibatch.
+    NParts: 1              # The number of partitions (i.e., samplings) in generations within a sample. For models without ancillary input, assign a value of 1.
     WindowSize: 3          # The window size when calculating permutation entropy (default: 3)
     GPU: False             # GPU vs CPU during model predictions (i.e., for SampModel and GenModel). "The CPU is strongly recommended for optimal precision."
     SelMetricType: 'KLD'   # The type of metric used for selecting Zs and ancillary data. 

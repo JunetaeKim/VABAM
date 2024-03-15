@@ -15,14 +15,14 @@ TCVAE_II_30: # SigType_LatDim
   WMI: 1 # The scaling weight for the MI loss.
   
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.003 # The min weight for the Z loss.
-  MnWTC: 0.0005 # The min weight for the TC loss. 
-  MnWMI: 0.0005 # The min weight for the MI loss.
+  MnWZ: 0.00005 # The min weight for the Z loss.
+  MnWTC: 0.000005 # The min weight for the TC loss. 
+  MnWMI: 0.000005 # The min weight for the MI loss.
   
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.003 # The max weight for the Z loss.
-  MxWTC: 0.0005 # The max weight for the TC loss.
-  MxWMI: 0.0005 # The max weight for the MI loss.  
+  MxWZ: 0.00005 # The max weight for the Z loss.
+  MxWTC: 0.000005 # The max weight for the TC loss.
+  MxWMI: 0.000005 # The max weight for the MI loss.  
   
 
 TCVAE_II_50: # SigType_LatDim
@@ -42,14 +42,14 @@ TCVAE_II_50: # SigType_LatDim
   WMI: 1 # The scaling weight for the MI loss.
   
   MnWRec: 50 # The min weight for the reconstruction loss.
-  MnWZ: 0.003 # The min weight for the Z loss.
-  MnWTC: 0.0005 # The min weight for the TC loss. 
-  MnWMI: 0.0005 # The min weight for the MI loss.
+  MnWZ: 0.0001 # The min weight for the Z loss.
+  MnWTC: 0.00001 # The min weight for the TC loss. 
+  MnWMI: 0.00001 # The min weight for the MI loss.
   
   MxWRec: 50 # The max weight for the reconstruction loss.
-  MxWZ: 0.003 # The max weight for the Z loss.
-  MxWTC: 0.0005 # The max weight for the TC loss.
-  MxWMI: 0.0005 # The max weight for the MI loss.  
+  MxWZ: 0.0001 # The max weight for the Z loss.
+  MxWTC: 0.00001 # The max weight for the TC loss.
+  MxWMI: 0.00001 # The max weight for the MI loss.  
 
 
 FACVAE_II_30: # SigType_LatDim

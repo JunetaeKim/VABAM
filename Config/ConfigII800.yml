@@ -251,7 +251,7 @@ TCMIDKZFC_II_50_800: # SigType_LatDim_CompSize
   
 
 SKZ_II_30_800: # SigType_LatDim_CompSize
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   LatDim: 30 # The dimensionality of the latent variable z.
   CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
   MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.
@@ -285,7 +285,7 @@ SKZ_II_30_800: # SigType_LatDim_CompSize
 
 
 SKZ_II_50_800: # SigType_LatDim_CompSize
-  SigType: II # Types of signals to train on.: ART, PLETH, II. 
+  SigType: rawII # Types of signals to train on.: ART, PLETH, II. 
   LatDim: 50 # The dimensionality of the latent variable z.
   CompSize: 800 # Signal compression length (unit 0.01 second) "The value should be one of 100, 200, 300, 400, 500, 600, 700, 800"
   MaskingRate: 0.00 # The sequence masking ratio refers to the proportion of the sequence that will be masked during training.

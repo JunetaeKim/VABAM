@@ -105,7 +105,7 @@ def SerializeObjects(Instance, SaveResList, Filename):
 
     Parameters:
     - Instance: The instance of the Evaluator class.
-    - Filename: The name of the file where objects will be saved.
+    - Filename: The name of the file whFere objects will be saved.
     """
 
     DataToSave = {Name: getattr(Instance, Name) for Name in SaveResList}
