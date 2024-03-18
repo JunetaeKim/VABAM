@@ -1,0 +1,44 @@
+1 saved {'val_ReconOutLoss': 0.01169, 'val_kl_Loss_Z': 0.5644}
+2 saved {'val_ReconOutLoss': 0.01158, 'val_kl_Loss_Z': 0.34961}
+3 saved {'val_ReconOutLoss': 0.01155, 'val_kl_Loss_Z': 0.29843}
+4 saved {'val_ReconOutLoss': 0.01153, 'val_kl_Loss_Z': 0.26428}
+5 not saved {'val_ReconOutLoss': 0.01156, 'val_kl_Loss_Z': 0.2455}
+6 saved {'val_ReconOutLoss': 0.01151, 'val_kl_Loss_Z': 0.21243}
+7 not saved {'val_ReconOutLoss': 0.01156, 'val_kl_Loss_Z': 0.20541}
+8 saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.18366}
+9 saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.18291}
+10 not saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.1617}
+11 not saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.15606}
+12 not saved {'val_ReconOutLoss': 0.01151, 'val_kl_Loss_Z': 0.1625}
+13 not saved {'val_ReconOutLoss': 0.01151, 'val_kl_Loss_Z': 0.14595}
+14 saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.14332}
+15 saved {'val_ReconOutLoss': 0.01149, 'val_kl_Loss_Z': 0.14023}
+16 saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.1461}
+17 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.13023}
+18 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.12852}
+19 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.13776}
+20 saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.13031}
+21 saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.12111}
+22 not saved {'val_ReconOutLoss': 0.01149, 'val_kl_Loss_Z': 0.11633}
+23 not saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.11751}
+24 not saved {'val_ReconOutLoss': 0.01149, 'val_kl_Loss_Z': 0.11443}
+25 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.12003}
+26 not saved {'val_ReconOutLoss': 0.01149, 'val_kl_Loss_Z': 0.10767}
+27 saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.10513}
+28 not saved {'val_ReconOutLoss': 0.01149, 'val_kl_Loss_Z': 0.10655}
+29 not saved {'val_ReconOutLoss': 0.01151, 'val_kl_Loss_Z': 0.11936}
+30 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.1096}
+31 saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.10602}
+32 not saved {'val_ReconOutLoss': 0.0115, 'val_kl_Loss_Z': 0.10317}
+33 saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.09873}
+34 saved {'val_ReconOutLoss': 0.01147, 'val_kl_Loss_Z': 0.1102}
+35 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.1024}
+36 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.09681}
+37 not saved {'val_ReconOutLoss': 0.01149, 'val_kl_Loss_Z': 0.10442}
+38 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.11703}
+39 not saved {'val_ReconOutLoss': 0.01147, 'val_kl_Loss_Z': 0.09754}
+40 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.09699}
+41 not saved {'val_ReconOutLoss': 0.01147, 'val_kl_Loss_Z': 0.08862}
+42 not saved {'val_ReconOutLoss': 0.01148, 'val_kl_Loss_Z': 0.09057}
+43 saved {'val_ReconOutLoss': 0.01146, 'val_kl_Loss_Z': 0.117}
+44 saved {'val_ReconOutLoss': 0.01145, 'val_kl_Loss_Z': 0.12424}

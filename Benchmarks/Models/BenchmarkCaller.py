@@ -46,7 +46,7 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
 
 
 # Dynamic controller for losses
-def DCLCall (ConfigSpec, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=False):
+def DCLCall (ConfigSpec, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Buffer=0, Resume=False):
     
     if ToSaveLoss is None:
         ToSaveLoss = ['val_ReconOutLoss']
@@ -95,6 +95,6 @@ def DCLCall (ConfigSpec, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='ma
         
 
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, 
-                            ToSaveLoss=ToSaveLoss, SaveWay=SaveWay, Resume=Resume )
+                            ToSaveLoss=ToSaveLoss, SaveWay=SaveWay, Buffer=Buffer, Resume=Resume )
     
     return RelLoss

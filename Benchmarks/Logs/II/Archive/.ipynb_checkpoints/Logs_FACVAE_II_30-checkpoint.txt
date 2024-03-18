@@ -1,0 +1,531 @@
+1 saved {'val_ReconOutLoss': 0.00149, 'val_kl_Loss_Z': 0.22378, 'val_kl_Loss_TC': 0.01398, 'val_kl_Loss_DTC': 0.05686}
+2 saved {'val_ReconOutLoss': 0.00066, 'val_kl_Loss_Z': 0.21922, 'val_kl_Loss_TC': 0.00039, 'val_kl_Loss_DTC': 0.00394}
+3 saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.18293, 'val_kl_Loss_TC': 0.0026, 'val_kl_Loss_DTC': 0.00482}
+4 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.17888, 'val_kl_Loss_TC': 0.00072, 'val_kl_Loss_DTC': 0.01061}
+5 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.17645, 'val_kl_Loss_TC': 0.00059, 'val_kl_Loss_DTC': 0.0056}
+6 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.17256, 'val_kl_Loss_TC': 0.0014, 'val_kl_Loss_DTC': 0.00831}
+7 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.16478, 'val_kl_Loss_TC': 0.00085, 'val_kl_Loss_DTC': 0.0117}
+8 not saved {'val_ReconOutLoss': 0.00071, 'val_kl_Loss_Z': 0.18046, 'val_kl_Loss_TC': 0.00252, 'val_kl_Loss_DTC': 0.00389}
+9 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.16491, 'val_kl_Loss_TC': 0.00048, 'val_kl_Loss_DTC': 0.00536}
+10 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.15383, 'val_kl_Loss_TC': 0.00235, 'val_kl_Loss_DTC': 0.01028}
+11 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.14833, 'val_kl_Loss_TC': 0.00031, 'val_kl_Loss_DTC': 0.0044}
+12 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.15947, 'val_kl_Loss_TC': 0.00215, 'val_kl_Loss_DTC': 0.00622}
+13 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.15382, 'val_kl_Loss_TC': 0.00194, 'val_kl_Loss_DTC': 0.00392}
+14 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.14676, 'val_kl_Loss_TC': 0.00329, 'val_kl_Loss_DTC': 0.00372}
+15 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.14263, 'val_kl_Loss_TC': 0.00207, 'val_kl_Loss_DTC': 0.00417}
+16 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.13704, 'val_kl_Loss_TC': 0.00035, 'val_kl_Loss_DTC': 0.00326}
+17 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.1345, 'val_kl_Loss_TC': 0.00221, 'val_kl_Loss_DTC': 0.00512}
+18 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.12999, 'val_kl_Loss_TC': 0.00326, 'val_kl_Loss_DTC': 0.00398}
+19 saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.13305, 'val_kl_Loss_TC': 0.00319, 'val_kl_Loss_DTC': 0.00309}
+20 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.12359, 'val_kl_Loss_TC': 0.00204, 'val_kl_Loss_DTC': 0.00549}
+21 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.12797, 'val_kl_Loss_TC': 0.00321, 'val_kl_Loss_DTC': 0.00586}
+22 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.12774, 'val_kl_Loss_TC': 0.00165, 'val_kl_Loss_DTC': 0.0197}
+23 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.12254, 'val_kl_Loss_TC': 0.00858, 'val_kl_Loss_DTC': 0.008}
+24 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.12373, 'val_kl_Loss_TC': 0.00565, 'val_kl_Loss_DTC': 0.00739}
+25 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.1328, 'val_kl_Loss_TC': 0.00047, 'val_kl_Loss_DTC': 0.0084}
+26 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.11972, 'val_kl_Loss_TC': 0.00073, 'val_kl_Loss_DTC': 0.00243}
+27 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.12041, 'val_kl_Loss_TC': 0.00167, 'val_kl_Loss_DTC': 0.00347}
+28 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.12218, 'val_kl_Loss_TC': 0.00554, 'val_kl_Loss_DTC': 0.0024}
+29 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.11268, 'val_kl_Loss_TC': 0.00172, 'val_kl_Loss_DTC': 0.00528}
+30 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.11494, 'val_kl_Loss_TC': 0.00189, 'val_kl_Loss_DTC': 0.00273}
+31 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.10915, 'val_kl_Loss_TC': 0.0005, 'val_kl_Loss_DTC': 0.00896}
+32 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.10929, 'val_kl_Loss_TC': 0.00025, 'val_kl_Loss_DTC': 0.00313}
+33 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.106, 'val_kl_Loss_TC': 0.00207, 'val_kl_Loss_DTC': 0.00339}
+34 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.09495, 'val_kl_Loss_TC': 0.00645, 'val_kl_Loss_DTC': 0.00768}
+35 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.09763, 'val_kl_Loss_TC': 0.0007, 'val_kl_Loss_DTC': 0.00419}
+36 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.08004, 'val_kl_Loss_TC': 0.00396, 'val_kl_Loss_DTC': 0.00874}
+37 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.07908, 'val_kl_Loss_TC': 0.00094, 'val_kl_Loss_DTC': 0.01192}
+38 not saved {'val_ReconOutLoss': 0.00068, 'val_kl_Loss_Z': 0.06733, 'val_kl_Loss_TC': 0.0003, 'val_kl_Loss_DTC': 0.00292}
+39 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.08166, 'val_kl_Loss_TC': 0.0108, 'val_kl_Loss_DTC': 0.00282}
+40 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.0615, 'val_kl_Loss_TC': 0.00042, 'val_kl_Loss_DTC': 0.00332}
+41 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.0589, 'val_kl_Loss_TC': 0.00652, 'val_kl_Loss_DTC': 0.00821}
+42 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.05182, 'val_kl_Loss_TC': 0.00735, 'val_kl_Loss_DTC': 0.00802}
+43 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04906, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.00345}
+44 saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04852, 'val_kl_Loss_TC': 0.00468, 'val_kl_Loss_DTC': 0.00372}
+45 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04239, 'val_kl_Loss_TC': 0.00323, 'val_kl_Loss_DTC': 0.00366}
+46 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04723, 'val_kl_Loss_TC': 0.00211, 'val_kl_Loss_DTC': 0.01863}
+47 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.041, 'val_kl_Loss_TC': 0.00711, 'val_kl_Loss_DTC': 0.01952}
+48 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04026, 'val_kl_Loss_TC': 0.00028, 'val_kl_Loss_DTC': 0.01154}
+49 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04498, 'val_kl_Loss_TC': 0.01459, 'val_kl_Loss_DTC': 0.01827}
+50 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04711, 'val_kl_Loss_TC': 0.00148, 'val_kl_Loss_DTC': 0.00319}
+51 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03987, 'val_kl_Loss_TC': 0.00148, 'val_kl_Loss_DTC': 0.00278}
+52 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04014, 'val_kl_Loss_TC': 0.00139, 'val_kl_Loss_DTC': 0.01003}
+53 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04721, 'val_kl_Loss_TC': 0.00089, 'val_kl_Loss_DTC': 0.0139}
+54 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03672, 'val_kl_Loss_TC': 0.00152, 'val_kl_Loss_DTC': 0.00706}
+55 not saved {'val_ReconOutLoss': 0.00066, 'val_kl_Loss_Z': 0.05676, 'val_kl_Loss_TC': 0.00524, 'val_kl_Loss_DTC': 0.00457}
+56 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03836, 'val_kl_Loss_TC': 0.00719, 'val_kl_Loss_DTC': 0.00318}
+57 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04411, 'val_kl_Loss_TC': 0.00334, 'val_kl_Loss_DTC': 0.00438}
+58 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04688, 'val_kl_Loss_TC': 0.00308, 'val_kl_Loss_DTC': 0.00427}
+59 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04642, 'val_kl_Loss_TC': 0.00043, 'val_kl_Loss_DTC': 0.00295}
+60 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03971, 'val_kl_Loss_TC': 0.00229, 'val_kl_Loss_DTC': 0.00494}
+61 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03314, 'val_kl_Loss_TC': 0.00161, 'val_kl_Loss_DTC': 0.01567}
+62 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04502, 'val_kl_Loss_TC': 0.00923, 'val_kl_Loss_DTC': 0.00509}
+63 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0326, 'val_kl_Loss_TC': 0.004, 'val_kl_Loss_DTC': 0.004}
+64 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04419, 'val_kl_Loss_TC': 0.00437, 'val_kl_Loss_DTC': 0.00337}
+65 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03973, 'val_kl_Loss_TC': 0.00431, 'val_kl_Loss_DTC': 0.00954}
+66 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03961, 'val_kl_Loss_TC': 0.00212, 'val_kl_Loss_DTC': 0.02208}
+67 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04845, 'val_kl_Loss_TC': 0.00343, 'val_kl_Loss_DTC': 0.00335}
+68 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04415, 'val_kl_Loss_TC': 0.00151, 'val_kl_Loss_DTC': 0.00975}
+69 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03573, 'val_kl_Loss_TC': 0.00073, 'val_kl_Loss_DTC': 0.00398}
+70 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04762, 'val_kl_Loss_TC': 0.00578, 'val_kl_Loss_DTC': 0.0075}
+71 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04018, 'val_kl_Loss_TC': 0.0039, 'val_kl_Loss_DTC': 0.01914}
+72 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04151, 'val_kl_Loss_TC': 0.00034, 'val_kl_Loss_DTC': 0.00376}
+73 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03249, 'val_kl_Loss_TC': 0.00377, 'val_kl_Loss_DTC': 0.0063}
+74 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.03618, 'val_kl_Loss_TC': 0.00674, 'val_kl_Loss_DTC': 0.01164}
+75 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0326, 'val_kl_Loss_TC': 0.00501, 'val_kl_Loss_DTC': 0.00375}
+76 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0329, 'val_kl_Loss_TC': 0.00217, 'val_kl_Loss_DTC': 0.01745}
+77 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.04216, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.0033}
+78 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03043, 'val_kl_Loss_TC': 0.00193, 'val_kl_Loss_DTC': 0.00471}
+79 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03085, 'val_kl_Loss_TC': 0.00834, 'val_kl_Loss_DTC': 0.00525}
+80 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04668, 'val_kl_Loss_TC': 0.00255, 'val_kl_Loss_DTC': 0.01503}
+81 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02869, 'val_kl_Loss_TC': 0.00053, 'val_kl_Loss_DTC': 0.01149}
+82 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04031, 'val_kl_Loss_TC': 0.00374, 'val_kl_Loss_DTC': 0.00365}
+83 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03509, 'val_kl_Loss_TC': 0.00739, 'val_kl_Loss_DTC': 0.00364}
+84 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04568, 'val_kl_Loss_TC': 0.00624, 'val_kl_Loss_DTC': 0.00545}
+85 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.036, 'val_kl_Loss_TC': 0.00024, 'val_kl_Loss_DTC': 0.00971}
+86 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03047, 'val_kl_Loss_TC': 0.00585, 'val_kl_Loss_DTC': 0.01287}
+87 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03064, 'val_kl_Loss_TC': 0.00526, 'val_kl_Loss_DTC': 0.00597}
+88 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03067, 'val_kl_Loss_TC': 0.00064, 'val_kl_Loss_DTC': 0.01083}
+89 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02255, 'val_kl_Loss_TC': 0.0004, 'val_kl_Loss_DTC': 0.00813}
+90 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02136, 'val_kl_Loss_TC': 0.00209, 'val_kl_Loss_DTC': 0.00534}
+91 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04088, 'val_kl_Loss_TC': 0.001, 'val_kl_Loss_DTC': 0.02582}
+92 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04004, 'val_kl_Loss_TC': 0.00381, 'val_kl_Loss_DTC': 0.00295}
+93 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0334, 'val_kl_Loss_TC': 0.00215, 'val_kl_Loss_DTC': 0.00302}
+94 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04738, 'val_kl_Loss_TC': 0.00245, 'val_kl_Loss_DTC': 0.02209}
+95 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03185, 'val_kl_Loss_TC': 0.00496, 'val_kl_Loss_DTC': 0.0056}
+96 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02568, 'val_kl_Loss_TC': 0.00432, 'val_kl_Loss_DTC': 0.00302}
+97 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02399, 'val_kl_Loss_TC': 0.0018, 'val_kl_Loss_DTC': 0.00383}
+98 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03133, 'val_kl_Loss_TC': 0.00218, 'val_kl_Loss_DTC': 0.00332}
+99 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02583, 'val_kl_Loss_TC': 0.00211, 'val_kl_Loss_DTC': 0.02852}
+100 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02197, 'val_kl_Loss_TC': 0.00382, 'val_kl_Loss_DTC': 0.01195}
+101 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02934, 'val_kl_Loss_TC': 0.00299, 'val_kl_Loss_DTC': 0.00531}
+102 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03365, 'val_kl_Loss_TC': 0.0031, 'val_kl_Loss_DTC': 0.00846}
+103 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02142, 'val_kl_Loss_TC': 0.00291, 'val_kl_Loss_DTC': 0.01446}
+104 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0224, 'val_kl_Loss_TC': 0.00056, 'val_kl_Loss_DTC': 0.00257}
+105 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02645, 'val_kl_Loss_TC': 0.00302, 'val_kl_Loss_DTC': 0.01687}
+106 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02211, 'val_kl_Loss_TC': 0.0046, 'val_kl_Loss_DTC': 0.00632}
+107 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03828, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.00922}
+108 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02567, 'val_kl_Loss_TC': 0.0098, 'val_kl_Loss_DTC': 0.00242}
+109 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02141, 'val_kl_Loss_TC': 0.00187, 'val_kl_Loss_DTC': 0.00322}
+110 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02638, 'val_kl_Loss_TC': 0.00144, 'val_kl_Loss_DTC': 0.00311}
+111 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03673, 'val_kl_Loss_TC': 0.00069, 'val_kl_Loss_DTC': 0.01519}
+112 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02741, 'val_kl_Loss_TC': 0.00047, 'val_kl_Loss_DTC': 0.00383}
+113 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01924, 'val_kl_Loss_TC': 0.0004, 'val_kl_Loss_DTC': 0.00484}
+114 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0284, 'val_kl_Loss_TC': 0.002, 'val_kl_Loss_DTC': 0.00211}
+115 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01942, 'val_kl_Loss_TC': 0.00499, 'val_kl_Loss_DTC': 0.00426}
+116 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01994, 'val_kl_Loss_TC': 0.00503, 'val_kl_Loss_DTC': 0.01182}
+117 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02041, 'val_kl_Loss_TC': 0.00649, 'val_kl_Loss_DTC': 0.00631}
+118 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02971, 'val_kl_Loss_TC': 0.00312, 'val_kl_Loss_DTC': 0.00775}
+119 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02646, 'val_kl_Loss_TC': 0.00262, 'val_kl_Loss_DTC': 0.01644}
+120 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02376, 'val_kl_Loss_TC': 0.00094, 'val_kl_Loss_DTC': 0.01747}
+121 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02196, 'val_kl_Loss_TC': 0.00376, 'val_kl_Loss_DTC': 0.01363}
+122 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03179, 'val_kl_Loss_TC': 0.00023, 'val_kl_Loss_DTC': 0.01018}
+123 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02336, 'val_kl_Loss_TC': 0.00559, 'val_kl_Loss_DTC': 0.0141}
+124 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03029, 'val_kl_Loss_TC': 0.00027, 'val_kl_Loss_DTC': 0.00628}
+125 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.02635, 'val_kl_Loss_TC': 0.00127, 'val_kl_Loss_DTC': 0.01326}
+126 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02326, 'val_kl_Loss_TC': 0.00481, 'val_kl_Loss_DTC': 0.00552}
+127 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01992, 'val_kl_Loss_TC': 0.00135, 'val_kl_Loss_DTC': 0.00584}
+128 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03093, 'val_kl_Loss_TC': 0.0008, 'val_kl_Loss_DTC': 0.0025}
+129 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01616, 'val_kl_Loss_TC': 0.00338, 'val_kl_Loss_DTC': 0.01221}
+130 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02937, 'val_kl_Loss_TC': 0.00173, 'val_kl_Loss_DTC': 0.0097}
+131 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0374, 'val_kl_Loss_TC': 0.00253, 'val_kl_Loss_DTC': 0.00541}
+132 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02081, 'val_kl_Loss_TC': 0.00086, 'val_kl_Loss_DTC': 0.00271}
+133 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02744, 'val_kl_Loss_TC': 0.00131, 'val_kl_Loss_DTC': 0.00772}
+134 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02442, 'val_kl_Loss_TC': 0.0003, 'val_kl_Loss_DTC': 0.00249}
+135 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0232, 'val_kl_Loss_TC': 0.00495, 'val_kl_Loss_DTC': 0.00462}
+136 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03054, 'val_kl_Loss_TC': 0.00353, 'val_kl_Loss_DTC': 0.01513}
+137 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0308, 'val_kl_Loss_TC': 0.00054, 'val_kl_Loss_DTC': 0.00293}
+138 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02488, 'val_kl_Loss_TC': 0.0014, 'val_kl_Loss_DTC': 0.00416}
+139 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01708, 'val_kl_Loss_TC': 0.00481, 'val_kl_Loss_DTC': 0.02371}
+140 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04125, 'val_kl_Loss_TC': 0.00122, 'val_kl_Loss_DTC': 0.0106}
+141 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02298, 'val_kl_Loss_TC': 0.00157, 'val_kl_Loss_DTC': 0.01248}
+142 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02292, 'val_kl_Loss_TC': 0.00818, 'val_kl_Loss_DTC': 0.03217}
+143 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01078, 'val_kl_Loss_TC': 0.00639, 'val_kl_Loss_DTC': 0.00318}
+144 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02889, 'val_kl_Loss_TC': 0.00447, 'val_kl_Loss_DTC': 0.01371}
+145 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03069, 'val_kl_Loss_TC': 0.00162, 'val_kl_Loss_DTC': 0.01139}
+146 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02111, 'val_kl_Loss_TC': 0.00318, 'val_kl_Loss_DTC': 0.00423}
+147 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0317, 'val_kl_Loss_TC': 0.0035, 'val_kl_Loss_DTC': 0.01819}
+148 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02895, 'val_kl_Loss_TC': 0.00123, 'val_kl_Loss_DTC': 0.00805}
+149 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02014, 'val_kl_Loss_TC': 0.00262, 'val_kl_Loss_DTC': 0.01128}
+150 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01997, 'val_kl_Loss_TC': 0.00291, 'val_kl_Loss_DTC': 0.00548}
+151 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01731, 'val_kl_Loss_TC': 0.00224, 'val_kl_Loss_DTC': 0.00832}
+152 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02365, 'val_kl_Loss_TC': 0.00276, 'val_kl_Loss_DTC': 0.01392}
+153 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.02707, 'val_kl_Loss_TC': 0.00135, 'val_kl_Loss_DTC': 0.00301}
+154 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02525, 'val_kl_Loss_TC': 0.00838, 'val_kl_Loss_DTC': 0.00423}
+155 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02401, 'val_kl_Loss_TC': 0.00133, 'val_kl_Loss_DTC': 0.00292}
+156 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01914, 'val_kl_Loss_TC': 0.00543, 'val_kl_Loss_DTC': 0.00905}
+157 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02514, 'val_kl_Loss_TC': 0.00152, 'val_kl_Loss_DTC': 0.00378}
+158 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02632, 'val_kl_Loss_TC': 0.0015, 'val_kl_Loss_DTC': 0.01442}
+159 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03587, 'val_kl_Loss_TC': 0.00084, 'val_kl_Loss_DTC': 0.00532}
+160 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02527, 'val_kl_Loss_TC': 0.00038, 'val_kl_Loss_DTC': 0.00421}
+161 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01988, 'val_kl_Loss_TC': 0.00297, 'val_kl_Loss_DTC': 0.01075}
+162 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02457, 'val_kl_Loss_TC': 0.00141, 'val_kl_Loss_DTC': 0.00248}
+163 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03166, 'val_kl_Loss_TC': 0.00211, 'val_kl_Loss_DTC': 0.01403}
+164 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02013, 'val_kl_Loss_TC': 0.00102, 'val_kl_Loss_DTC': 0.00443}
+165 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02678, 'val_kl_Loss_TC': 0.00513, 'val_kl_Loss_DTC': 0.00425}
+166 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01879, 'val_kl_Loss_TC': 0.00172, 'val_kl_Loss_DTC': 0.0043}
+167 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02963, 'val_kl_Loss_TC': 0.00082, 'val_kl_Loss_DTC': 0.0052}
+168 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.0229, 'val_kl_Loss_TC': 0.00154, 'val_kl_Loss_DTC': 0.01032}
+169 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03, 'val_kl_Loss_TC': 0.0014, 'val_kl_Loss_DTC': 0.01763}
+170 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04015, 'val_kl_Loss_TC': 0.00052, 'val_kl_Loss_DTC': 0.01733}
+171 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01686, 'val_kl_Loss_TC': 0.0003, 'val_kl_Loss_DTC': 0.00316}
+172 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01752, 'val_kl_Loss_TC': 0.00106, 'val_kl_Loss_DTC': 0.00816}
+173 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.02532, 'val_kl_Loss_TC': 0.00087, 'val_kl_Loss_DTC': 0.00448}
+174 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02217, 'val_kl_Loss_TC': 0.00155, 'val_kl_Loss_DTC': 0.00294}
+175 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02147, 'val_kl_Loss_TC': 0.00121, 'val_kl_Loss_DTC': 0.00669}
+176 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02186, 'val_kl_Loss_TC': 0.00154, 'val_kl_Loss_DTC': 0.00461}
+177 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.08454, 'val_kl_Loss_TC': 0.00068, 'val_kl_Loss_DTC': 0.00356}
+178 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02292, 'val_kl_Loss_TC': 0.00174, 'val_kl_Loss_DTC': 0.003}
+179 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0205, 'val_kl_Loss_TC': 0.00189, 'val_kl_Loss_DTC': 0.01346}
+180 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03933, 'val_kl_Loss_TC': 0.0017, 'val_kl_Loss_DTC': 0.01559}
+181 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01695, 'val_kl_Loss_TC': 0.00259, 'val_kl_Loss_DTC': 0.00606}
+182 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02123, 'val_kl_Loss_TC': 0.00148, 'val_kl_Loss_DTC': 0.00314}
+183 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01864, 'val_kl_Loss_TC': 0.00126, 'val_kl_Loss_DTC': 0.00477}
+184 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0238, 'val_kl_Loss_TC': 0.00075, 'val_kl_Loss_DTC': 0.00602}
+185 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02491, 'val_kl_Loss_TC': 0.0006, 'val_kl_Loss_DTC': 0.01012}
+186 not saved {'val_ReconOutLoss': 0.00064, 'val_kl_Loss_Z': 0.02924, 'val_kl_Loss_TC': 0.00096, 'val_kl_Loss_DTC': 0.00638}
+187 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01847, 'val_kl_Loss_TC': 5e-05, 'val_kl_Loss_DTC': 0.00288}
+188 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01999, 'val_kl_Loss_TC': 5e-05, 'val_kl_Loss_DTC': 0.00368}
+189 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02312, 'val_kl_Loss_TC': 0.00102, 'val_kl_Loss_DTC': 0.00238}
+190 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02901, 'val_kl_Loss_TC': 0.00223, 'val_kl_Loss_DTC': 0.01101}
+191 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02148, 'val_kl_Loss_TC': 0.00127, 'val_kl_Loss_DTC': 0.00579}
+192 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03338, 'val_kl_Loss_TC': 0.0003, 'val_kl_Loss_DTC': 0.00237}
+193 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02534, 'val_kl_Loss_TC': 0.00099, 'val_kl_Loss_DTC': 0.00449}
+194 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03767, 'val_kl_Loss_TC': 0.00112, 'val_kl_Loss_DTC': 0.00357}
+195 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02378, 'val_kl_Loss_TC': 0.00106, 'val_kl_Loss_DTC': 0.00241}
+196 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04422, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.00297}
+197 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02389, 'val_kl_Loss_TC': 0.00016, 'val_kl_Loss_DTC': 0.00315}
+198 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02173, 'val_kl_Loss_TC': 0.00117, 'val_kl_Loss_DTC': 0.01452}
+199 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02207, 'val_kl_Loss_TC': 0.00067, 'val_kl_Loss_DTC': 0.00639}
+200 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01937, 'val_kl_Loss_TC': 0.00409, 'val_kl_Loss_DTC': 0.00667}
+201 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.04103, 'val_kl_Loss_TC': 0.00471, 'val_kl_Loss_DTC': 0.00973}
+202 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02261, 'val_kl_Loss_TC': 0.0035, 'val_kl_Loss_DTC': 0.00267}
+203 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0202, 'val_kl_Loss_TC': 0.00163, 'val_kl_Loss_DTC': 0.00378}
+204 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02129, 'val_kl_Loss_TC': 0.00085, 'val_kl_Loss_DTC': 0.00287}
+205 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02208, 'val_kl_Loss_TC': 0.00302, 'val_kl_Loss_DTC': 0.00661}
+206 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03219, 'val_kl_Loss_TC': 0.00059, 'val_kl_Loss_DTC': 0.00214}
+207 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0168, 'val_kl_Loss_TC': 0.00053, 'val_kl_Loss_DTC': 0.00775}
+208 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01591, 'val_kl_Loss_TC': 0.0008, 'val_kl_Loss_DTC': 0.00555}
+209 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02198, 'val_kl_Loss_TC': 0.00168, 'val_kl_Loss_DTC': 0.01286}
+210 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02074, 'val_kl_Loss_TC': 0.00367, 'val_kl_Loss_DTC': 0.01747}
+211 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03155, 'val_kl_Loss_TC': 0.00035, 'val_kl_Loss_DTC': 0.00224}
+212 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03041, 'val_kl_Loss_TC': 0.00082, 'val_kl_Loss_DTC': 0.00291}
+213 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03343, 'val_kl_Loss_TC': 0.00059, 'val_kl_Loss_DTC': 0.01019}
+214 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02532, 'val_kl_Loss_TC': 0.00088, 'val_kl_Loss_DTC': 0.00381}
+215 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0193, 'val_kl_Loss_TC': 0.00176, 'val_kl_Loss_DTC': 0.00362}
+216 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0315, 'val_kl_Loss_TC': 4e-05, 'val_kl_Loss_DTC': 0.00326}
+217 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02113, 'val_kl_Loss_TC': 0.00138, 'val_kl_Loss_DTC': 0.00536}
+218 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01639, 'val_kl_Loss_TC': 0.00022, 'val_kl_Loss_DTC': 0.00641}
+219 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02397, 'val_kl_Loss_TC': 0.00156, 'val_kl_Loss_DTC': 0.00217}
+220 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02608, 'val_kl_Loss_TC': 0.00582, 'val_kl_Loss_DTC': 0.00307}
+221 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02034, 'val_kl_Loss_TC': 0.00044, 'val_kl_Loss_DTC': 0.0026}
+222 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02077, 'val_kl_Loss_TC': 5e-05, 'val_kl_Loss_DTC': 0.00468}
+223 not saved {'val_ReconOutLoss': 0.00089, 'val_kl_Loss_Z': 0.0403, 'val_kl_Loss_TC': 0.00067, 'val_kl_Loss_DTC': 0.00952}
+224 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02463, 'val_kl_Loss_TC': 0.0001, 'val_kl_Loss_DTC': 0.00339}
+225 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03211, 'val_kl_Loss_TC': 0.00203, 'val_kl_Loss_DTC': 0.006}
+226 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02239, 'val_kl_Loss_TC': 0.00016, 'val_kl_Loss_DTC': 0.00281}
+227 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02099, 'val_kl_Loss_TC': 0.00095, 'val_kl_Loss_DTC': 0.00224}
+228 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02871, 'val_kl_Loss_TC': 0.00025, 'val_kl_Loss_DTC': 0.00301}
+229 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01565, 'val_kl_Loss_TC': 0.00242, 'val_kl_Loss_DTC': 0.00244}
+230 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02884, 'val_kl_Loss_TC': 0.00326, 'val_kl_Loss_DTC': 0.00414}
+231 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01357, 'val_kl_Loss_TC': 0.00211, 'val_kl_Loss_DTC': 0.00242}
+232 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01644, 'val_kl_Loss_TC': 0.00234, 'val_kl_Loss_DTC': 0.00345}
+233 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02374, 'val_kl_Loss_TC': 0.00258, 'val_kl_Loss_DTC': 0.00263}
+234 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01933, 'val_kl_Loss_TC': 0.00144, 'val_kl_Loss_DTC': 0.00195}
+235 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01726, 'val_kl_Loss_TC': 0.00094, 'val_kl_Loss_DTC': 0.00368}
+236 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01746, 'val_kl_Loss_TC': 0.00184, 'val_kl_Loss_DTC': 0.00395}
+237 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02366, 'val_kl_Loss_TC': 0.00055, 'val_kl_Loss_DTC': 0.00285}
+238 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02066, 'val_kl_Loss_TC': 0.00024, 'val_kl_Loss_DTC': 0.00727}
+239 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02753, 'val_kl_Loss_TC': 0.00013, 'val_kl_Loss_DTC': 0.00541}
+240 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01431, 'val_kl_Loss_TC': 6e-05, 'val_kl_Loss_DTC': 0.00341}
+241 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01327, 'val_kl_Loss_TC': 0.00129, 'val_kl_Loss_DTC': 0.00242}
+242 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02452, 'val_kl_Loss_TC': 0.00094, 'val_kl_Loss_DTC': 0.0047}
+243 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02528, 'val_kl_Loss_TC': 0.00089, 'val_kl_Loss_DTC': 0.00189}
+244 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01942, 'val_kl_Loss_TC': 0.0005, 'val_kl_Loss_DTC': 0.00276}
+245 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01926, 'val_kl_Loss_TC': 0.00079, 'val_kl_Loss_DTC': 0.00349}
+246 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01996, 'val_kl_Loss_TC': 0.00136, 'val_kl_Loss_DTC': 0.01114}
+247 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01586, 'val_kl_Loss_TC': 0.00042, 'val_kl_Loss_DTC': 0.00598}
+248 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02006, 'val_kl_Loss_TC': 0.00045, 'val_kl_Loss_DTC': 0.00249}
+249 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02212, 'val_kl_Loss_TC': 0.00223, 'val_kl_Loss_DTC': 0.00248}
+250 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01458, 'val_kl_Loss_TC': 0.00434, 'val_kl_Loss_DTC': 0.00335}
+251 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01535, 'val_kl_Loss_TC': 4e-05, 'val_kl_Loss_DTC': 0.00433}
+252 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01707, 'val_kl_Loss_TC': 0.0026, 'val_kl_Loss_DTC': 0.00769}
+253 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02247, 'val_kl_Loss_TC': 0.00108, 'val_kl_Loss_DTC': 0.00293}
+254 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01607, 'val_kl_Loss_TC': 0.00136, 'val_kl_Loss_DTC': 0.0029}
+255 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02917, 'val_kl_Loss_TC': 0.00191, 'val_kl_Loss_DTC': 0.00332}
+256 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03219, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.00282}
+257 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02036, 'val_kl_Loss_TC': 0.00146, 'val_kl_Loss_DTC': 0.00245}
+258 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02955, 'val_kl_Loss_TC': 0.00091, 'val_kl_Loss_DTC': 0.00206}
+259 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03197, 'val_kl_Loss_TC': 0.00118, 'val_kl_Loss_DTC': 0.00481}
+260 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02426, 'val_kl_Loss_TC': 0.00169, 'val_kl_Loss_DTC': 0.00458}
+261 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01732, 'val_kl_Loss_TC': 0.00025, 'val_kl_Loss_DTC': 0.00476}
+262 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02172, 'val_kl_Loss_TC': 0.00411, 'val_kl_Loss_DTC': 0.00923}
+263 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01933, 'val_kl_Loss_TC': 0.00148, 'val_kl_Loss_DTC': 0.00403}
+264 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03008, 'val_kl_Loss_TC': 0.00038, 'val_kl_Loss_DTC': 0.00381}
+265 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02079, 'val_kl_Loss_TC': 0.00193, 'val_kl_Loss_DTC': 0.00214}
+266 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02138, 'val_kl_Loss_TC': 8e-05, 'val_kl_Loss_DTC': 0.00679}
+267 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04135, 'val_kl_Loss_TC': 0.00238, 'val_kl_Loss_DTC': 0.01051}
+268 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01492, 'val_kl_Loss_TC': 0.00056, 'val_kl_Loss_DTC': 0.00326}
+269 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.01913, 'val_kl_Loss_TC': 0.00083, 'val_kl_Loss_DTC': 0.0029}
+270 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.02287, 'val_kl_Loss_TC': 0.00183, 'val_kl_Loss_DTC': 0.00356}
+271 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02568, 'val_kl_Loss_TC': 4e-05, 'val_kl_Loss_DTC': 0.00833}
+272 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.015, 'val_kl_Loss_TC': 0.00095, 'val_kl_Loss_DTC': 0.00262}
+273 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01321, 'val_kl_Loss_TC': 0.00542, 'val_kl_Loss_DTC': 0.00309}
+274 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02241, 'val_kl_Loss_TC': 0.00542, 'val_kl_Loss_DTC': 0.00332}
+275 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01444, 'val_kl_Loss_TC': 0.00333, 'val_kl_Loss_DTC': 0.00493}
+276 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01938, 'val_kl_Loss_TC': 0.00128, 'val_kl_Loss_DTC': 0.0046}
+277 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02263, 'val_kl_Loss_TC': 0.00027, 'val_kl_Loss_DTC': 0.00321}
+278 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02578, 'val_kl_Loss_TC': 0.00161, 'val_kl_Loss_DTC': 0.00631}
+279 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01882, 'val_kl_Loss_TC': 0.0032, 'val_kl_Loss_DTC': 0.00539}
+280 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03209, 'val_kl_Loss_TC': 0.00343, 'val_kl_Loss_DTC': 0.00188}
+281 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02155, 'val_kl_Loss_TC': 0.00071, 'val_kl_Loss_DTC': 0.00229}
+282 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01807, 'val_kl_Loss_TC': 0.00105, 'val_kl_Loss_DTC': 0.00894}
+283 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01973, 'val_kl_Loss_TC': 0.00081, 'val_kl_Loss_DTC': 0.00399}
+284 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01293, 'val_kl_Loss_TC': 0.00018, 'val_kl_Loss_DTC': 0.00657}
+285 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0191, 'val_kl_Loss_TC': 1e-05, 'val_kl_Loss_DTC': 0.00292}
+286 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01831, 'val_kl_Loss_TC': 0.0003, 'val_kl_Loss_DTC': 0.00481}
+287 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01842, 'val_kl_Loss_TC': 0.00184, 'val_kl_Loss_DTC': 0.00354}
+288 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0176, 'val_kl_Loss_TC': 0.00082, 'val_kl_Loss_DTC': 0.00368}
+289 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01612, 'val_kl_Loss_TC': 2e-05, 'val_kl_Loss_DTC': 0.00429}
+290 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01773, 'val_kl_Loss_TC': 0.00063, 'val_kl_Loss_DTC': 0.00415}
+291 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01847, 'val_kl_Loss_TC': 0.00022, 'val_kl_Loss_DTC': 0.00322}
+292 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01996, 'val_kl_Loss_TC': 0.00021, 'val_kl_Loss_DTC': 0.00285}
+293 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01715, 'val_kl_Loss_TC': 0.00056, 'val_kl_Loss_DTC': 0.0035}
+294 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01652, 'val_kl_Loss_TC': 0.00057, 'val_kl_Loss_DTC': 0.00218}
+295 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02168, 'val_kl_Loss_TC': 0.00132, 'val_kl_Loss_DTC': 0.00405}
+296 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02288, 'val_kl_Loss_TC': 0.00138, 'val_kl_Loss_DTC': 0.00226}
+297 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0145, 'val_kl_Loss_TC': 0.00133, 'val_kl_Loss_DTC': 0.00279}
+298 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02065, 'val_kl_Loss_TC': 0.00059, 'val_kl_Loss_DTC': 0.00678}
+299 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02083, 'val_kl_Loss_TC': 0.00499, 'val_kl_Loss_DTC': 0.00763}
+300 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03201, 'val_kl_Loss_TC': 0.00312, 'val_kl_Loss_DTC': 0.00476}
+301 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01714, 'val_kl_Loss_TC': 0.00378, 'val_kl_Loss_DTC': 0.00751}
+302 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02329, 'val_kl_Loss_TC': 0.00092, 'val_kl_Loss_DTC': 0.00696}
+303 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01712, 'val_kl_Loss_TC': 0.0018, 'val_kl_Loss_DTC': 0.00242}
+304 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02805, 'val_kl_Loss_TC': 0.00311, 'val_kl_Loss_DTC': 0.00225}
+305 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01782, 'val_kl_Loss_TC': 0.0006, 'val_kl_Loss_DTC': 0.00268}
+306 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01665, 'val_kl_Loss_TC': 0.00398, 'val_kl_Loss_DTC': 0.00691}
+307 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01756, 'val_kl_Loss_TC': 0.0002, 'val_kl_Loss_DTC': 0.00227}
+308 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02903, 'val_kl_Loss_TC': 0.00096, 'val_kl_Loss_DTC': 0.00725}
+309 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01935, 'val_kl_Loss_TC': 0.00127, 'val_kl_Loss_DTC': 0.00271}
+310 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02456, 'val_kl_Loss_TC': 0.00156, 'val_kl_Loss_DTC': 0.00886}
+311 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02103, 'val_kl_Loss_TC': 0.00046, 'val_kl_Loss_DTC': 0.00206}
+312 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0202, 'val_kl_Loss_TC': 0.00149, 'val_kl_Loss_DTC': 0.00204}
+313 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02514, 'val_kl_Loss_TC': 0.00162, 'val_kl_Loss_DTC': 0.00288}
+314 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01766, 'val_kl_Loss_TC': 0.00152, 'val_kl_Loss_DTC': 0.00235}
+315 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01572, 'val_kl_Loss_TC': 8e-05, 'val_kl_Loss_DTC': 0.00228}
+316 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0169, 'val_kl_Loss_TC': 0.00044, 'val_kl_Loss_DTC': 0.00322}
+317 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01596, 'val_kl_Loss_TC': 0.00187, 'val_kl_Loss_DTC': 0.00979}
+318 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03661, 'val_kl_Loss_TC': 0.00082, 'val_kl_Loss_DTC': 0.00521}
+319 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03221, 'val_kl_Loss_TC': 0.0008, 'val_kl_Loss_DTC': 0.00274}
+320 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02479, 'val_kl_Loss_TC': 0.00343, 'val_kl_Loss_DTC': 0.00243}
+321 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01843, 'val_kl_Loss_TC': 0.00191, 'val_kl_Loss_DTC': 0.00856}
+322 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01709, 'val_kl_Loss_TC': 0.00029, 'val_kl_Loss_DTC': 0.00255}
+323 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02512, 'val_kl_Loss_TC': 0.00026, 'val_kl_Loss_DTC': 0.009}
+324 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01789, 'val_kl_Loss_TC': 0.00048, 'val_kl_Loss_DTC': 0.00708}
+325 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0149, 'val_kl_Loss_TC': 0.00111, 'val_kl_Loss_DTC': 0.00547}
+326 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02024, 'val_kl_Loss_TC': 0.00106, 'val_kl_Loss_DTC': 0.00868}
+327 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02196, 'val_kl_Loss_TC': 0.00181, 'val_kl_Loss_DTC': 0.00564}
+328 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01908, 'val_kl_Loss_TC': 0.00121, 'val_kl_Loss_DTC': 0.00235}
+329 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01623, 'val_kl_Loss_TC': 0.00136, 'val_kl_Loss_DTC': 0.00268}
+330 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01564, 'val_kl_Loss_TC': 0.00153, 'val_kl_Loss_DTC': 0.00424}
+331 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01438, 'val_kl_Loss_TC': 0.00111, 'val_kl_Loss_DTC': 0.00271}
+332 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02703, 'val_kl_Loss_TC': 0.00218, 'val_kl_Loss_DTC': 0.00191}
+333 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01363, 'val_kl_Loss_TC': 0.00013, 'val_kl_Loss_DTC': 0.0137}
+334 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.016, 'val_kl_Loss_TC': 0.00129, 'val_kl_Loss_DTC': 0.0049}
+335 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01835, 'val_kl_Loss_TC': 0.00256, 'val_kl_Loss_DTC': 0.00282}
+336 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01182, 'val_kl_Loss_TC': 5e-05, 'val_kl_Loss_DTC': 0.00219}
+337 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02331, 'val_kl_Loss_TC': 0.00063, 'val_kl_Loss_DTC': 0.00326}
+338 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.021, 'val_kl_Loss_TC': 0.00139, 'val_kl_Loss_DTC': 0.00489}
+339 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01504, 'val_kl_Loss_TC': 0.00125, 'val_kl_Loss_DTC': 0.00506}
+340 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02154, 'val_kl_Loss_TC': 1e-05, 'val_kl_Loss_DTC': 0.0056}
+341 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01761, 'val_kl_Loss_TC': 0.00176, 'val_kl_Loss_DTC': 0.00728}
+342 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0223, 'val_kl_Loss_TC': 0.00365, 'val_kl_Loss_DTC': 0.00558}
+343 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01762, 'val_kl_Loss_TC': 2e-05, 'val_kl_Loss_DTC': 0.0101}
+344 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02004, 'val_kl_Loss_TC': 6e-05, 'val_kl_Loss_DTC': 0.00303}
+345 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01821, 'val_kl_Loss_TC': 0.00212, 'val_kl_Loss_DTC': 0.00177}
+346 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0197, 'val_kl_Loss_TC': 0.00042, 'val_kl_Loss_DTC': 0.00599}
+347 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01753, 'val_kl_Loss_TC': 0.00104, 'val_kl_Loss_DTC': 0.00245}
+348 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02692, 'val_kl_Loss_TC': 0.00156, 'val_kl_Loss_DTC': 0.00251}
+349 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01646, 'val_kl_Loss_TC': 0.00151, 'val_kl_Loss_DTC': 0.00743}
+350 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0282, 'val_kl_Loss_TC': 0.0008, 'val_kl_Loss_DTC': 0.01297}
+351 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02356, 'val_kl_Loss_TC': 0.00196, 'val_kl_Loss_DTC': 0.00286}
+352 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01654, 'val_kl_Loss_TC': 0.00013, 'val_kl_Loss_DTC': 0.00484}
+353 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01668, 'val_kl_Loss_TC': 0.00349, 'val_kl_Loss_DTC': 0.00996}
+354 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0251, 'val_kl_Loss_TC': 0.00015, 'val_kl_Loss_DTC': 0.00257}
+355 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01907, 'val_kl_Loss_TC': 0.0009, 'val_kl_Loss_DTC': 0.01269}
+356 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0195, 'val_kl_Loss_TC': 0.00061, 'val_kl_Loss_DTC': 0.01492}
+357 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01895, 'val_kl_Loss_TC': 0.00077, 'val_kl_Loss_DTC': 0.00304}
+358 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02422, 'val_kl_Loss_TC': 0.00055, 'val_kl_Loss_DTC': 0.00625}
+359 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01811, 'val_kl_Loss_TC': 0.00069, 'val_kl_Loss_DTC': 0.00328}
+360 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01777, 'val_kl_Loss_TC': 0.00023, 'val_kl_Loss_DTC': 0.00263}
+361 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02029, 'val_kl_Loss_TC': 0.00053, 'val_kl_Loss_DTC': 0.01578}
+362 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02547, 'val_kl_Loss_TC': 5e-05, 'val_kl_Loss_DTC': 0.00579}
+363 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02099, 'val_kl_Loss_TC': 0.00079, 'val_kl_Loss_DTC': 0.0025}
+364 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03382, 'val_kl_Loss_TC': 0.00081, 'val_kl_Loss_DTC': 0.00268}
+365 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01716, 'val_kl_Loss_TC': 0.00032, 'val_kl_Loss_DTC': 0.00652}
+366 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0137, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.00218}
+367 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02476, 'val_kl_Loss_TC': 0.00131, 'val_kl_Loss_DTC': 0.00307}
+368 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02796, 'val_kl_Loss_TC': 0.0006, 'val_kl_Loss_DTC': 0.00191}
+369 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02019, 'val_kl_Loss_TC': 0.00216, 'val_kl_Loss_DTC': 0.00411}
+370 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02488, 'val_kl_Loss_TC': 0.00146, 'val_kl_Loss_DTC': 0.00438}
+371 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0158, 'val_kl_Loss_TC': 0.0006, 'val_kl_Loss_DTC': 0.00852}
+372 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0187, 'val_kl_Loss_TC': 0.00254, 'val_kl_Loss_DTC': 0.00462}
+373 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01888, 'val_kl_Loss_TC': 0.00017, 'val_kl_Loss_DTC': 0.00179}
+374 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01491, 'val_kl_Loss_TC': 1e-05, 'val_kl_Loss_DTC': 0.00272}
+375 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02076, 'val_kl_Loss_TC': 0.00169, 'val_kl_Loss_DTC': 0.00259}
+376 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01483, 'val_kl_Loss_TC': 0.00013, 'val_kl_Loss_DTC': 0.00288}
+377 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01573, 'val_kl_Loss_TC': 0.00114, 'val_kl_Loss_DTC': 0.01509}
+378 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02644, 'val_kl_Loss_TC': 0.00114, 'val_kl_Loss_DTC': 0.00256}
+379 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01791, 'val_kl_Loss_TC': 0.00196, 'val_kl_Loss_DTC': 0.00176}
+380 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01978, 'val_kl_Loss_TC': 0.0006, 'val_kl_Loss_DTC': 0.00749}
+381 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01675, 'val_kl_Loss_TC': 0.00094, 'val_kl_Loss_DTC': 0.00539}
+382 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01471, 'val_kl_Loss_TC': 0.00089, 'val_kl_Loss_DTC': 0.00361}
+383 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02355, 'val_kl_Loss_TC': 0.00082, 'val_kl_Loss_DTC': 0.00681}
+384 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02077, 'val_kl_Loss_TC': 0.00138, 'val_kl_Loss_DTC': 0.00974}
+385 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01982, 'val_kl_Loss_TC': 0.00019, 'val_kl_Loss_DTC': 0.00497}
+386 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02068, 'val_kl_Loss_TC': 0.0012, 'val_kl_Loss_DTC': 0.00576}
+387 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01789, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.01285}
+388 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02317, 'val_kl_Loss_TC': 2e-05, 'val_kl_Loss_DTC': 0.00628}
+389 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02597, 'val_kl_Loss_TC': 0.00106, 'val_kl_Loss_DTC': 0.00734}
+390 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02133, 'val_kl_Loss_TC': 0.00102, 'val_kl_Loss_DTC': 0.00662}
+391 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03047, 'val_kl_Loss_TC': 4e-05, 'val_kl_Loss_DTC': 0.00413}
+392 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01691, 'val_kl_Loss_TC': 0.00042, 'val_kl_Loss_DTC': 0.00896}
+393 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02757, 'val_kl_Loss_TC': 0.0005, 'val_kl_Loss_DTC': 0.00674}
+394 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02402, 'val_kl_Loss_TC': 0.00028, 'val_kl_Loss_DTC': 0.00537}
+395 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02454, 'val_kl_Loss_TC': 0.00056, 'val_kl_Loss_DTC': 0.00331}
+396 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02152, 'val_kl_Loss_TC': 0.00017, 'val_kl_Loss_DTC': 0.00326}
+397 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01943, 'val_kl_Loss_TC': 0.00079, 'val_kl_Loss_DTC': 0.0016}
+398 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0255, 'val_kl_Loss_TC': 0.00236, 'val_kl_Loss_DTC': 0.00549}
+399 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01264, 'val_kl_Loss_TC': 0.00071, 'val_kl_Loss_DTC': 0.00199}
+400 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01698, 'val_kl_Loss_TC': 1e-05, 'val_kl_Loss_DTC': 0.00454}
+401 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01999, 'val_kl_Loss_TC': 0.00078, 'val_kl_Loss_DTC': 0.006}
+402 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02244, 'val_kl_Loss_TC': 7e-05, 'val_kl_Loss_DTC': 0.00358}
+403 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03515, 'val_kl_Loss_TC': 0.00203, 'val_kl_Loss_DTC': 0.00809}
+404 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02239, 'val_kl_Loss_TC': 0.00046, 'val_kl_Loss_DTC': 0.00254}
+405 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01871, 'val_kl_Loss_TC': 0.00122, 'val_kl_Loss_DTC': 0.01094}
+406 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02186, 'val_kl_Loss_TC': 0.00213, 'val_kl_Loss_DTC': 0.00683}
+407 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02216, 'val_kl_Loss_TC': 0.00154, 'val_kl_Loss_DTC': 0.0024}
+408 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02335, 'val_kl_Loss_TC': 0.00123, 'val_kl_Loss_DTC': 0.00612}
+409 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01908, 'val_kl_Loss_TC': 0.00012, 'val_kl_Loss_DTC': 0.00698}
+410 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01725, 'val_kl_Loss_TC': 0.00067, 'val_kl_Loss_DTC': 0.00519}
+411 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02741, 'val_kl_Loss_TC': 0.0021, 'val_kl_Loss_DTC': 0.00259}
+412 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02126, 'val_kl_Loss_TC': 0.00035, 'val_kl_Loss_DTC': 0.00286}
+413 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03059, 'val_kl_Loss_TC': 0.00193, 'val_kl_Loss_DTC': 0.00328}
+414 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01777, 'val_kl_Loss_TC': 0.00156, 'val_kl_Loss_DTC': 0.01184}
+415 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0258, 'val_kl_Loss_TC': 0.00115, 'val_kl_Loss_DTC': 0.00208}
+416 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01609, 'val_kl_Loss_TC': 0.00015, 'val_kl_Loss_DTC': 0.00352}
+417 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02446, 'val_kl_Loss_TC': 0.00236, 'val_kl_Loss_DTC': 0.00746}
+418 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02451, 'val_kl_Loss_TC': 0.00217, 'val_kl_Loss_DTC': 0.00636}
+419 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03147, 'val_kl_Loss_TC': 0.00067, 'val_kl_Loss_DTC': 0.0047}
+420 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0309, 'val_kl_Loss_TC': 0.00144, 'val_kl_Loss_DTC': 0.00283}
+421 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02002, 'val_kl_Loss_TC': 0.00164, 'val_kl_Loss_DTC': 0.00742}
+422 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03607, 'val_kl_Loss_TC': 0.00154, 'val_kl_Loss_DTC': 0.0022}
+423 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03641, 'val_kl_Loss_TC': 0.00109, 'val_kl_Loss_DTC': 0.00249}
+424 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02721, 'val_kl_Loss_TC': 2e-05, 'val_kl_Loss_DTC': 0.00713}
+425 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02088, 'val_kl_Loss_TC': 0.00152, 'val_kl_Loss_DTC': 0.00411}
+426 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02129, 'val_kl_Loss_TC': 0.00059, 'val_kl_Loss_DTC': 0.00221}
+427 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01884, 'val_kl_Loss_TC': 0.00095, 'val_kl_Loss_DTC': 0.0035}
+428 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02434, 'val_kl_Loss_TC': 0.00118, 'val_kl_Loss_DTC': 0.00264}
+429 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0228, 'val_kl_Loss_TC': 0.00152, 'val_kl_Loss_DTC': 0.00207}
+430 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02238, 'val_kl_Loss_TC': 0.00032, 'val_kl_Loss_DTC': 0.00272}
+431 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02684, 'val_kl_Loss_TC': 0.00109, 'val_kl_Loss_DTC': 0.00965}
+432 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01932, 'val_kl_Loss_TC': 0.00137, 'val_kl_Loss_DTC': 0.00281}
+433 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.04596, 'val_kl_Loss_TC': 0.00328, 'val_kl_Loss_DTC': 0.0152}
+434 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02559, 'val_kl_Loss_TC': 3e-05, 'val_kl_Loss_DTC': 0.00247}
+435 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02098, 'val_kl_Loss_TC': 0.00126, 'val_kl_Loss_DTC': 0.00212}
+436 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01859, 'val_kl_Loss_TC': 0.00068, 'val_kl_Loss_DTC': 0.00217}
+437 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01798, 'val_kl_Loss_TC': 0.00168, 'val_kl_Loss_DTC': 0.00619}
+438 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01987, 'val_kl_Loss_TC': 0.00076, 'val_kl_Loss_DTC': 0.00519}
+439 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02065, 'val_kl_Loss_TC': 0.00177, 'val_kl_Loss_DTC': 0.00213}
+440 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02027, 'val_kl_Loss_TC': 0.00243, 'val_kl_Loss_DTC': 0.00237}
+441 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02429, 'val_kl_Loss_TC': 0.00129, 'val_kl_Loss_DTC': 0.00189}
+442 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03467, 'val_kl_Loss_TC': 0.00166, 'val_kl_Loss_DTC': 0.00251}
+443 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02195, 'val_kl_Loss_TC': 0.00228, 'val_kl_Loss_DTC': 0.00254}
+444 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02135, 'val_kl_Loss_TC': 0.00212, 'val_kl_Loss_DTC': 0.00685}
+445 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01928, 'val_kl_Loss_TC': 0.00134, 'val_kl_Loss_DTC': 0.01247}
+446 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.02152, 'val_kl_Loss_TC': 0.00214, 'val_kl_Loss_DTC': 0.00391}
+447 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02225, 'val_kl_Loss_TC': 0.00167, 'val_kl_Loss_DTC': 0.00463}
+448 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02791, 'val_kl_Loss_TC': 0.00079, 'val_kl_Loss_DTC': 0.00867}
+449 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0224, 'val_kl_Loss_TC': 0.0002, 'val_kl_Loss_DTC': 0.00179}
+450 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01739, 'val_kl_Loss_TC': 0.00021, 'val_kl_Loss_DTC': 0.00377}
+451 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03133, 'val_kl_Loss_TC': 0.00196, 'val_kl_Loss_DTC': 0.00197}
+452 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01984, 'val_kl_Loss_TC': 0.00176, 'val_kl_Loss_DTC': 0.00312}
+453 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02768, 'val_kl_Loss_TC': 0.00133, 'val_kl_Loss_DTC': 0.00486}
+454 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02626, 'val_kl_Loss_TC': 0.00029, 'val_kl_Loss_DTC': 0.00285}
+455 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02741, 'val_kl_Loss_TC': 0.00029, 'val_kl_Loss_DTC': 0.00891}
+456 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02808, 'val_kl_Loss_TC': 0.00011, 'val_kl_Loss_DTC': 0.0021}
+457 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02036, 'val_kl_Loss_TC': 0.00074, 'val_kl_Loss_DTC': 0.00433}
+458 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01957, 'val_kl_Loss_TC': 0.00057, 'val_kl_Loss_DTC': 0.00408}
+459 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01568, 'val_kl_Loss_TC': 0.00092, 'val_kl_Loss_DTC': 0.00743}
+460 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03117, 'val_kl_Loss_TC': 0.0017, 'val_kl_Loss_DTC': 0.00664}
+461 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02942, 'val_kl_Loss_TC': 0.0001, 'val_kl_Loss_DTC': 0.0061}
+462 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02336, 'val_kl_Loss_TC': 0.00032, 'val_kl_Loss_DTC': 0.00495}
+463 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02317, 'val_kl_Loss_TC': 0.00068, 'val_kl_Loss_DTC': 0.00629}
+464 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03045, 'val_kl_Loss_TC': 0.00332, 'val_kl_Loss_DTC': 0.00493}
+465 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02992, 'val_kl_Loss_TC': 0.00137, 'val_kl_Loss_DTC': 0.00456}
+466 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02409, 'val_kl_Loss_TC': 0.00018, 'val_kl_Loss_DTC': 0.00416}
+467 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03164, 'val_kl_Loss_TC': 0.00016, 'val_kl_Loss_DTC': 0.00662}
+468 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0266, 'val_kl_Loss_TC': 0.00018, 'val_kl_Loss_DTC': 0.00365}
+469 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02755, 'val_kl_Loss_TC': 0.00106, 'val_kl_Loss_DTC': 0.00956}
+470 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0226, 'val_kl_Loss_TC': 0.0004, 'val_kl_Loss_DTC': 0.00389}
+471 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02672, 'val_kl_Loss_TC': 0.00135, 'val_kl_Loss_DTC': 0.00524}
+472 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02354, 'val_kl_Loss_TC': 0.00035, 'val_kl_Loss_DTC': 0.00852}
+473 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02958, 'val_kl_Loss_TC': 0.00098, 'val_kl_Loss_DTC': 0.00694}
+474 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02414, 'val_kl_Loss_TC': 0.00018, 'val_kl_Loss_DTC': 0.0066}
+475 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.01891, 'val_kl_Loss_TC': 0.00022, 'val_kl_Loss_DTC': 0.01004}
+476 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02549, 'val_kl_Loss_TC': 0.00308, 'val_kl_Loss_DTC': 0.01135}
+477 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02677, 'val_kl_Loss_TC': 0.00198, 'val_kl_Loss_DTC': 0.00817}
+478 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02348, 'val_kl_Loss_TC': 0.00082, 'val_kl_Loss_DTC': 0.01311}
+479 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0347, 'val_kl_Loss_TC': 0.00287, 'val_kl_Loss_DTC': 0.0081}
+480 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02852, 'val_kl_Loss_TC': 0.00186, 'val_kl_Loss_DTC': 0.01134}
+481 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02545, 'val_kl_Loss_TC': 0.00193, 'val_kl_Loss_DTC': 0.00378}
+482 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02971, 'val_kl_Loss_TC': 0.00165, 'val_kl_Loss_DTC': 0.00907}
+483 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02849, 'val_kl_Loss_TC': 0.00194, 'val_kl_Loss_DTC': 0.00685}
+484 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02638, 'val_kl_Loss_TC': 0.00092, 'val_kl_Loss_DTC': 0.01202}
+485 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02609, 'val_kl_Loss_TC': 0.00198, 'val_kl_Loss_DTC': 0.00534}
+486 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02372, 'val_kl_Loss_TC': 0.00155, 'val_kl_Loss_DTC': 0.00526}
+487 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0335, 'val_kl_Loss_TC': 0.00254, 'val_kl_Loss_DTC': 0.00168}
+488 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02254, 'val_kl_Loss_TC': 0.00031, 'val_kl_Loss_DTC': 0.00553}
+489 saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02561, 'val_kl_Loss_TC': 0.00199, 'val_kl_Loss_DTC': 0.00141}
+490 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0231, 'val_kl_Loss_TC': 0.00185, 'val_kl_Loss_DTC': 0.01191}
+491 saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.03207, 'val_kl_Loss_TC': 0.00242, 'val_kl_Loss_DTC': 0.00783}
+492 not saved {'val_ReconOutLoss': 0.00063, 'val_kl_Loss_Z': 0.04353, 'val_kl_Loss_TC': 0.00139, 'val_kl_Loss_DTC': 0.00252}
+493 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02649, 'val_kl_Loss_TC': 0.00074, 'val_kl_Loss_DTC': 0.00685}
+494 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02493, 'val_kl_Loss_TC': 8e-05, 'val_kl_Loss_DTC': 0.00656}
+495 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03042, 'val_kl_Loss_TC': 0.00078, 'val_kl_Loss_DTC': 0.00578}
+496 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0248, 'val_kl_Loss_TC': 0.00026, 'val_kl_Loss_DTC': 0.00955}
+497 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.02912, 'val_kl_Loss_TC': 0.00074, 'val_kl_Loss_DTC': 0.01075}
+498 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0275, 'val_kl_Loss_TC': 0.0027, 'val_kl_Loss_DTC': 0.00278}
+499 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03821, 'val_kl_Loss_TC': 0.00221, 'val_kl_Loss_DTC': 0.00329}
+500 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02757, 'val_kl_Loss_TC': 0.00188, 'val_kl_Loss_DTC': 0.0034}
+501 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.03629, 'val_kl_Loss_TC': 0.00191, 'val_kl_Loss_DTC': 0.0047}
+502 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03094, 'val_kl_Loss_TC': 0.00212, 'val_kl_Loss_DTC': 0.01234}
+503 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03144, 'val_kl_Loss_TC': 0.0027, 'val_kl_Loss_DTC': 0.00504}
+504 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03365, 'val_kl_Loss_TC': 8e-05, 'val_kl_Loss_DTC': 0.01017}
+505 saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.03409, 'val_kl_Loss_TC': 8e-05, 'val_kl_Loss_DTC': 0.00804}
+506 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02362, 'val_kl_Loss_TC': 0.00139, 'val_kl_Loss_DTC': 0.00512}
+507 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.03123, 'val_kl_Loss_TC': 0.00033, 'val_kl_Loss_DTC': 0.00339}
+508 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03212, 'val_kl_Loss_TC': 0.00119, 'val_kl_Loss_DTC': 0.00307}
+509 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03642, 'val_kl_Loss_TC': 0.00054, 'val_kl_Loss_DTC': 0.00748}
+510 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02879, 'val_kl_Loss_TC': 0.00073, 'val_kl_Loss_DTC': 0.00538}
+511 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0292, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.00517}
+512 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0265, 'val_kl_Loss_TC': 0.00019, 'val_kl_Loss_DTC': 0.00483}
+513 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.02857, 'val_kl_Loss_TC': 0.0003, 'val_kl_Loss_DTC': 0.00971}
+514 saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.02861, 'val_kl_Loss_TC': 0.00054, 'val_kl_Loss_DTC': 0.00701}
+515 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02851, 'val_kl_Loss_TC': 0.00177, 'val_kl_Loss_DTC': 0.00503}
+516 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02838, 'val_kl_Loss_TC': 0.00231, 'val_kl_Loss_DTC': 0.00648}
+517 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03868, 'val_kl_Loss_TC': 0.00141, 'val_kl_Loss_DTC': 0.00392}
+518 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03244, 'val_kl_Loss_TC': 0.00116, 'val_kl_Loss_DTC': 0.01239}
+519 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03108, 'val_kl_Loss_TC': 0.00039, 'val_kl_Loss_DTC': 0.00833}
+520 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.02785, 'val_kl_Loss_TC': 0.00031, 'val_kl_Loss_DTC': 0.00491}
+521 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.03414, 'val_kl_Loss_TC': 0.00248, 'val_kl_Loss_DTC': 0.00148}
+522 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.0354, 'val_kl_Loss_TC': 0.00257, 'val_kl_Loss_DTC': 0.00281}
+523 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02638, 'val_kl_Loss_TC': 0.00032, 'val_kl_Loss_DTC': 0.00882}
+524 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.0271, 'val_kl_Loss_TC': 0.00056, 'val_kl_Loss_DTC': 0.00519}
+525 not saved {'val_ReconOutLoss': 0.0006, 'val_kl_Loss_Z': 0.02804, 'val_kl_Loss_TC': 0.00257, 'val_kl_Loss_DTC': 0.00165}
+526 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0366, 'val_kl_Loss_TC': 0.0012, 'val_kl_Loss_DTC': 0.00297}
+527 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02899, 'val_kl_Loss_TC': 0.00034, 'val_kl_Loss_DTC': 0.00886}
+528 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.02889, 'val_kl_Loss_TC': 0.00052, 'val_kl_Loss_DTC': 0.00505}
+529 not saved {'val_ReconOutLoss': 0.00062, 'val_kl_Loss_Z': 0.05062, 'val_kl_Loss_TC': 0.00061, 'val_kl_Loss_DTC': 0.00644}
+530 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.03308, 'val_kl_Loss_TC': 0.00194, 'val_kl_Loss_DTC': 0.00361}
+531 not saved {'val_ReconOutLoss': 0.00061, 'val_kl_Loss_Z': 0.0314, 'val_kl_Loss_TC': 0.00064, 'val_kl_Loss_DTC': 0.00241}
