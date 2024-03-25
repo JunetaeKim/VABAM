@@ -204,12 +204,13 @@ if __name__ == "__main__":
     print('-----------------------------------------------------' )
     ObjLoadPath = './EvalResults/Instances/'
     FileList = os.listdir(ObjLoadPath)
+    FileList = [file for file in FileList if file.endswith('.pkl')]
     
     ## Loading the model configuration lists
     EvalConfigList = os.listdir(YamlPath) # Retrieve a list of all files in the YamlPath directory.
     EvalConfigList = [i for i in EvalConfigList if 'Eval' in i] # Filter the list to include only files that contain 'Eval' in their names.
 
-       
+    print(FileList)   
     # loop
     for Filename in FileList:
         # Extracts the string between 'Obj_' and '_Nj'
