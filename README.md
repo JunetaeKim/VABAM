@@ -14,9 +14,9 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
 
 ## Research Motivation
 <p align="center">
-  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/signal_filter_animation.gif" width="60%" alt="Pass-filter mechanism">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/signal_filter_animation.gif" width="48%" alt="Pass-filter mechanism">
   &#32; <!-- This is an HTML entity for space to provide some spacing between the images -->
-  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/processing_animation.gif" width="60%" alt="Trade-off between cleansing efficacy and morphological alteration in pulsatile signals">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/processing_animation.gif" width="48%" alt="Trade-off between cleansing efficacy and morphological alteration in pulsatile signals">
   <br>
   <em>Figure 1: Pass-filter mechanism</em>
   &#32; <!-- More spacing -->
