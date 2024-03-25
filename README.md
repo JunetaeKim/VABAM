@@ -10,3 +10,8 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
   1. **Disentanglement of Z in Signal Morphology:** Assessing the model's ability to separate different aspects of the signal morphology.
   2. **Contribution of Ancillary Information to Signal Morphology:** Evaluating how additional (conditional) information affects the signal morphology.
   3. **Controllability of Amplitude-based Synthesis within Morphological Identities:** Measuring the model's capability to modulate signal amplitude without altering its morphological identity.
+ 
+
+## Research Motivation
+
+![signal_filter_animation](https://github.com/JunetaeKim/VABAM/assets/26215934/f367698b-57fc-473a-a825-dc75ad70c22a)
