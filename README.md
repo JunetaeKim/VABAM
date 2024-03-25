@@ -6,6 +6,12 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
 
 - **Development of the VABAM Model:** A model capable of synthesizing pulsatile physiological signals through pass filter effects, namely *amplitude-based* modulation, ensuring the preservation of the signals' morphological identity.
 
+<p align="center">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/diffusion_animation_gradient_color55.gif" width="75%" alt="Pass-filter mechanism">
+  <br>
+  <em>Figure 1: Amplitude-Based Modulation of ABP via VABAM ) </em>  
+</p>
+
 - **Introduction of Novel Metrics:** We propose three novel metrics to provide a comprehensive evaluation of the model's synthesis and representation capabilities:
   1. **Disentanglement of Z in Signal Morphology:** Assessing the model's ability to separate different aspects of the signal morphology.
   2. **Contribution of Ancillary Information to Signal Morphology:** Evaluating how additional (conditional) information affects the signal morphology.
