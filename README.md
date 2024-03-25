@@ -1,0 +1,3 @@
+## VABAM: Variational Autoencoder for Amplitude-based Biosignal Augmentation within Morphological Identities.
+####  We developed a model named VABAM that enables the synthesis of pulsatile physiological signals via pass filter effects (i.e., amplitude-based modulating), while ensuring the preservation of the signals' morphological identity.
+####  We proposed three novel metrics to establish a comprehensive evaluation for the model's synthesis and representation capabilities: 1) Disentanglement of Z in signal morphology, 2) Contribution of ancillary (i.e., conditional) information to signal morphology, and 3) Controllability of amplitude-based synthesis within morphological identities.
