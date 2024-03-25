@@ -14,7 +14,7 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
 
 ## Research Motivation
 <p align="center">
-  <img src="[https://raw.githubusercontent.com/JunetaeKim/Figures/signal_filter_animation.gif]" alt="Signal Filter Animation" width="50%">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/signal_filter_animation.gif" alt="Signal Filter Animation" width="50%">
   <br>
   <em>Figure 1: Signal Filter Animation</em>
 </p>
