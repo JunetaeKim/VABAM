@@ -48,7 +48,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
 
 - **Sampler** $\boldsymbol{g_{z}(\cdot)}$ and $\boldsymbol{g_{\theta}(\cdot)}$ utilizes the reparameterization trick for backpropagation, allowing sampling of $z_{j}$ and $\theta_{k}$ for gradient flow.
 
-- **Feature Generator** $\boldsymbol{g_{x'}(\cdot)}$, with Encoder-derived parameters, generates four principal feature signals for the Signal Reconstructor, aligning with the amplitude-modulated subsets from the Feature Extractor.
+- **Feature Generator** $\boldsymbol{g_{x'}(\cdot)}$ generates four principal feature signals for the Signal Reconstructor, aligning with the amplitude-modulated subsets from the Feature Extractor.
 
 - **Signal Reconstructor** $\boldsymbol{g_{y}(\cdot)}$ reconstructs coherent signals from the feature subsets, keeping the original signal's main aspects and adding latent elements influenced by $z_{j}$ and $\theta_{k}$.
 
