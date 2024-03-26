@@ -57,3 +57,14 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <br>
   <em> Figure 4: Intuitive Illustration of VABAM </em>  
 </p>
+
+## Library Dependencies and Test Environment Information
+- Python == 3.8.16 / 3.9.18
+- numpy == 1.19.5 / 1.26.0
+- pandas == 1.1.4 / 2.1.1
+- tensorflow == 2.4.0 / 2.10.0
+- gpu == rtx4080 / rtx4090
+
+
+
+
