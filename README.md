@@ -99,7 +99,7 @@ Please consult the documentation within each script for more detailed instructio
 
 ## Scripts Executed for Our Research
 
-### 1.TrainModel.py Usage
+### 1.TrainModel.py 
 
 **MainModel Training Commands:**
 python TrainModel.py --Config [model_config] --GPUID [gpu_id]
@@ -128,7 +128,7 @@ python TrainModel.py --Config [model_config] --GPUID [gpu_id]
   - `python .\TrainModel.py --Config SKZFC_II_30_800 --GPUID 0`
   - ...
   - `python .\TrainModel.py --Config TCMIDKZFC_II_50_800 --GPUID 0`
-
+<br><br>
 
 **Benchmark Model Training Commands:**
 python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
@@ -142,7 +142,7 @@ python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
   - `python .\TrainBenchmark.py --Config TCVAE_II_30 --GPUID 0`
   - ...
   - `python .\TrainBenchmark.py --Config BaseVAE_II_50 --GPUID 0`
-
+<br><br><br>
 
 ### 2. SubProcMIEVAL.py
 **MainModel Training Commands:**
@@ -152,6 +152,7 @@ python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id] --ConfigSpec [mo
   - `python .\SubProcMIEVAL.py --Config EvalConfigART800 --GPUID 4`
   - ...
   - `python .\SubProcMIEVAL.py --Config EvalConfigII500 --GPUID 4`
+<br><br>
 
 **Benchmark Model Training Commands:**
 python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
@@ -159,7 +160,7 @@ python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
 - **Benchmark Examples:**
   - `python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 4`
   - `python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4`
-
+<br><br><br>
 
 ### 3. TabulatingResults.py
 **MainModel Training Commands:**
@@ -167,6 +168,7 @@ python TabulatingResults.py -CP [config_path] --GPUID [gpu_id]
 
 - **MainModel Example:**
   - `python .\TabulatingResults.py -CP ./Config/ --GPUID 4`
+<br><br>
 
 **Benchmark Model Training Commands:**
 python TabulatingBMResults.py -CP [config_path] --GPUID [gpu_id]
