@@ -38,3 +38,8 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
 </p>
 
 ## A Brief Introduction to VABAM
+<p align="center">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Training%20and%20Generating%20Framework.png" width="60%" alt="Intuitive Illustration of VABAM">
+  <br>
+  <em> Figure 3: Intuitive Illustration of VABAM </em>  
+</p>
