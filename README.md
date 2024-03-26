@@ -2,7 +2,7 @@
 
 This repository contains the Python code for VABAM and the Joint Mutual Information (JMI) based metrics introduced in our paper. Our research focuses on the synthesis of pulsatile physiological signals, emphasizing the modulation of amplitude while preserving the signals' morphological identities.
 
-## Research Highlights
+### Research Highlights
 
 - **Development of the VABAM Model:** A model capable of synthesizing pulsatile physiological signals through pass filter effects, namely *amplitude-based* modulation, ensuring the preservation of the signals' morphological identity.
 <p align="center">
@@ -21,7 +21,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   3. **Controllability of Amplitude-based Synthesis within Morphological Identities:** Measuring the model's capability to modulate signal amplitude without altering its morphological identity.
  
 
-## Research Motivation
+### Research Motivation
 - **Challenges in Signal Processing:** Signals often face noise and artifacts from various sources like electrical interference, motion, and external physiological factors, complicating accurate diagnostic information extraction. Using frequency pass filters to mitigate these problems can lead to edge effects, causing signal truncation that may compromise crucial information at the signal boundaries (Figure 2). Furthermore, these filters may also result in phase alterations and horizontal shifts along the time axis (Figure 2).
 <p align="center">
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/signal_filter_animation.gif" width="49%" alt="Pass-filter mechanism">
@@ -37,7 +37,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <em> Figure 3: Application for Predicting Hypotension Utilizing Amplitude-Based Features </em>  
 </p>
 
-## A Brief Introduction to VABAM
+### A Brief Introduction to VABAM
 -VABAM is structured around five key components: Feature Extractor, Encoder, Sampler, Feature Generator, and Signal Reconstructor (Figure 4). 
 
 - **Feature Extractor** $\boldsymbol{g_{x}(\cdot)}$ applies cascading filters to the raw signal $y$, producing four amplitude-modulated subsets $x \in \{x_{HH}, x_{HL}, x_{LH}, x_{LL}\}$ that guide the Feature Generator.
@@ -58,7 +58,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <em> Figure 4: Intuitive Illustration of VABAM </em>  
 </p>
 
-## Library Dependencies and Test Environment Information
+### Library Dependencies and Test Environment Information
 - Python == 3.8.16 / 3.9.18
 - numpy == 1.19.5 / 1.26.0
 - pandas == 1.1.4 / 2.1.1
