@@ -43,7 +43,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
 - **Feature Extractor** $\boldsymbol{g_{x}(\cdot)}$ applies cascading filters to the raw signal $y$, producing four amplitude-modulated subsets $x \in \{x_{HH}, x_{HL}, x_{LH}, x_{LL}\}$ that guide the Feature Generator.
 
 - **Encoder** $\boldsymbol{g_{e}(\cdot)}$ learns parameters for the latent variable $Z$ and cutoff frequency $\Theta$, under two assumptions:
-  - $\theta_k \sim \mathcal{U}(0, 1)$ for $k = 1, \ldots, 6$, indicating six instances in the model, approximated by a Bernoulli distribution (refer to Eq.(\ref{Approximated Bern})).
+  - $\theta_k \sim \mathcal{U}(0, 1)$ for $k = 1, \ldots, 6$, indicating six instances in the model, approximated by a Bernoulli distribution.
   - $z_{j} \sim \mathcal{N}(\mu_{z_j}, \sigma_{z_j}^2)$ for each dimension $j$, with $j \in \{1, 2, \ldots, J\}$, where $J$ is a hyperparameter defining dimension count.
 
 - **Sampler** $\boldsymbol{g_{z}(\cdot)}$ and $\boldsymbol{g_{\theta}(\cdot)}$ utilizes the reparameterization trick for backpropagation, allowing sampling of $z_{j}$ and $\theta_{k}$ for gradient flow.
