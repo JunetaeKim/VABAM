@@ -32,8 +32,9 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
 
 - **Enhancement of Artificial Intelligence Models Through Preservation of Signal Morphology in Synthesis:** The ability to maintain the original shape of signals during synthesis can significantly enhance the capabilities of rapidly evolving artificial intelligence models that utilize frequency and amplitude-based features of physiological signals, as shown through an example in [our previous work](https://ieeexplore.ieee.org/document/10130807).
 <p align="center">
-  <img src="https://github.com/JunetaeKim/DWT-HPI/blob/main/Figures/ScenarioBasedGuideline.jpg" width="49%" alt="HPI Model">
+  <img src="https://github.com/JunetaeKim/DWT-HPI/blob/main/Figures/ScenarioBasedGuideline.jpg" width="60%" alt="HPI Model">
   <br>
   <em> Figure 3: Application for Predicting Hypotension Utilizing Amplitude-Based Features </em>  
 </p>
 
+## A Brief Introduction to VABAM
