@@ -1,133 +1,122 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------
 1. TrainModel.py 
-2. BatchMIEvaluation.py or  SubProcMIEVAL.py
-3. TabulatingResults.py
-
-optional: FineTuneModel.py, VisualizationSig.ipynb, VisualizationMetrics.ipynb, Tables.ipynb
-
----------------------------------------------------------------------------------------------------------------------------------------------------
-
-1. TrainModel.py 
-
-ex) python TrainModel.py --Config [model_config] --GPUID [gpu_id]
 
 MainModel
+python TrainModel.py --Config [model_config] --GPUID [gpu_id]
+
 <ConfigART500>
-python .\TrainModel.py --Config SKZFC_ART_30_500 --GPUID 0
-python .\TrainModel.py --Config SKZFC_ART_50_500 --GPUID 0
-python .\TrainModel.py --Config FACFC_ART_30_500 --GPUID 0
-python .\TrainModel.py --Config FACFC_ART_50_500 --GPUID 0
-python .\TrainModel.py --Config SKZ_ART_30_500 --GPUID 0
-python .\TrainModel.py --Config SKZ_ART_50_500 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_ART_30_500 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_ART_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_ART_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_ART_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_ART_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_ART_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_ART_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_ART_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_ART_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_ART_50_500 --GPUID 0
 
 <ConfigART800>
-python .\TrainModel.py --Config SKZFC_ART_30_800 --GPUID 0
-python .\TrainModel.py --Config SKZFC_ART_50_800 --GPUID 0
-python .\TrainModel.py --Config FACFC_ART_30_800 --GPUID 0
-python .\TrainModel.py --Config FACFC_ART_50_800 --GPUID 0
-python .\TrainModel.py --Config SKZ_ART_30_800 --GPUID 0
-python .\TrainModel.py --Config SKZ_ART_50_800 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_ART_30_800 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_ART_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_ART_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_ART_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_ART_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_ART_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_ART_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_ART_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_ART_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_ART_50_800 --GPUID 0
 
 <ConfigII500>
-python .\TrainModel.py --Config SKZFC_II_30_500 --GPUID 0
-python .\TrainModel.py --Config SKZFC_II_50_500 --GPUID 0
-python .\TrainModel.py --Config FACFC_II_30_500 --GPUID 0
-python .\TrainModel.py --Config FACFC_II_50_500 --GPUID 0
-python .\TrainModel.py --Config SKZ_II_30_500 --GPUID 0
-python .\TrainModel.py --Config SKZ_II_50_500 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_II_30_500 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_II_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_II_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_II_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_II_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_II_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_II_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_II_50_500 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_II_30_500 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_II_50_500 --GPUID 0
 
 <ConfigII800>
-python .\TrainModel.py --Config SKZFC_II_30_800 --GPUID 0
-python .\TrainModel.py --Config SKZFC_II_50_800 --GPUID 0
-python .\TrainModel.py --Config FACFC_II_30_800 --GPUID 0
-python .\TrainModel.py --Config FACFC_II_50_800 --GPUID 0
-python .\TrainModel.py --Config SKZ_II_30_800 --GPUID 0
-python .\TrainModel.py --Config SKZ_II_50_800 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_II_30_800 --GPUID 0
-python .\TrainModel.py --Config TCMIDKZFC_II_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_II_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZFC_II_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_II_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config FACFC_II_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_II_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config SKZ_II_50_800 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_II_30_800 --GPUID 0
+ex) python .\TrainModel.py --Config TCMIDKZFC_II_50_800 --GPUID 0
 
----------------------------------------------------------------------------------------------------------------------------------------------------
 
 Benchmark
-ex) python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
+python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
+
 <ConfigART>
-python .\TrainBenchmark.py --Config TCVAE_ART_30 --GPUID 0
-python .\TrainBenchmark.py --Config TCVAE_ART_50 --GPUID 0
-python .\TrainBenchmark.py --Config FACVAE_ART_30 --GPUID 0
-python .\TrainBenchmark.py --Config FACVAE_ART_50 --GPUID 0
-python .\TrainBenchmark.py --Config ConVAE_ART_30 --GPUID 0
-python .\TrainBenchmark.py --Config ConVAE_ART_50 --GPUID 0
-python .\TrainBenchmark.py --Config BaseVAE_ART_30 --GPUID 0
-python .\TrainBenchmark.py --Config BaseVAE_ART_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config TCVAE_ART_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config TCVAE_ART_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config FACVAE_ART_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config FACVAE_ART_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config ConVAE_ART_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config ConVAE_ART_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config BaseVAE_ART_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config BaseVAE_ART_50 --GPUID 0
 
 <ConfigII>
-
-python .\TrainBenchmark.py --Config TCVAE_II_30 --GPUID 0
-python .\TrainBenchmark.py --Config TCVAE_II_50 --GPUID 0
-python .\TrainBenchmark.py --Config FACVAE_II_30 --GPUID 0
-python .\TrainBenchmark.py --Config FACVAE_II_50 --GPUID 0
-python .\TrainBenchmark.py --Config ConVAE_II_30 --GPUID 0
-python .\TrainBenchmark.py --Config ConVAE_II_50 --GPUID 0
-python .\TrainBenchmark.py --Config BaseVAE_II_30 --GPUID 0
-python .\TrainBenchmark.py --Config BaseVAE_II_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config TCVAE_II_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config TCVAE_II_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config FACVAE_II_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config FACVAE_II_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config ConVAE_II_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config ConVAE_II_50 --GPUID 0
+ex) python .\TrainBenchmark.py --Config BaseVAE_II_30 --GPUID 0
+ex) python .\TrainBenchmark.py --Config BaseVAE_II_50 --GPUID 0
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 2. SubProcMIEVAL.py 
 
-ex) python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id] --ConfigSpec [model_spec] --SpecNZs [nz_values] --SpecFCs [fc_values]
-
 MainModel
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --GPUID 4 
-python .\SubProcMIEVAL.py --Config EvalConfigART500 --GPUID 4 
-python .\SubProcMIEVAL.py --Config EvalConfigII800 --GPUID 4 
-python .\SubProcMIEVAL.py --Config EvalConfigII500 --GPUID 4 
+python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id] --ConfigSpec [model_spec] --SpecNZs [nz_values] --SpecFCs [fc_values]
 
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4 --SpecNZs 10 20 30
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --GPUID 4 
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART500 --GPUID 4 
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --GPUID 4 
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII500 --GPUID 4 
 
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4 --SpecNZs 10 20 30
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
 
-python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4 --SpecNZs 10 20 30
-python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
 
-python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50
- python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4 --SpecNZs 10 20 30
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
 
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4 --SpecNZs 10 20 30 --SpecFCs 0.05 0.1 0.5
-python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4 --SpecFCs 0.05 0.1 0.5
 
-python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4 --SpecNZs 10 20 30 --SpecFCs 0.05 0.1 0.5
-python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_30_800  --GPUID 4 --SpecNZs 10 20 30 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART800 --ConfigSpec SKZFC_ART_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50 --SpecFCs 0.05 0.1 0.5
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_30_800  --GPUID 4 --SpecNZs 10 20 30 --SpecFCs 0.05 0.1 0.5
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII800 --ConfigSpec SKZFC_II_50_800  --GPUID 4 --SpecNZs 10 20 30 40 50 --SpecFCs 0.05 0.1 0.5
+
 
 Benchmark
+python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
 
-ex) python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
-
-python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 4
-python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4
+ex) python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 4
+ex) python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 
 3. TabulatingResults.py
 
-ex) python TabulatingResults.py -CP [config_path] --GPUID [gpu_id]
-
 MainModel 
-python .\TabulatingResults.py -CP ./Config/ --GPUID 4
+python TabulatingResults.py -CP [config_path] --GPUID [gpu_id]
+ex) python .\TabulatingResults.py -CP ./Config/ --GPUID 4
 
----------------------------------------------------------------------------------------------------------------------------------------------------
 Benchmark
-ex) python TabulatingBMResults.py -CP [config_path] --GPUID [gpu_id]
+python TabulatingBMResults.py -CP [config_path] --GPUID [gpu_id]
+ex) python .\TabulatingBMResults.py -CP ./Config/ --GPUID 4
 
-python .\TabulatingBMResults.py -CP ./Config/ --GPUID 4
+
 
 
