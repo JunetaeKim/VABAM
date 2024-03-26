@@ -145,33 +145,33 @@ python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
 
 
 ### 2. SubProcMIEVAL.py
--**MainModel Training Commands:**
+**MainModel Training Commands:**
 python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id] --ConfigSpec [model_spec] --SpecNZs [nz_values] --SpecFCs [fc_values]
 
--**MainModel Examples:**
+- **MainModel Examples:**
   - `python .\SubProcMIEVAL.py --Config EvalConfigART800 --GPUID 4`
   - ...
   - `python .\SubProcMIEVAL.py --Config EvalConfigII500 --GPUID 4`
 
--**Benchmark Model Training Commands:**
+**Benchmark Model Training Commands:**
 python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
 
--**Benchmark Examples:**
+- **Benchmark Examples:**
   - `python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 4`
   - `python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4`
 
 
 ### 3. TabulatingResults.py
--**MainModel Training Commands:**
+**MainModel Training Commands:**
 python TabulatingResults.py -CP [config_path] --GPUID [gpu_id]
 
--**MainModel Example:**
+- **MainModel Example:**
   - `python .\TabulatingResults.py -CP ./Config/ --GPUID 4`
 
--**Benchmark Model Training Commands:**
+**Benchmark Model Training Commands:**
 python TabulatingBMResults.py -CP [config_path] --GPUID [gpu_id]
 
--**Benchmark Example:**
+- **Benchmark Example:**
   - `python .\TabulatingBMResults.py -CP ./Config/ --GPUID 4`
 
 
