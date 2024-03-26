@@ -22,6 +22,9 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
  
 
 ## Research Motivation
+- **Challenges in Signal Processing:**
+- Signals frequently encounter noise from electrical interference, motion artifacts, and external physiological factors, complicating the extraction of accurate diagnostic information. Employing frequency pass filters to alleviate these issues can introduce edge effects, leading to signal truncation and potentially compromising vital information at the signal boundaries. Additionally, these filters can induce variations in phase and horizontal shifts along the time axis.
+
 <p align="center">
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/signal_filter_animation.gif" width="49%" alt="Pass-filter mechanism">
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/processing_animation.gif" width="49%" alt="Trade-off between cleansing efficacy and morphological alteration in pulsatile signals">
