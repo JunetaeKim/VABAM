@@ -30,7 +30,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <em> Figure 2: Pass-filter mechanism (left) vs Trade-off between cleansing efficacy and morphological alteration (right) </em>  
 </p>
 
-- **Enhancement of Artificial Intelligence Models Through Preservation of Signal Morphology in Synthesis:** The ability to maintain the original shape of signals during synthesis can significantly enhance the capabilities of rapidly evolving artificial intelligence models that utilize frequency and amplitude-based features of physiological signals.
+- **Enhancement of Artificial Intelligence Models Through Preservation of Signal Morphology in Synthesis:** The ability to maintain the original shape of signals during synthesis can significantly enhance the capabilities of rapidly evolving artificial intelligence models that utilize frequency and amplitude-based features of physiological signals ([our previous work](https://ieeexplore.ieee.org/document/10130807)).
 <p align="center">
   <img src="https://github.com/JunetaeKim/DWT-HPI/blob/main/Figures/ScenarioBasedGuideline.jpg" width="49%" alt="HPI Model">
   <br>
