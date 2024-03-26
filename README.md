@@ -37,7 +37,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <em> Figure 3: Application for Predicting Hypotension Utilizing Amplitude-Based Features </em>  
 </p>
 
-### A Brief Introduction to VABAM
+## A Brief Introduction to VABAM
 -VABAM is structured around five key components: Feature Extractor, Encoder, Sampler, Feature Generator, and Signal Reconstructor (Figure 4). For detailed information, please refer to our paper.
 
 - **Feature Extractor** $\boldsymbol{g_{x}(\cdot)}$ applies cascading filters to the raw signal $y$, producing four amplitude-modulated subsets $x \in \{x_{HH}, x_{HL}, x_{LH}, x_{LL}\}$ that guide the Feature Generator.
@@ -58,7 +58,8 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <em> Figure 4: Intuitive Illustration of VABAM </em>  
 </p>
 
-### Library Dependencies and Test Environment Information
+<br>
+## Library Dependencies and Test Environment Information
 VABAM's training and its post-evaluation were conducted and tested with the following libraries and their respective versions:
 - Python == 3.8.16 , 3.9.18
 - numpy == 1.19.5 , 1.26.0
