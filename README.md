@@ -56,9 +56,8 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Training%20and%20Generating%20Framework.png" width="60%" alt="Intuitive Illustration of VABAM">
   <br>
   <em> Figure 4: Intuitive Illustration of VABAM </em>  
-</p>
+</p><br>
 
-<br>
 ## Library Dependencies and Test Environment Information
 VABAM's training and its post-evaluation were conducted and tested with the following libraries and their respective versions:
 - Python == 3.8.16 , 3.9.18
