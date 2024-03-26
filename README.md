@@ -98,6 +98,7 @@ Please consult the documentation within each script for more detailed instructio
 <br><br>
 
 ## Scripts Executed for Our Research
+All execution code lists are available in the [ExecutionProcedure.txt](https://github.com/JunetaeKim/VABAM/blob/main/ExecutionProcedure.txt) file; please refer to this file for detailed information.
 
 ### 1.TrainModel.py 
 
