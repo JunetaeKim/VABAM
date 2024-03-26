@@ -97,5 +97,81 @@ Please consult the documentation within each script for more detailed instructio
 /Config/](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks/Config) folders, respectively.
 
 
+## Scripts Executed for Our Research
+
+### 1.TrainModel.py Usage
+
+**MainModel Training Commands:**
+python TrainModel.py --Config [model_config] --GPUID [gpu_id]
+
+- **ConfigART500 Examples:**
+  - `python .\TrainModel.py --Config SKZFC_ART_30_500 --GPUID 0`
+  - `python .\TrainModel.py --Config SKZFC_ART_50_500 --GPUID 0`
+  - `python .\TrainModel.py --Config FACFC_ART_30_500 --GPUID 0`
+  - `python .\TrainModel.py --Config FACFC_ART_50_500 --GPUID 0`
+  - `python .\TrainModel.py --Config SKZ_ART_30_500 --GPUID 0`
+  - `python .\TrainModel.py --Config SKZ_ART_50_500 --GPUID 0`
+  - `python .\TrainModel.py --Config TCMIDKZFC_ART_30_500 --GPUID 0`
+  - `python .\TrainModel.py --Config TCMIDKZFC_ART_50_500 --GPUID 0`
+
+- **ConfigART800 Examples:**
+  - `python .\TrainModel.py --Config SKZFC_ART_30_800 --GPUID 0`
+  - ...
+  - `python .\TrainModel.py --Config TCMIDKZFC_ART_50_800 --GPUID 0`
+
+- **ConfigII500 Examples:**
+  - `python .\TrainModel.py --Config SKZFC_II_30_500 --GPUID 0`
+  - ...
+  - `python .\TrainModel.py --Config TCMIDKZFC_II_50_500 --GPUID 0`
+
+- **ConfigII800 Examples:**
+  - `python .\TrainModel.py --Config SKZFC_II_30_800 --GPUID 0`
+  - ...
+  - `python .\TrainModel.py --Config TCMIDKZFC_II_50_800 --GPUID 0`
+
+
+**Benchmark Model Training Commands:**
+python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
+
+- **ConfigART Examples:**
+  - `python .\TrainBenchmark.py --Config TCVAE_ART_30 --GPUID 0`
+  - ...
+  - `python .\TrainBenchmark.py --Config BaseVAE_ART_50 --GPUID 0`
+
+- **ConfigII Examples:**
+  - `python .\TrainBenchmark.py --Config TCVAE_II_30 --GPUID 0`
+  - ...
+  - `python .\TrainBenchmark.py --Config BaseVAE_II_50 --GPUID 0`
+
+
+### 2. SubProcMIEVAL.py
+-**MainModel Training Commands:**
+python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id] --ConfigSpec [model_spec] --SpecNZs [nz_values] --SpecFCs [fc_values]
+
+-**MainModel Examples:**
+  - `python .\SubProcMIEVAL.py --Config EvalConfigART800 --GPUID 4`
+  - ...
+  - `python .\SubProcMIEVAL.py --Config EvalConfigII500 --GPUID 4`
+
+-**Benchmark Model Training Commands:**
+python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
+
+-**Benchmark Examples:**
+  - `python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 4`
+  - `python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4`
+
+
+### 3. TabulatingResults.py
+-**MainModel Training Commands:**
+python TabulatingResults.py -CP [config_path] --GPUID [gpu_id]
+
+-**MainModel Example:**
+  - `python .\TabulatingResults.py -CP ./Config/ --GPUID 4`
+
+-**Benchmark Model Training Commands:**
+python TabulatingBMResults.py -CP [config_path] --GPUID [gpu_id]
+
+-**Benchmark Example:**
+  - `python .\TabulatingBMResults.py -CP ./Config/ --GPUID 4`
 
 
