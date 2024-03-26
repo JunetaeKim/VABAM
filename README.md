@@ -11,7 +11,7 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
   <br>
   <em>Figure 1: Amplitude-Based Modulation of ABP via VABAM (left) vs CVAE (right) </em>  
 </p>
-Figure 1 illustrates that our VABAM model excels at amplitude-based modulation, maintaining the original morphology of signals by avoiding horizontal shifts in both phase and time axes. Conversely, conditional VAEs struggle to manage these shifts when PSD values are introduced as additional input.
+Figure 1 illustrates that our VABAM excels in maintaining the original morphology of signals during synthesis by avoiding horizontal shifts in both phase and time axes. Conversely, conditional VAEs struggle to manage these shifts when PSD values are incorporated as conditional input.
 <br><br>
 
 
