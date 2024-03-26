@@ -10,7 +10,7 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/diffusion_animation_vabam_gradient_color55.gif" width="49%" alt="Pass-filter mechanism">
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/diffusion_animation_convae_gradient_color55.gif" width="49%" alt="Pass-filter mechanism">
   <br>
-  <em>Figure 1: Amplitude-Based Modulation of ABP via VABAM </em>  
+  <em>Figure 1: Amplitude-Based Modulation of ABP via VABAM (left) vs CVAE (right) </em>  
 </p>
 
 - **Introduction of Novel Metrics:** We propose three novel metrics to provide a comprehensive evaluation of the model's synthesis and representation capabilities:
@@ -24,7 +24,7 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/signal_filter_animation.gif" width="49%" alt="Pass-filter mechanism">
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/processing_animation.gif" width="49%" alt="Trade-off between cleansing efficacy and morphological alteration in pulsatile signals">
   <br>
-  <em> Figure 2: Pass-filter mechanism (left) and Trade-off between cleansing efficacy and morphological alteration in pulsatile signals (right) </em>  
+  <em> Figure 2: Pass-filter mechanism (left) vs Trade-off between cleansing efficacy and morphological alteration in pulsatile signals (right) </em>  
 </p>
 
 
