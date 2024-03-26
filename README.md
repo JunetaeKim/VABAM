@@ -35,7 +35,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <img src="https://github.com/JunetaeKim/DWT-HPI/blob/main/Figures/ScenarioBasedGuideline.jpg" width="60%" alt="HPI Model">
   <br>
   <em> Figure 3: Application for Predicting Hypotension Utilizing Amplitude-Based Features </em>  
-</p>
+</p><br><br>
 
 ## A Brief Introduction to VABAM
 -VABAM is structured around five key components: Feature Extractor, Encoder, Sampler, Feature Generator, and Signal Reconstructor (Figure 4). For detailed information, please refer to our paper.
@@ -56,7 +56,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
   <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Training%20and%20Generating%20Framework.png" width="60%" alt="Intuitive Illustration of VABAM">
   <br>
   <em> Figure 4: Intuitive Illustration of VABAM </em>  
-</p><br>
+</p><br><br>
 
 ## Library Dependencies and Test Environment Information
 VABAM's training and its post-evaluation were conducted and tested with the following libraries and their respective versions:
@@ -65,7 +65,7 @@ VABAM's training and its post-evaluation were conducted and tested with the foll
 - pandas == 1.1.4 , 2.1.1
 - tensorflow == 2.4.0 , 2.10.0
 - gpu == rtx4080 , rtx4090
-
+<br><br>
 
 ## Code Overview and Run Procedure Guide
 ### For Training
@@ -95,7 +95,7 @@ Please consult the documentation within each script for more detailed instructio
 ### Configurations
 - Configuration files for the main and benchmark models are located in the [Config](https://github.com/JunetaeKim/VABAM/tree/main/Config) and [/Benchmarks
 /Config/](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks/Config) folders, respectively.
-
+<br><br>
 
 ## Scripts Executed for Our Research
 
@@ -142,7 +142,7 @@ python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
   - `python .\TrainBenchmark.py --Config TCVAE_II_30 --GPUID 0`
   - ...
   - `python .\TrainBenchmark.py --Config BaseVAE_II_50 --GPUID 0`
-<br><br><br>
+<br><br>
 
 ### 2. SubProcMIEVAL.py
 **MainModel Training Commands:**
@@ -160,7 +160,7 @@ python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
 - **Benchmark Examples:**
   - `python .\SubProcMIEVAL.py --Config EvalConfigART --GPUID 4`
   - `python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4`
-<br><br><br>
+<br><br>
 
 ### 3. TabulatingResults.py
 **MainModel Training Commands:**
