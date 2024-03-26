@@ -59,7 +59,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
 </p>
 
 ### Library Dependencies and Test Environment Information
-VABAM training and post-evaluation were conducted and tested with the following libraries and their respective versions:
+VABAM's training and its post-evaluation were conducted and tested with the following libraries and their respective versions:
 - Python == 3.8.16 , 3.9.18
 - numpy == 1.19.5 , 1.26.0
 - pandas == 1.1.4 , 2.1.1
