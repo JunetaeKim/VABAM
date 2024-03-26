@@ -67,13 +67,13 @@ VABAM's training and its post-evaluation were conducted and tested with the foll
 - gpu == rtx4080 , rtx4090
 
 
-### Code Overview and Run Procedure Guide
-#### For Training
+## Code Overview and Run Procedure Guide
+### For Training
 To start the training process, use the following scripts:
 - `TrainModel.py`: Script for training the main model.
 - `TrainBenchmark.py`: Script for training benchmark models. Refer to the [Benchmarks](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks) folder.
 
-#### For JMI-Based Metric Computation
+### For JMI-Based Metric Computation
 To compute the JMI-based metrics, follow these steps:
 - `SubProcMIEVAL.py` (with `BatchMIEvaluation.py`): Script for computing metrics.
 - `SubProcMIEVAL.py` (with `BatchBMMIEvaluation.py`): Script for computing benchmark model metrics. Refer to the [Benchmarks](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks) folder.
@@ -85,14 +85,14 @@ For visualization and table generation:
 - `Tables.ipynb`: Jupyter notebook for generating tables of results.
 - Please note that the visualization code heavily relies on GPT-4.0 and was not primarily written with high readability in mind.
 
-#### For Fine-Tuning (Optional)
+### For Fine-Tuning (Optional)
 For optional fine-tuning of the model, use:
 - `FineTuneModel.py`: Script for fine-tuning the model based on specific needs or data.
 - `FineTuneBenchmark.py`: Script for fine-tuning benchmark models. Refer to the [Benchmarks](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks) folder.
 
 Please consult the documentation within each script for more detailed instructions on usage and parameters.
 
-#### Configurations
+### Configurations
 - Configuration files for the main and benchmark models are located in the [Config](https://github.com/JunetaeKim/VABAM/tree/main/Config) and [/Benchmarks
 /Config/](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks/Config) folders, respectively.
 
