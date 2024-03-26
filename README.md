@@ -38,7 +38,7 @@ Figure 1 illustrates that VABAM excels in maintaining the original morphology of
 </p>
 
 ### A Brief Introduction to VABAM
--VABAM is structured around five key components: Feature Extractor, Encoder, Sampler, Feature Generator, and Signal Reconstructor (Figure 4). 
+-VABAM is structured around five key components: Feature Extractor, Encoder, Sampler, Feature Generator, and Signal Reconstructor (Figure 4). For detailed information, please refer to our paper.
 
 - **Feature Extractor** $\boldsymbol{g_{x}(\cdot)}$ applies cascading filters to the raw signal $y$, producing four amplitude-modulated subsets $x \in \{x_{HH}, x_{HL}, x_{LH}, x_{LL}\}$ that guide the Feature Generator.
 
