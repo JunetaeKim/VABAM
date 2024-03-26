@@ -79,11 +79,11 @@ To compute the JMI-based metrics, follow these steps:
 - `SubProcMIEVAL.py` (with `BatchBMMIEvaluation.py`): Script for computing benchmark model metrics. Refer to the [Benchmarks](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks) folder.
 - `TabulatingResults.py`: Script for tabulating results from the main model evaluation.
 - `TabulatingBMResults.py`: Script for tabulating results from the benchmark model evaluation. Refer to the [Benchmarks](https://github.com/JunetaeKim/VABAM/tree/main/Benchmarks) folder.
-- For visualization and table generation:
-  - `VisualizationSig.ipynb`: Jupyter notebook for signal visualization.
-  - `VisualizationMetrics.ipynb`: Jupyter notebook for metrics visualization.
-  - `Tables.ipynb`: Jupyter notebook for generating tables of results.
-  - Please note that the visualization code heavily relies on GPT-4.0 and was not primarily written with high readability in mind.
+For visualization and table generation:
+- `VisualizationSig.ipynb`: Jupyter notebook for signal visualization.
+- `VisualizationMetrics.ipynb`: Jupyter notebook for metrics visualization.
+- `Tables.ipynb`: Jupyter notebook for generating tables of results.
+- Please note that the visualization code heavily relies on GPT-4.0 and was not primarily written with high readability in mind.
 
 #### For Fine-Tuning (Optional)
 For optional fine-tuning of the model, use:
