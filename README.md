@@ -83,7 +83,7 @@ For visualization and table generation:
 - `VisualizationSig.ipynb`: Jupyter notebook for signal visualization.
 - `VisualizationMetrics.ipynb`: Jupyter notebook for metrics visualization.
 - `Tables.ipynb`: Jupyter notebook for generating tables of results.
-- Please note that the visualization code heavily relies on GPT-4.0 and was not primarily written with high readability in mind.
+- Please note that the visualization code heavily relies on GPT-4.0 and was not primarily written with high readability in mind.This is an ongoing coding file, so the code may contain redundancies and is subject to continuous updates.
 
 ### For Fine-Tuning (Optional)
 For optional fine-tuning of the model, use:
