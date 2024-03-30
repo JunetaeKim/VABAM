@@ -6,8 +6,8 @@ This repository contains the Python code for VABAM and the Joint Mutual Informat
 
 - **Development of the VABAM Model:** A model capable of synthesizing pulsatile physiological signals through pass filter effects, namely *amplitude-based* modulation, ensuring the preservation of the signals' morphological identity.
 <p align="center">
-  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Fig.%20S1%20VABAM%20(Our%20Model)%20Synthesis%20Results.gif" width="49%" alt="Pass-filter mechanism">
-  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Fig.%20S2%20C-VAE%20Synthesis%20Results.gif" width="49%" alt="Pass-filter mechanism">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Anim.%201%20VABAM%20(Our%20Model)%20Synthesis%20Results.gif" width="49%" alt="Pass-filter mechanism">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Anim.%202%20C-VAE%20Synthesis%20Results.gif" width="49%" alt="Pass-filter mechanism">
   <br>
   <em>Figure 1: Amplitude-Based Modulation of ABP via VABAM (left) vs CVAE (right) </em>  
 </p>
@@ -24,8 +24,8 @@ Figure 1 shows the results of synthesizing 100 signals from a single original Ar
 ### Research Motivation
 - **Challenges in Signal Processing:** Signals often face noise and artifacts from various sources like electrical interference, motion, and external physiological factors, complicating accurate diagnostic information extraction. Using frequency pass filters to mitigate these problems can lead to edge effects, causing signal truncation that may compromise crucial information at the signal boundaries (Figure 2). Furthermore, these filters may also result in phase alterations and horizontal shifts along the time axis (Figure 2).
 <p align="center">
-  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Fig.%20S3%20Pass%20Filter%20Convolution%20Operation%20Animation.gif" width="49%" alt="Pass-filter mechanism">
-  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Fig.%20S4%20Trade-off%20between%20Cleansing%20Efficacy%20and%20Morphological%20Alteration.gif" width="49%" alt="Trade-off between cleansing efficacy and morphological alteration in pulsatile signals">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Anim.%203%20Pass%20Filter%20Convolution%20Operation%20Animation.gif" width="49%" alt="Pass-filter mechanism">
+  <img src="https://github.com/JunetaeKim/VABAM/blob/main/Figures/Anim.%204%20Trade-off%20between%20Cleansing%20Efficacy%20and%20Morphological%20Alteration.gif" width="49%" alt="Trade-off between cleansing efficacy and morphological alteration in pulsatile signals">
   <br>
   <em> Figure 2: Pass-filter mechanism (left) vs Trade-off between cleansing efficacy and morphological alteration (right) </em>  
 </p>
