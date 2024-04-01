@@ -1,6 +1,6 @@
 ## VABAM: Variational Autoencoder for Amplitude-based Biosignal Augmentation within Morphological Identities.
 
-This repository contains the Python code for VABAM and the Joint Mutual Information (JMI) based metrics introduced in our paper. Our research focuses on the synthesis of pulsatile physiological signals, emphasizing the modulation of amplitude while preserving the signals' morphological identities. Our working paper is currently being registered with TechRxiv and is expected to be uploaded soon.
+This repository contains the Python code for VABAM and the Joint Mutual Information (JMI) based metrics introduced in our paper. Our research focuses on the synthesis of pulsatile physiological signals, emphasizing the modulation of amplitude while preserving the signals' morphological identities. Please access our working paper [here](https://www.techrxiv.org/users/146056/articles/737765-vabam-variational-autoencoder-for-amplitude-based-biosignal-augmentation-within-morphological-identities).
 
 ### Research Highlights
 
