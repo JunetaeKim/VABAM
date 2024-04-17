@@ -100,8 +100,8 @@ Please consult the documentation within each script for more detailed instructio
 ## Scripts Executed for Our Research
 All execution code lists are available in the [ExecutionProcedure.txt](https://github.com/JunetaeKim/VABAM/blob/main/ExecutionProcedure.txt) file; please refer to this file for detailed information.
 
-### 1.Download link for the processed dataset
-You can download this data by running GitBash or Command Prompt and using wget, or you can directly download it via the URL.
+### 1.Download Link for Dataset
+You can download the processed dataset by running GitBash or Command Prompt and using wget, or you can directly download it via the URL.
 
 **Download link:** https://www.dropbox.com/scl/fi/g6f83ooxtg5p3bz4m6aur/ProcessedData.egg?rlkey=bb74m27fyqm4e73s960aeq6z0&dl=1
 
