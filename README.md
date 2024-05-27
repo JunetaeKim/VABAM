@@ -1,6 +1,6 @@
 ## VABAM: Variational Autoencoder for Amplitude-based Biosignal Augmentation within Morphological Identities.
 
-This repository contains the Python code for VABAM and the Joint Mutual Information (JMI) based metrics introduced in our paper. Our research focuses on the synthesis of pulsatile physiological signals, emphasizing the modulation of amplitude while preserving the signals' morphological identities.
+This repository contains the Python code for VABAM and the Joint Mutual Information (JMI) based metrics introduced in our paper. Our research focuses on the synthesis of pulsatile physiological signals, emphasizing the modulation of amplitude while preserving the signals' morphological identities. Please access **our working paper** [here](https://www.techrxiv.org/users/146056/articles/737765-vabam-variational-autoencoder-for-amplitude-based-biosignal-augmentation-within-morphological-identities).
 
 ### Research Highlights
 
@@ -100,7 +100,14 @@ Please consult the documentation within each script for more detailed instructio
 ## Scripts Executed for Our Research
 All execution code lists are available in the [ExecutionProcedure.txt](https://github.com/JunetaeKim/VABAM/blob/main/ExecutionProcedure.txt) file; please refer to this file for detailed information.
 
-### 1.TrainModel.py 
+### 1.Dataset
+You can download the processed dataset by running GitBash or Command Prompt and using wget, or you can directly download it via the URL.
+
+**Download link:** https://www.dropbox.com/scl/fi/g6f83ooxtg5p3bz4m6aur/ProcessedData.egg?rlkey=bb74m27fyqm4e73s960aeq6z0&dl=1
+
+
+
+### 2.TrainModel.py 
 
 **MainModel Training Commands:**
 python TrainModel.py --Config [model_config] --GPUID [gpu_id]
@@ -145,7 +152,7 @@ python TrainBenchmark.py --Config [model_config] --GPUID [gpu_id]
   - `python .\TrainBenchmark.py --Config BaseVAE_II_50 --GPUID 0`
 <br><br>
 
-### 2. SubProcMIEVAL.py
+### 3. SubProcMIEVAL.py
 **MainModel Training Commands:**
 python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id] --ConfigSpec [model_spec] --SpecNZs [nz_values] --SpecFCs [fc_values]
 
@@ -163,7 +170,7 @@ python SubProcMIEVAL.py --Config [eval_config] --GPUID [gpu_id]
   - `python .\SubProcMIEVAL.py --Config EvalConfigII --GPUID 4`
 <br><br>
 
-### 3. TabulatingResults.py
+### 4. TabulatingResults.py
 **MainModel Training Commands:**
 python TabulatingResults.py -CP [config_path] --GPUID [gpu_id]
 
