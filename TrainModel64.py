@@ -7,9 +7,10 @@ from argparse import ArgumentParser
 import re
 
 import tensorflow as tf
+tf.keras.backend.set_floatx('float64') # Set the default float type for TensorFlow to float64
 from tensorflow.keras import Model
 from Utilities.Utilities import ReadYaml, LoadModelConfigs
-from Models.Caller import *
+from Models.Caller64 import *
 
 # Refer to the execution code        
 # python .\TrainModel.py --Config TCMIDKZFC_II_50_500 --GPUID 0 --Resume True    

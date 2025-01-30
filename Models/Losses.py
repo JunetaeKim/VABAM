@@ -43,8 +43,8 @@ def DefLosses (Models, DataSize, LossConfigSet):
     EncModel,FeatExtModel,FeatGenModel,ReconModel =  Models
     EncInp =EncModel.input
     InpZ = EncModel.output[2]
-    InpFCCommon = EncModel.output[1][:, :2]
-    InpFCEach = EncModel.output[1][:, 2:]
+    InpFCCommon = EncModel.output[1][:, :-len(FeatExtModel.output)]
+    InpFCEach = EncModel.output[1][:, -len(FeatExtModel.output):]
 
     ## Each output of each model
     FeatExtOut = FeatExtModel(EncModel.output[:2])
@@ -175,8 +175,8 @@ def FACLosses (Models, LossConfigSet):
     EncModel,FeatExtModel,FeatGenModel,ReconModel,FacDiscModel =  Models
     EncInp =EncModel.input
     InpZ = EncModel.output[2]
-    InpFCCommon = EncModel.output[1][:, :2]
-    InpFCEach = EncModel.output[1][:, 2:]
+    InpFCCommon = EncModel.output[1][:, :-len(FeatExtModel.output)]
+    InpFCEach = EncModel.output[1][:, -len(FeatExtModel.output):]
 
 
     ## Batch split 

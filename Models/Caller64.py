@@ -1,16 +1,20 @@
-from Models.MainModel import *
-from Models.Losses import *
+from Models.MainModel64 import *
+from Models.Losses64 import *
 from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import RelLossWeight
 
 
-def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, ReturnModelPart=False, Reparam=True, ReparaStd=None, ModelSaveName=None):
+def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, ReturnModelPart=False, Reparam=True, ReparaStd=None, ModelSaveName=None, ModelSummary=True):
     
     assert not (Resume or LoadWeight) or ModelSaveName is not None, "ModelSaveName must be provided to load the weights."
     
     ### Model-related parameters
     LatDim = SelConfigSet['LatDim']
     CompSize = SelConfigSet['CompSize']
+    Depth = SelConfigSet['Depth']
+    KernelSize = (SigDim - CompSize)//Depth + 1    
+    CompSize = SigDim - Depth*(KernelSize-1)
+
     assert CompSize in [i for i in range(100, 1000, 100)], "Value should be one of " +str([i for i in range(100, 1000, 100)])
     MaskingRate = SelConfigSet['MaskingRate']
     NoiseStd = SelConfigSet['NoiseStd']
@@ -20,36 +24,37 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
     FcLimit = SelConfigSet['FcLimit']
     DecayH = SelConfigSet['DecayH']
     DecayL = SelConfigSet['DecayL']
+    Depth = SelConfigSet['Depth']
     
     ### Loss-related parameters
     LossType = SelConfigSet['LossType']
            
         
-        
     # Defining Modesl
-    EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=Reparam, FcLimit=FcLimit)
-    FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, DecayH=DecayH, DecayL=DecayL)
-    FeatGenModel = FeatGenerator(SigDim=SigDim,CompSize= CompSize, LatDim= LatDim)
-    ReconModel = Reconstructor(SigDim=SigDim, CompSize= CompSize)
+    EncModel = Encoder(SigDim=SigDim, LatDim= LatDim, Depth=Depth, Type = '', MaskingRate = MaskingRate, NoiseStd = NoiseStd, MaskStd = MaskStd, ReparaStd = ReparaStd, Reparam=Reparam, FcLimit=FcLimit)
+    FeatExtModel = FeatExtractor(SigDim=SigDim, CompSize = CompSize, Depth=Depth, DecayH=DecayH, DecayL=DecayL)
+    NeachFC = len(FeatExtModel.output)
+    NCommonFC = EncModel.output[1].shape[1] - NeachFC
+    FeatGenModel = FeatGenerator(SigDim = SigDim,CompSize = CompSize, NCommonFC = NCommonFC, NeachFC = NeachFC, LatDim = LatDim)
+    ReconModel = Reconstructor(SigDim , NeachFC,  CompSize = CompSize)
 
     
     # Adding losses
-    if LossType =='TCLosses':
+    if LossType =='Default':
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel] 
-        SigRepModel = TCLosses(Models, DataSize, SelConfigSet)
-        ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel]
+        SigRepModel = DefLosses(Models, DataSize, SelConfigSet)
         
     elif LossType =='FACLosses':
         DiscHiddenSize = SelConfigSet['DiscHiddenSize']
         FacDiscModel = FacDiscriminator(LatDim, DiscHiddenSize)
         Models = [EncModel,FeatExtModel,FeatGenModel,ReconModel, FacDiscModel] 
         SigRepModel = FACLosses(Models, SelConfigSet)
-        ModelParts = [EncModel, FeatExtModel, FeatGenModel, ReconModel, FacDiscModel]
 
         
     # Model Compile
     SigRepModel.compile(optimizer='adam') 
-    SigRepModel.summary()
+    if ModelSummary == True:
+        SigRepModel.summary()
     
     
     # Model Training
@@ -61,11 +66,11 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
     if ReturnModelPart == False:
         return SigRepModel
     else:
-        return SigRepModel, ModelParts
+        return SigRepModel, Models
 
 
 # Dynamic controller for losses
-def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max'):
+def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', CheckPoint=False, Resume=False, Buffer=0):
     
     if ToSaveLoss is None:
         ToSaveLoss = ['val_FeatRecLoss', 'val_OrigRecLoss']
@@ -127,6 +132,7 @@ def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max'):
         MaxLimit['Beta_DTC'] = SelConfigSet['MxWDTC']
         
 
-    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, ToSaveLoss=ToSaveLoss , SaveWay=SaveWay )
+    RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, CheckPoint=CheckPoint,
+                            ToSaveLoss=ToSaveLoss, SaveWay=SaveWay, Buffer=Buffer, Resume=Resume)
     
     return RelLoss

@@ -2,11 +2,40 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import Model
 from Utilities.Utilities import Lossweight
-from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch
+from Utilities.AncillaryFunctions64 import LogNormalDensity, SplitBatch
 
 
-    
-def TCLosses (Models, DataSize, LossConfigSet):
+def CustCCE(y_true, y_pred):
+    epsilon = 1e-15
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    y_pred = tf.clip_by_value(y_pred, epsilon, 1. - epsilon)
+    return -tf.reduce_mean(tf.reduce_sum(y_true * tf.math.log(y_pred), axis=-1))
+
+
+def CustMSE_NLL(y_true, y_pred, Type='MSE', Sigma=1., HybRate = 0.85, NLLScale= 1e-7):
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+
+    if Type =='MSE':
+        return tf.reduce_mean(tf.square(y_pred - y_true))
+    elif Type =='NLL':
+        # mu : y_true
+        # x : y_pred
+        nll = 0.5 * tf.math.log(2 * tf.constant(np.pi) * Sigma**2) + ((y_pred - y_true)**2 / (2 * Sigma**2))
+        return  tf.reduce_sum(nll) * NLLScale
+
+    elif Type =='MSENLL':
+        MSE = tf.reduce_mean(tf.square(y_pred - y_true))
+        nll = 0.5 * tf.math.log(2 * tf.constant(np.pi) * Sigma**2) + ((y_pred - y_true)**2 / (2 * Sigma**2))
+        return HybRate*MSE  + (1-HybRate)*tf.reduce_sum(nll) * NLLScale  
+
+        
+        
+
+
+
+def DefLosses (Models, DataSize, LossConfigSet):
     SpecLosses = LossConfigSet['SpecLosses']
     
     ###-------------------------------- Model structuring -------------------------------------------- ###
@@ -14,8 +43,8 @@ def TCLosses (Models, DataSize, LossConfigSet):
     EncModel,FeatExtModel,FeatGenModel,ReconModel =  Models
     EncInp =EncModel.input
     InpZ = EncModel.output[2]
-    InpFCCommon = EncModel.output[1][:, :2]
-    InpFCEach = EncModel.output[1][:, 2:]
+    InpFCCommon = EncModel.output[1][:, :-len(FeatExtModel.output)]
+    InpFCEach = EncModel.output[1][:, -len(FeatExtModel.output):]
 
     ## Each output of each model
     FeatExtOut = FeatExtModel(EncModel.output[:2])
@@ -30,6 +59,8 @@ def TCLosses (Models, DataSize, LossConfigSet):
     
     ###-------------------------------- Weights for losses -------------------------------------------- ###
     ### Weight controller; Apply beta and capacity 
+    ''' The values assigned to 'InitVal' are just initial values. TThey are dynamically modified within the on_epoch_end function in the RelLossWeight class, based on the values provided through BetaList as specified in the Config file. '''
+    
     Beta_Z = Lossweight(name='Beta_Z', InitVal=0.01)(SigRepModel.input)
     Beta_Fc = Lossweight(name='Beta_Fc', InitVal=0.01)(SigRepModel.input)
     Beta_TC = Lossweight(name='Beta_TC', InitVal=0.01)(SigRepModel.input)
@@ -42,15 +73,14 @@ def TCLosses (Models, DataSize, LossConfigSet):
     ###-------------------------------- Common losses -------------------------------------------- ###
 
     ### Adding the RecLoss; 
-    MSE = tf.keras.losses.MeanSquaredError()
-    ReconOut_ext = Beta_Orig * MSE(ReconExtOut, EncInp)
+    ReconOut_ext = Beta_Orig * CustMSE_NLL(ReconExtOut, EncInp)
 
     SigRepModel.add_loss(ReconOut_ext)
     SigRepModel.add_metric(ReconOut_ext, 'OrigRecLoss')
     print('OrigRecLoss added')
 
     ### Adding the FeatRecLoss; It allows connection between the extractor and generator
-    FeatRecLoss= Beta_Feat * MSE(tf.concat(FeatGenOut, axis=-1), tf.concat(FeatExtOut, axis=-1))
+    FeatRecLoss= Beta_Feat * CustMSE_NLL(tf.concat(FeatGenOut, axis=-1), tf.concat(FeatExtOut, axis=-1))
 
     SigRepModel.add_loss(FeatRecLoss)
     SigRepModel.add_metric(FeatRecLoss, 'FeatRecLoss')
@@ -68,8 +98,8 @@ def TCLosses (Models, DataSize, LossConfigSet):
     Z_Mu, Z_Log_Sigma, Zs = SigRepModel.get_layer('Z_Mu').output, SigRepModel.get_layer('Z_Log_Sigma').output, SigRepModel.get_layer('Zs').output
     LogProb_Prod_QZi = tf.maximum(LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None]), np.log(1/DataSize)) 
     LogProb_Prod_QZ = tf.reduce_sum(LogProb_Prod_QZi, axis=2, keepdims=False)
-    JointEntropy  = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_Prod_QZ ,   axis=1,   keepdims=False)
-    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1),  axis=1)
+    JointEntropy = tf.reduce_logsumexp(-tf.math.log(tf.cast(DataSize * 1., tf.float64)) + LogProb_Prod_QZ, axis=1, keepdims=False)
+    MarginalEntropies = tf.reduce_sum(- tf.math.log(tf.cast(DataSize * 1., tf.float64)) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1), axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
     
     
@@ -81,8 +111,9 @@ def TCLosses (Models, DataSize, LossConfigSet):
     
     
     ### KL Divergence for p(FC) vs q(FC)
-    BernP = 0.5 # hyperparameter
+    BernP = tf.cast(0.5, tf.float32) # hyperparameter
     FC_Mu = SigRepModel.get_layer('FC_Mu').output 
+    FC_Mu = tf.cast(FC_Mu, tf.float32)
     kl_Loss_FC = FC_Mu*(tf.math.log(FC_Mu) - tf.math.log(BernP)) + (1-FC_Mu)*(tf.math.log(1-FC_Mu) - tf.math.log(1-BernP))
     kl_Loss_FC = tf.reduce_mean(kl_Loss_FC )
     
@@ -103,7 +134,7 @@ def TCLosses (Models, DataSize, LossConfigSet):
         
     ### Adding specific losses
     Capacity_Z = LossConfigSet['Capacity_Z']
-    kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
+    kl_Loss_Z = tf.cast(Beta_Z, tf.float64) * tf.abs(kl_Loss_Z - Capacity_Z)
     SigRepModel.add_loss(kl_Loss_Z )
     SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
     print('kl_Loss_Z added')
@@ -144,8 +175,8 @@ def FACLosses (Models, LossConfigSet):
     EncModel,FeatExtModel,FeatGenModel,ReconModel,FacDiscModel =  Models
     EncInp =EncModel.input
     InpZ = EncModel.output[2]
-    InpFCCommon = EncModel.output[1][:, :2]
-    InpFCEach = EncModel.output[1][:, 2:]
+    InpFCCommon = EncModel.output[1][:, :-len(FeatExtModel.output)]
+    InpFCEach = EncModel.output[1][:, -len(FeatExtModel.output):]
 
 
     ## Batch split 
@@ -180,10 +211,9 @@ def FACLosses (Models, LossConfigSet):
 
     ###-------------------------------- Common losses -------------------------------------------- ###
     ### Adding the RecLoss; 
-    MSE = tf.keras.losses.MeanSquaredError()
     ReconExtOut_D1 = SplitBatch(ReconExtOut, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
     EncInp_D1 = SplitBatch(EncInp, HalfBatchIdx1, HalfBatchIdx2, mode='D1')
-    ReconOut_ext = Beta_Orig * MSE(ReconExtOut_D1, EncInp_D1)
+    ReconOut_ext = Beta_Orig * CustMSE_NLL(ReconExtOut_D1, EncInp_D1)
 
     SigRepModel.add_loss(ReconOut_ext)
     SigRepModel.add_metric(ReconOut_ext, 'OrigRecLoss')
@@ -194,7 +224,7 @@ def FACLosses (Models, LossConfigSet):
     ### Adding the FeatRecLoss; It allows connection between the extractor and generator
     FeatGenOut_D1 = SplitBatch(tf.concat(FeatGenOut, axis=-1), HalfBatchIdx1, HalfBatchIdx2, mode='D1')
     FeatExtOut_D1 = SplitBatch(tf.concat(FeatExtOut, axis=-1), HalfBatchIdx1, HalfBatchIdx2, mode='D1')
-    FeatRecLoss= Beta_Feat * MSE(FeatGenOut_D1, FeatExtOut_D1)
+    FeatRecLoss= Beta_Feat * CustMSE_NLL(FeatGenOut_D1, FeatExtOut_D1)
 
     SigRepModel.add_loss(FeatRecLoss)
     SigRepModel.add_metric(FeatRecLoss, 'FeatRecLoss')
@@ -210,8 +240,8 @@ def FACLosses (Models, LossConfigSet):
     Capacity_Z = LossConfigSet['Capacity_Z']
     kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu_D1**2  +  tf.exp(Z_Log_Sigma_D1)- Z_Log_Sigma_D1-1, axis=1)    
     kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
-    kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
-    
+    kl_Loss_Z = tf.cast(Beta_Z, tf.float64) * tf.abs(kl_Loss_Z - Capacity_Z)
+        
     SigRepModel.add_loss(kl_Loss_Z )
     SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
     print('kl_Loss_SKZ added')
@@ -236,9 +266,8 @@ def FACLosses (Models, LossConfigSet):
 
     Ones = tf.ones_like(HalfBatchIdx1)[:,None]
     Zeros = tf.zeros_like(HalfBatchIdx2)[:,None]
-    CCE = tf.keras.losses.MeanSquaredError()
     
-    kl_Loss_DTC = 0.5 * (CCE(Zeros, FacDiscOut_D1) + CCE(Ones, FacDiscOut_D2))
+    kl_Loss_DTC = 0.5 * (CustCCE(Zeros, FacDiscOut_D1) + CustCCE(Ones, FacDiscOut_D2))
     kl_Loss_DTC = Beta_DTC * tf.abs(kl_Loss_DTC - Capacity_DTC)
     
     SigRepModel.add_loss(kl_Loss_DTC )

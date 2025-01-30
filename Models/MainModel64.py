@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+tf.keras.backend.set_floatx('float64') # Set the default float type for TensorFlow to float64
 from tensorflow.keras import backend as K
 from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten, RepeatVector, Bidirectional, Activation, GaussianNoise
 from tensorflow.keras import Model
@@ -11,26 +12,26 @@ def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     NBatch = tf.shape(InpRegul)[0]
     
     MaskIDX = tf.random.shuffle(tf.range(NBatch * InpRegul.shape[1] ))
-    CutIDX = tf.cast(  tf.cast(tf.shape(MaskIDX)[0], dtype=tf.float32) * (1-MaskingRate), dtype=tf.int32 )
-    MaskIDX = tf.cast(MaskIDX < CutIDX, dtype=tf.float32)
+    CutIDX = tf.cast(  tf.cast(tf.shape(MaskIDX)[0], dtype=tf.float64) * (1-MaskingRate), dtype=tf.int32 )
+    MaskIDX = tf.cast(MaskIDX < CutIDX, dtype=tf.float64)
     MaskVec = tf.reshape(MaskIDX, (NBatch, -1))[:,:,None]
     
     # Generate noise vector for unmasked positions (where mask is 0)
     RevMaskIDX = MaskIDX == 0
-    RevMaskIDX = tf.cast(RevMaskIDX, dtype=tf.float32)
-    NoisVec = RevMaskIDX * tf.random.normal(tf.shape(RevMaskIDX), stddev=MaskStd)
+    RevMaskIDX = tf.cast(RevMaskIDX, dtype=tf.float64)
+    NoisVec = RevMaskIDX * tf.random.normal(tf.shape(RevMaskIDX), stddev=MaskStd, dtype=tf.float64)
     NoisVec = tf.reshape(NoisVec, (NBatch, -1))[:,:,None]
     return MaskVec, NoisVec
 
 def GenLowFilter (LF, N, Decay=0.):
-    nVec = tf.range(N, dtype=np.float32)
+    nVec = np.arange(N, dtype=np.float64)
     Window = tf.signal.hamming_window(N) # Window shape = [N]
 
     # A low-pass filter
     X = 2 * LF * (nVec - (N - 1) / 2)
-    X = tf.where(X == 0, 1e-20, X)
+    X = tf.where(X == 0, tf.constant(1e-40, dtype=tf.float64), X)
     LPF = tf.sin(np.pi*X)/(np.pi*X)
-    LPF *= Window
+    LPF *= tf.cast(Window, tf.float64)
     LPF /= tf.reduce_sum(LPF, axis=-1, keepdims=True)
     
     # Freq cutoff Decay effect
@@ -41,14 +42,14 @@ def GenLowFilter (LF, N, Decay=0.):
     return LPF[:,None]  
 
 def GenHighFilter (HF, N, Decay=0.):
-    nVec = tf.range(N, dtype=np.float32)
+    nVec = np.arange(N, dtype=np.float64)
     Window = tf.signal.hamming_window(N)
 
     # A high-pass filter
     Y = 2 * HF * (nVec - (N - 1) / 2)
-    Y = tf.where(Y == 0, 1e-20, Y)
+    Y = tf.where(Y == 0, tf.constant(1e-40, dtype=tf.float64), Y)
     HPF = tf.sin(np.pi*Y)/(np.pi*Y)
-    HPF *= Window
+    HPF *= tf.cast(Window, tf.float64)
     HPF /= tf.reduce_sum(HPF, axis=-1, keepdims=True)
     HPF = -HPF
 
@@ -56,7 +57,7 @@ def GenHighFilter (HF, N, Decay=0.):
     # Add center spike for high-pass characteristic
     Mask = np.zeros(HPF.shape[1])
     Mask[(N - 1) // 2] += 1
-    Mask = tf.constant(Mask, dtype=tf.float32)
+    Mask = tf.constant(Mask, dtype=tf.float64)
     HPF = HPF + Mask
     
     # Freq cutoff Decay effect
@@ -105,7 +106,7 @@ def Encoder(SigDim, SlidingSize = 50, LatDim= 2, Depth=2, Type = '', MaskingRate
     if Reparam==False:
         Epsilon_z = Epsilon_z * 0
 
-    Zs = Z_Mu + tf.exp(0.5 * Z_Log_Sigma) * Epsilon_z
+    Zs = Z_Mu + tf.exp(0.5 * Z_Log_Sigma) * tf.cast(Epsilon_z, tf.float64)
     Zs = ReName(Zs,'Zs'+Type)
     
     FC_Mu =  Dense(NFilters, activation='relu')(Encoder)
@@ -115,8 +116,8 @@ def Encoder(SigDim, SlidingSize = 50, LatDim= 2, Depth=2, Type = '', MaskingRate
     
     # Reparameterization Trick for sampling from Uniformly distribution; ϵ∼U(0,1) 
     Epsilon_fc = tf.random.uniform(shape=(tf.shape(FC_Mu)[0], FC_Mu.shape[1]))
-    Epsilon_fc = tf.clip_by_value(Epsilon_fc, 1e-7, 1-1e-7)
-    
+    Epsilon_fc = tf.clip_by_value(tf.cast(Epsilon_fc, tf.float64), 1e-30, 1-1e-30)
+
     LogEps = tf.math.log(Epsilon_fc)
     LogNegEps = tf.math.log(1 - Epsilon_fc)
     

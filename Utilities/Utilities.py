@@ -85,7 +85,10 @@ def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, Roo
 
     YamlPath = RootDirYaml + LoadConfig+'.yml'
     ConfigSet = ReadYaml(YamlPath) # The YAML file
-        
+
+    CommonParams = ConfigSet["Common"]
+    ModelParams = ConfigSet["Models"][ConfigName]
+
     ### Model path
     ModelName = ConfigName +'.hdf5'
     ModelPath = RootDirRes + SubPath + ModelName
@@ -94,7 +97,7 @@ def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, Roo
     if not os.path.exists(RootDirRes + SubPath) and Training == True:
         os.makedirs(RootDirRes + SubPath)
     
-    return ConfigSet[ConfigName], ModelPath
+    return {**CommonParams, **ModelParams}, ModelPath
 
 
 
@@ -137,37 +140,40 @@ def LoadParams (ModelConfigSet, EvalConfigSet): # Experiment setting
     Params = {}
     
     ### Model-related parameters
-    Params['SigType']  = ModelConfigSet['SigType']            # Types of signals to train on.: ART, PLETH, II. 
-    Params['LatDim']  = ModelConfigSet['LatDim']              # The dimensionality of the latent variable z.
-    Params['ReparaStd'] = EvalConfigSet['ReparaStd']          # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
-    Params['ReparaStdZj'] = EvalConfigSet['ReparaStdZj']      # The standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
+    Params['DataSource'] = ModelConfigSet['DataSource']          # The data source. 
+    Params['SigType']  = ModelConfigSet['SigType']               # Types of signals to train on.: ART, PLETH, II. 
+    Params['LatDim']  = ModelConfigSet['LatDim']                 # The dimensionality of the latent variable z.
+    Params['ReparaStd'] = EvalConfigSet['ReparaStd']             # The standard deviation value for Gaussian noise generation used in the reparametrization trick.
+    Params['ReparaStdZj'] = EvalConfigSet['ReparaStdZj']         # The standard deviation when sampling Zj (Samp_ZjRPT ~ N(0, ReparaStdZj)).
 
     
     ### Evaluation-related parameters
-    Params['MaxFreq'] = EvalConfigSet['MaxFreq']              # The maximum frequency value within the analysis range (default = 51).
-    Params['MinFreq'] = EvalConfigSet['MinFreq']              # The minimum frequency value within the analysis range (default = 1).
-    Params['NMiniBat'] = EvalConfigSet['NMiniBat']            # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
-    Params['SimSize'] = EvalConfigSet['SimSize']              # The number of repetition (i.e., samplings) within the mini-batch.
-    Params['NSubGen'] = EvalConfigSet['NSubGen']                # The number of generations (i.e., samplings) within a sample.
-    Params['NSelZ'] = EvalConfigSet['NSelZ']                  # The size of js to be selected at the same time (default: 1).
-    Params['SelMetricType'] = EvalConfigSet['SelMetricType']  # The type of metric used for selecting Zs and ancillary data. 
-    Params['SelMetricCut'] = EvalConfigSet['SelMetricCut']    # The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
-    Params['SecDataType'] = EvalConfigSet['SecDataType']      # The secondary data type
-    Params['NParts'] = EvalConfigSet['NParts']                # The number of partitions (i.e., samplings) in generations within a sample.
+    Params['MaxFreq'] = EvalConfigSet['MaxFreq']                 # The maximum frequency value within the analysis range (default = 51).
+    Params['MinFreq'] = EvalConfigSet['MinFreq']                 # The minimum frequency value within the analysis range (default = 1).
+    Params['NMiniBat'] = EvalConfigSet['NMiniBat']               # The size of the mini-batch, splitting the task into N pieces of size NMiniBat.
+    Params['SimSize'] = EvalConfigSet['SimSize']                 # The number of repetition (i.e., samplings) within the mini-batch.
+    Params['NSubGen'] = EvalConfigSet['NSubGen']                 # The number of generations (i.e., samplings) within a sample.
+    Params['NSelZ'] = EvalConfigSet['NSelZ']                     # The size of js to be selected at the same time (default: 1).
+    Params['SelMetricType'] = EvalConfigSet['SelMetricType']     # The type of metric used for selecting Zs and ancillary data. 
+    Params['SelMetricCut'] = EvalConfigSet['SelMetricCut']       # The threshold value for selecting Zs whose Entropy or KLD of PSD is less than the MetricCut.
+    Params['SecDataType'] = EvalConfigSet['SecDataType']         # The secondary data type
+    Params['NParts'] = EvalConfigSet['NParts']                   # The number of partitions (i.e., samplings) in generations within a sample.
+    Params['TestDataSource'] = EvalConfigSet['TestDataSource']  # The data source for testing and visualization. 
+    
         
     ### Functional parameters
-    Params['EvalDataSize'] = EvalConfigSet['EvalDataSize']    # The number of observations in the evaluation data.
-    Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']  # The batch size during prediction of the sampling model.
-    Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']    # The batch size during prediction of the generation model.
-    Params['GPU'] = EvalConfigSet['GPU']                      # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
-    Params['Spec_Info'] = EvalConfigSet['Spec_Info']          # The list of specific objects subject to class serialization.
+    Params['EvalDataSize'] = EvalConfigSet['EvalDataSize']       # The number of observations in the evaluation data.
+    Params['SampBatchSize'] = EvalConfigSet['SampBatchSize']     # The batch size during prediction of the sampling model.
+    Params['GenBatchSize'] = EvalConfigSet['GenBatchSize']       # The batch size during prediction of the generation model.
+    Params['GPU'] = EvalConfigSet['GPU']                         # GPU vs CPU during model predictions (i.e., for SampModel and GenModel).
+    Params['Spec_Info'] = EvalConfigSet['Spec_Info']             # The list of specific objects subject to class serialization.
      
     
     ### Model-specific parameters
     if 'WindowSize' in EvalConfigSet:
-        Params['WindowSize'] = EvalConfigSet['WindowSize']    # The window size when calculating permutation entropy (default: 3)
+        Params['WindowSize'] = EvalConfigSet['WindowSize']       # The window size when calculating permutation entropy (default: 3)
     if 'FcLimit' in EvalConfigSet:
-        Params['FcLimit'] = EvalConfigSet['FcLimit']          # The threshold value of the max of the FC value input into the generation model.
+        Params['FcLimit'] = EvalConfigSet['FcLimit']             # The threshold value of the max of the FC value input into the generation model.
         
         
     ### Loss-specific parameters (only for main models)

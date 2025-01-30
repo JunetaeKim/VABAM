@@ -17,6 +17,12 @@ def LogNormalDensity(LatSamp, LatMean, LogSquaScale):
     Norm = tf.math.log(2. * tf.constant(np.pi))
     InvSigma = tf.math.exp(-LogSquaScale)
     MeanSampDiff = (LatSamp - LatMean)
+
+    MeanSampDiff = tf.cast(MeanSampDiff, tf.float64) 
+    InvSigma = tf.cast(InvSigma, tf.float64)
+    LogSquaScale = tf.cast(LogSquaScale, tf.float64)
+    Norm = tf.cast(Norm, tf.float64)
+
     return -0.5 * (MeanSampDiff * MeanSampDiff * InvSigma + LogSquaScale + Norm)
 
 
