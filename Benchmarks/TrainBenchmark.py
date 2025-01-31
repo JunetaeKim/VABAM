@@ -65,9 +65,6 @@ if __name__ == "__main__":
     if 'ART' in ConfigName:
         LoadConfig = 'Config' + 'ART'
         SubPath = 'ART/'
-    elif 'PLETH' in ConfigName:
-        LoadConfig = 'Config' + 'PLETH'
-        SubPath = 'PLETH/'
     elif 'II' in ConfigName:
         LoadConfig = 'Config' + 'II'
         SubPath = 'II/'
@@ -80,13 +77,14 @@ if __name__ == "__main__":
     
     #### -----------------------------------------------------   Experiment setting   -------------------------------------------------------------------------    
     ### Model related parameters
-    SigType = ConfigSet[ConfigName]['SigType']
-    LatDim = ConfigSet[ConfigName]['LatDim']
+    SigType = ConfigSet['Common']['SigType']
+    LatDim = ConfigSet['Models'][ConfigName]['LatDim']
+    DataSource = ConfigSet['Models'][ConfigName]['DataSource']
     
     
     ### Other parameters
-    BatSize = ConfigSet[ConfigName]['BatSize']
-    NEpochs = ConfigSet[ConfigName]['NEpochs']
+    BatSize = ConfigSet['Common']['BatSize']
+    NEpochs = ConfigSet['Common']['NEpochs']
     
     
     ### Experiment setting
@@ -102,18 +100,21 @@ if __name__ == "__main__":
 
     
     #### -----------------------------------------------------   Data load and processing   --------------------------------------------------------
-    TrData = np.load('../Data/ProcessedData/Tr'+str(SigType)+'.npy').astype('float32')
-    ValData = np.load('../Data/ProcessedData/Val'+str(SigType)+'.npy').astype('float32')
+    TrData = np.load('../Data/ProcessedData/'+str(DataSource)+'Tr'+str(SigType)+'.npy')
+    ValData = np.load('../Data/ProcessedData/'+str(DataSource)+'Val'+str(SigType)+'.npy')
     
     
     
     #### -----------------------------------------------------  Defining model structure -------------------------------------------------------------------------     
+    CommonParams = ConfigSet['Common']
+    ModelParams = ConfigSet["Models"][ConfigName]
+
     # Calling Modesl
-    BenchModel, TrInp, ValInp = ModelCall (ConfigSet[ConfigName], ConfigName, TrData, ValData, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName) 
+    BenchModel, TrInp, ValInp = ModelCall ({**CommonParams, **ModelParams}, ConfigName, TrData, ValData, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName) 
     
     # Calling dynamic controller for losses (DCL)
     ## The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLoss = DCLCall (ConfigSet[ConfigName], ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume)
+    RelLoss = DCLCall ({**CommonParams, **ModelParams}, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume)
     NEpochs -= (RelLoss.StartEpoch )    
     
     #### Model Training

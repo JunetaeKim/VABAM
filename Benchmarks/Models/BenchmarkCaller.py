@@ -15,6 +15,10 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
         BenchModel = BaseVAE(SigDim, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
         TrInp, ValInp = TrData, ValData
     
+    elif 'VDVAE' in ConfigName:
+        BenchModel = VDVAE(SigDim, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
+        TrInp, ValInp = TrData, ValData
+    
     elif 'TCVAE' in ConfigName:
         BenchModel = TCVAE(SigDim, DataSize, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
         TrInp, ValInp = TrData, ValData

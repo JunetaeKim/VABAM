@@ -253,11 +253,55 @@ class Anneal(tf.keras.callbacks.Callback):
 
         
 class RelLossWeight(tf.keras.callbacks.Callback):
+
+    """
+    RelLossWeight is a custom Keras callback designed to dynamically adjust loss weights 
+    (beta values) based on unit losses during training. It ensures balanced learning in 
+    multi-loss training setups by dynamically scaling loss contributions.
+    
+    ### **Dynamic Loss Weight Adjustment Process:**
+    1. Each loss starts with an initial weight (WRec, WFeat, WZ, WFC).
+    2. At the end of each epoch, unit losses are computed by dividing each loss by its corresponding beta value.
+    3. Loss weights (beta values) are adjusted dynamically based on unit losses:
+       - If a loss is relatively high, its weight is reduced to balance training.
+       - If a loss is relatively low, its weight is increased to maintain importance.
+    4. Adjustments are constrained within predefined minimum (`MnW*`) and maximum (`MxW*`) limits.
+    
+    *** If `MnW*` and `MxW*` are equal, the weight remains constant without dynamic scaling. ***
+    
+    ### **Key Features:**
+    - Dynamically adjusts loss weights based on unit loss magnitudes.
+    - Prevents dominance of any single loss by maintaining balance.
+    - Logs training progress, including loss values and weight updates.
+    - Supports model checkpointing at specified intervals.
+    - Saves the model when monitored losses improve.
+    - Allows resuming training from previous log checkpoints.
+    - Provides configurable constraints on weight scaling.
+    
+    ### **Parameters:**
+    - `BetaList` (dict): Mapping of loss names to their corresponding beta layer names.
+    - `LossScaling` (dict): Scaling factors applied to each loss component.
+    - `MinLimit` (dict): Minimum allowable values for each beta parameter.
+    - `MaxLimit` (dict): Maximum allowable values for each beta parameter.
+    - `SavePath` (str): Path where the model should be saved.
+    - `verbose` (int): Verbosity level (1 for detailed logging, 0 for silent mode).
+    - `ToSaveLoss` (list, optional): List of losses to monitor for saving the model.
+    - `SaveWay` (str, optional): Method to determine loss-based saving (`'min'`, `'mean'`, `'max'`).
+    - `SaveLogOnly` (bool): If `True`, only logs losses without adjusting beta values.
+    - `CheckPoint` (int, optional): Interval for model checkpointing (every `n` epochs).
+    - `Buffer` (int): Number of initial epochs before checking loss improvements.
+    - `Resume` (bool): If `True`, resumes training from the last recorded epoch.
+    
+    ### **Methods:**
+    - `on_epoch_end(epoch, logs)`: Updates loss weights, logs losses, and saves the model if conditions are met.
+    """
+    
     def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , SavePath, verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True,  CheckPoint=False, Buffer=0, Resume=False):
             
         if type(ToSaveLoss) != list and ToSaveLoss is not None:
             ToSaveLoss = [ToSaveLoss]
-            
+
+        # Store input parameters
         self.BetaList = BetaList
         self.LossScaling = LossScaling
         self.MinLimit = MinLimit
@@ -268,15 +312,18 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.SaveWay = SaveWay
         self.SavePath = SavePath
         self.Resume = Resume
+
+        # Extract model name from SavePath
         PathInfo = SavePath.split('/')
         self.ModelName = PathInfo[-1].split('.')[0]
+        
         self.SaveLogOnly = SaveLogOnly
         self.LogsPath = './Logs/'+PathInfo[2]+'/Logs_'+self.ModelName+ '.txt'
         self.Buffer = Buffer
         self.CheckPoint = CheckPoint
 
 
-
+        # If resuming, load last recorded epoch from log file
         if Resume == True:
             with open(self.LogsPath, "r") as file:
                 self.Logs = file.read().split('\n')
@@ -285,43 +332,57 @@ class RelLossWeight(tf.keras.callbacks.Callback):
             self.Logs = []
             self.StartEpoch = 0
         
+        # Ensure the log directory exists
         if not os.path.exists('./Logs/'+PathInfo[2]):
             os.makedirs('./Logs/'+PathInfo[2])
         
         
     def on_epoch_end(self, epoch, logs={}):
-        
+        """
+        Called at the end of each epoch to adjust loss weights, log losses, and save models if necessary.
+        """
+        # Compute unit losses by removing the effect of beta scaling
+        # Since the loss function applies `Loss = beta * OriginalLoss`, we divide by beta to get the unscaled loss
+
         Losses = {key:logs[key]/np.maximum(1e-7,self.model.get_layer(beta).variables[0].numpy()) for key, beta in self.BetaList.items()}
         rounded_losses = {key: round(value, 5) for key, value in Losses.items()}
 
+        # Save only logs if SaveLogOnly is enabled
         if self.SaveLogOnly and self.ToSaveLoss == None:
             self.Logs.append(str(epoch+self.StartEpoch)+' '+ str(rounded_losses))
             
             with open(self.LogsPath, "w") as file:
                 file.write('\n'.join(self.Logs))
-        
+
+        # Save model at checkpoint intervals
         if self.CheckPoint:
             if (epoch+self.StartEpoch) % self.CheckPoint==0:
                 CharIDX = self.SavePath.rfind('/')
                 Path = self.SavePath[:CharIDX+1] +'Epoch' + str(epoch+self.StartEpoch)+'_' + self.SavePath[CharIDX+1:]
                 print(Path)
                 self.model.save(Path)
+
         
-        
-        if self.ToSaveLoss is not None:
+        # Check if model should be saved based on loss improvement
+        if self.ToSaveLoss is not None: # default values: ['val_FeatRecLoss', 'val_OrigRecLoss']
             
+            # Extract specific losses to monitor for saving
             SubLosses = []
             for LossName in self.ToSaveLoss:
-                beta = self.BetaList[LossName]
+                beta = self.BetaList[LossName]  # Get corresponding beta variable name
+                # Compute unit loss by dividing by the beta value (undoing its scaling effect)
                 SubLosses.append(logs[LossName]/np.maximum(1e-7,self.model.get_layer(beta).variables[0].numpy()))
-            
+
+            # Determine the loss comparison method
             if self.SaveWay == 'min':
-                CurrentLoss = np.min(SubLosses)
+                CurrentLoss = np.min(SubLosses) # Take the minimum unit loss across tracked losses
             elif self.SaveWay == 'mean':
-                CurrentLoss = np.mean(SubLosses)
+                CurrentLoss = np.mean(SubLosses) # Take the mean unit loss
             elif self.SaveWay == 'max':
-                CurrentLoss = np.max(SubLosses)
-            
+                CurrentLoss = np.max(SubLosses) # Take the maximum unit loss
+
+            # Check if the new computed loss is lower than the previous best loss
+            # Also ensures that enough epochs have passed based on the buffer value
             if CurrentLoss <= self.CheckLoss and (epoch+self.StartEpoch) > 0 and (epoch+self.StartEpoch) > (self.StartEpoch+self.Buffer):
                 self.model.save(self.SavePath)
                 print()

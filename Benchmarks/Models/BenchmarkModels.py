@@ -60,24 +60,69 @@ def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None
     ReconOutLoss = Beta_Rec * CustMSE(ReconOut, EncModel.input)
     VAEModel.add_loss(ReconOutLoss)
     VAEModel.add_metric(ReconOutLoss, 'ReconOutLoss')
-    print('ReconOutLoss added')
-
 
     ### KL Divergence for q(Z) vs q(Z)
     Z_Mu, Z_Log_Sigma = VAEModel.get_layer('Z_Mu').output, VAEModel.get_layer('Z_Log_Sigma').output
     kl_Loss_Z = SKLDZ(Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z)
     VAEModel.add_loss(kl_Loss_Z )
     VAEModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
-    
-    
+        
     ### Model Compile
     VAEModel.compile(optimizer='adam') 
     VAEModel.summary()
-
    
     return VAEModel
 
 
+
+def VDVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
+    
+    ### Model related parameters
+    ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
+    LatDim = ConfigSpec['LatDim']
+    
+    #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
+    EncModel = Encoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= LatDim,  Type = 'VDV', Reparam = Reparam, ReparaStd=ReparaStd)
+    
+    NZs = len(EncModel.output)
+    EncOut =  tf.concat(EncModel.output, axis=-1)
+    DecLatDim = EncOut.shape[-1]
+    ReconModel = Decoder(SigDim=SigDim, SlidingSize = SlidingSize, LatDim= DecLatDim)
+    
+    ## Model core parts
+    ReconOut =ReconModel(EncOut)
+    
+    ### Define the model
+    VDVModel = Model(EncModel.input, ReconOut)
+        
+    
+    #### -----------------------------------------------------   Losses   -------------------------------------------------------------------------
+    ### Loss-related parameters
+    Capacity_Z = ConfigSpec['Capacity_Z']
+    
+    
+    ### Weight controller; Apply beta and capacity 
+    Beta_Z = Lossweight(name='Beta_Z', InitVal=0.01)(VDVModel.input)
+    Beta_Rec = Lossweight(name='Beta_Rec', InitVal=1.)(VDVModel.input)
+    
+    ### Adding the RecLoss; 
+    ReconOutLoss = Beta_Rec * CustMSE(ReconOut, EncModel.input)
+    VDVModel.add_loss(ReconOutLoss)
+    VDVModel.add_metric(ReconOutLoss, 'ReconOutLoss')
+    
+    ### KL Divergence for q(Z) vs q(Z)
+    kl_Loss_Z = 0
+    for i in range(NZs):
+        Z_Mu, Z_Log_Sigma = VDVModel.get_layer('Z_Mu'+str(1+i)).output, VDVModel.get_layer('Z_Log_Sigma'+str(1+i)).output
+        kl_Loss_Z += SKLDZ(Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z)
+    VDVModel.add_loss(kl_Loss_Z )
+    VDVModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
+    
+    ### Model Compile
+    VDVModel.compile(optimizer='adam') 
+    VDVModel.summary()
+   
+    return VDVModel
 
 
 
@@ -119,12 +164,10 @@ def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaS
     kl_Loss_Z = SKLDZ(Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z)
     CVAEModel.add_loss(kl_Loss_Z )
     CVAEModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
-
     
     ### Model Compile
     CVAEModel.compile(optimizer='adam') 
     CVAEModel.summary()
-
    
     return CVAEModel
 
