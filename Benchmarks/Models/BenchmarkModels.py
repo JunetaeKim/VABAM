@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import Model
-from Benchmarks.Models.BaseModels import *
+from Benchmarks.Models.BaseVAES import *
+from Benchmarks.Models.Wavenet import *
 from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import Lossweight
 from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch
@@ -21,7 +22,7 @@ def CustMSE(y_true, y_pred):
     
 
 
-def SKLDZ (Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z):
+def SKLDZ(Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z):
     
     kl_Loss_Z = 0.5 * tf.reduce_sum( Z_Mu**2  +  tf.exp(Z_Log_Sigma)- Z_Log_Sigma-1, axis=1)    
     kl_Loss_Z = tf.reduce_mean(kl_Loss_Z )
@@ -30,7 +31,7 @@ def SKLDZ (Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z):
     return kl_Loss_Z
 
 
-def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
+def BaseVAE(SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
     ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
@@ -75,7 +76,7 @@ def BaseVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None
 
 
 
-def VDVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
+def VDVAE(SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
     ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
@@ -126,7 +127,7 @@ def VDVAE (SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
 
 
 
-def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
+def ConVAE(SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
     ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
@@ -174,7 +175,7 @@ def ConVAE (SigDim, CondDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaS
 
 
 
-def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
+def TCVAE(SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
     ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
@@ -257,7 +258,7 @@ def TCVAE (  SigDim, NData, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaSt
 
 
 
-def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
+def FACVAE(SigDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None):
     
     ### Model related parameters
     ReparaStd = ConfigSpec['ReparaStd'] if ReparaStd is None else ReparaStd
@@ -346,3 +347,24 @@ def FACVAE (  SigDim, ConfigSpec, SlidingSize = 50, Reparam=True, ReparaStd=None
 
    
     return FactorVAEModel
+
+
+
+
+def Wavenet(SigDim, ConfigSpec, ConDim, SlidingSize = 50):
+
+    ### Model related parameters
+    SlidingSize = ConfigSpec['SlidingSize']
+    NBlocks = ConfigSpec['NBlocks']
+    FilterSize = ConfigSpec['FilterSize']
+    KernelSize = ConfigSpec['KernelSize']
+    NumCl = ConfigSpec['NumCl']
+
+    #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
+    # Instantiate the model.
+    WavenetModel = ConditionalWaveNet(num_blocks=NBlocks, filters=FilterSize, kernel_size=KernelSize, condition_dim=ConDim, num_classes=NumCl)
+    
+    # Compile with sparse categorical crossentropy and proper from_logits setting
+    WavenetModel.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
+   
+    return WavenetModel

@@ -1,4 +1,4 @@
-from Benchmarks.Models.BaseModels import *
+from Benchmarks.Models.BaseVAES import *
 from Benchmarks.Models.BenchmarkModels import *
 from Utilities.Utilities import RelLossWeight
 from Utilities.AncillaryFunctions import FFT_PSD
@@ -6,8 +6,8 @@ from Utilities.AncillaryFunctions import FFT_PSD
 def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight=False, Reparam=True, ReparaStd=None, ModelSaveName=None):
     
     assert not (Resume or LoadWeight) or ModelSaveName is not None, "ModelSaveName must be provided to load the weights."
-    DataSize = TrData.shape[0] 
-    SigDim = TrData.shape[1]
+    DataSize = ConfigSpec['DataSize']
+    SigDim = ConfigSpec['SigDim']
     
         
     # ModelName selection
@@ -30,12 +30,26 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
     elif 'ConVAE' in ConfigName:
         ## Identifying conditions based on cumulative Power Spectral Entropy (PSE) over each frequency
         Tr_Cond = FFT_PSD(TrData, 'None')[:, 0]
-        Val_Cond = FFT_PSD(ValData, 'None')[:, 0]
+        Val_Cond = FFT_PSD(ValData, 'None')[:, 0]            
         TrInp, ValInp = [TrData, Tr_Cond], [ValData, Val_Cond]
-    
         CondDim = Tr_Cond.shape[-1]
+        
         BenchModel= ConVAE(SigDim, CondDim, ConfigSpec, Reparam=Reparam, ReparaStd=ReparaStd)
-         
+    
+    elif 'Wavenet' in ConfigName:
+        SlidingSize = ConfigSpec['SlidingSize']
+        TrSampled, TrRaw = TrData
+        ValSampled, ValRaw = ValData
+        ## Identifying 3-dimensional conditions using raw data, not sampled, based on PSE.
+        Tr_Cond_3d = FFT_PSD(tf.signal.frame(TrRaw, SlidingSize, SlidingSize), 'None')
+        Val_Cond_3d = FFT_PSD(tf.signal.frame(ValRaw, SlidingSize, SlidingSize), 'None')
+        TrInp, ValInp = [TrSampled, Tr_Cond_3d], [ValSampled, Val_Cond_3d]
+        ConDim = Tr_Cond_3d.shape[-1]
+
+        # Call the model with some dummy input data to create the variables and allows weight loading
+        BenchModel = Wavenet(SigDim, ConfigSpec, ConDim, SlidingSize = SlidingSize)
+        BenchModel([Dummy[:1] for Dummy in TrInp])
+        
     else:
         assert False, "Please verify if the model name is right or not."    
 
