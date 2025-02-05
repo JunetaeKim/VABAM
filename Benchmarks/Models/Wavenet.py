@@ -1,3 +1,4 @@
+from tqdm import tqdm
 import tensorflow as tf
 from tensorflow.keras import layers, Model
 
@@ -206,7 +207,8 @@ class ConditionalWaveNet(Model):
             
         return condition
         
-    def call(self, inputs):
+    def call(self, inputs, training=True):
+        
         """
         Performs the forward pass of the ConditionalWaveNet model.
 
@@ -243,9 +245,23 @@ class ConditionalWaveNet(Model):
         out = self.final_conv1(out)
         out = self.final_conv2(out)
         out = self.output_conv(out)  # Raw logits
-        return  out
 
+        if not training:
+            return tf.argmax(out, axis=-1)
+        
+        return out
+        
+    def predict(self, inputs, batch_size=32,  steps=None, callbacks=None):
+        results = []
+        num_batches = (len(inputs) + batch_size - 1) // batch_size
+          
+        for i in range(0, len(inputs), batch_size):
+            batch = inputs[i:i+batch_size]
+            results.append(self.call(batch, training=False))
+        
+        return tf.concat(results, axis=0)
 
+        
 
 def create_and_train_model(x_train, y_train, x_val, y_val, conditions_train, conditions_val, condition_dim=80, num_classes=None, epochs=2000, batch_size=1000):
     """

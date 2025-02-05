@@ -116,7 +116,7 @@ def VDVAE(SigDim, ConfigSpec,  SlidingSize = 50, Reparam=True, ReparaStd=None):
     for i in range(NZs):
         Z_Mu, Z_Log_Sigma = VDVModel.get_layer('Z_Mu'+str(1+i)).output, VDVModel.get_layer('Z_Log_Sigma'+str(1+i)).output
         kl_Loss_Z += SKLDZ(Z_Mu, Z_Log_Sigma, Beta_Z, Capacity_Z)
-    VDVModel.add_loss(kl_Loss_Z )
+    VDVModel.add_loss(tf.reduce_mean(kl_Loss_Z))
     VDVModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
     
     ### Model Compile

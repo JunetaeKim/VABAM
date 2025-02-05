@@ -41,10 +41,10 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
         TrSampled, TrRaw = TrData
         ValSampled, ValRaw = ValData
         ## Identifying 3-dimensional conditions using raw data, not sampled, based on PSE.
-        Tr_Cond_3d = FFT_PSD(tf.signal.frame(TrRaw, SlidingSize, SlidingSize), 'None')
-        Val_Cond_3d = FFT_PSD(tf.signal.frame(ValRaw, SlidingSize, SlidingSize), 'None')
-        TrInp, ValInp = [TrSampled, Tr_Cond_3d], [ValSampled, Val_Cond_3d]
-        ConDim = Tr_Cond_3d.shape[-1]
+        Tr_Cond = FFT_PSD(TrRaw, 'None')[:, 0]
+        Val_Cond = FFT_PSD(ValRaw, 'None')[:, 0]      
+        TrInp, ValInp = [TrSampled, Tr_Cond], [ValSampled, Val_Cond]
+        ConDim = Tr_Cond.shape[-1]
 
         # Call the model with some dummy input data to create the variables and allows weight loading
         BenchModel = Wavenet(SigDim, ConfigSpec, ConDim, SlidingSize = SlidingSize)

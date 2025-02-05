@@ -159,7 +159,7 @@ if __name__ == "__main__":
         # Checkpoint callback
         CheckPoint = tf.keras.callbacks.ModelCheckpoint(filepath=ModelSaveName, save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min', verbose=1)
         # Early-stop callback
-        EarlyStop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True )
+        EarlyStop = EarlyStopping(monitor='val_loss', patience=50, restore_best_weights=True )
         # Train model
         BenchModel.fit(TrInp, TrOut, validation_data=(ValInp, ValOut), epochs=ModelParams['NEpochs'], batch_size=ModelParams['BatSize'],  callbacks=[CheckPoint, EarlyStop])
 
