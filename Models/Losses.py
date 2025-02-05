@@ -133,12 +133,13 @@ def DefLosses (Models, DataSize, LossConfigSet):
 
         
     ### Adding specific losses
-    Capacity_Z = LossConfigSet['Capacity_Z']
-    kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
-    SigRepModel.add_loss(kl_Loss_Z )
-    SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
-    print('kl_Loss_Z added')
-    
+    if 'SKZ' in SpecLosses :
+        Capacity_Z = LossConfigSet['Capacity_Z']
+        kl_Loss_Z = Beta_Z * tf.abs(kl_Loss_Z - Capacity_Z)
+        SigRepModel.add_loss(kl_Loss_Z )
+        SigRepModel.add_metric(kl_Loss_Z , 'kl_Loss_Z')
+        print('kl_Loss_Z added')
+
     if 'FC' in SpecLosses :
         Capacity_Fc = LossConfigSet['Capacity_Fc']
         kl_Loss_FC = Beta_Fc * tf.abs(kl_Loss_FC - Capacity_Fc)

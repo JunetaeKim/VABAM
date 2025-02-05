@@ -815,3 +815,256 @@ class Evaluator ():
         # MI(VE;CON',Z') 
         self.I_S_CONsZj /= (self.TotalIterSize)
         self.AggResDic['I_S_CONsZj'].append(self.I_S_CONsZj)
+
+
+
+    
+    ### -------------------------- Evaluating the performance of the model using both X and Conditions -------------------------- ###
+    def Eval_XCON (self, AnalData, GenModel, FcLimit=0.05,  WindowSize=3, NSplitBatch=1, SecDataType=None,  Continue=True ):
+        
+        ## Required parameters
+        self.GenModel = GenModel             # The model that generates signals based on given Zs and Cons.
+        self.NSplitBatch = NSplitBatch
+        
+        assert SecDataType in ['FCIN','CONDIN', False], "Please verify the value of 'SecDataType'. Only 'FCIN', 'CONDIN'  or False are valid."
+        
+        
+        
+        ## Optional parameters with default values ##
+        # WindowSize: The window size when calculating the permutation sets (default: 3).
+        # Continue: Start from the beginning (Continue = False) vs. Continue where left off (Continue = True).
+        self.SecDataType = SecDataType   # The ancillary data-type: Use 'FCIN' for FC values or 'CONDIN' for conditional inputs such as power spectral density.
+        
+        
+
+        ## Intermediate variables
+        self.AnalSig = AnalData[0]  # The raw true signals to be used for analysis.
+        self.TrueCond = AnalData[1] # The raw true PSD to be used for analysis.
+        self.Ndata = len(self.AnalSig) # The dimension size of the data.
+        self.SigDim =  np.squeeze(self.AnalSig).shape[-1] # The dimension (i.e., length) size of the raw signal.
+        self.CondDim = self.TrueCond.shape[-1] # The dimension size of the conditional inputs.
+        self.SubIterSize = self.Ndata//self.NMiniBat
+        self.TotalIterSize = self.SubIterSize * self.SimSize
+        
+        assert self.NGen >= self.CondDim, "NGen must be greater than or equal to CondDim for the evaluation."
+
+        
+        # Functional trackers
+        if Continue == False or not hasattr(self, 'iter'):
+            self.sim, self.mini, self.iter = 0, 0, 0
+        
+            ## Result trackers
+            self.SubResDic = {'I_V_CONsX':[],'I_S_CONsX':[]}
+            self.AggResDic = {'I_V_CONsX':[],'I_S_CONsX':[]}
+            self.BestZsMetrics = {i:[np.inf] for i in range(1, self.MaxFreq - self.MinFreq + 2)}
+            self.TrackerCand_Temp = {i:{'TrackSecData':[],'TrackZs':[],'TrackMetrics':[] } for i in range(1, self.MaxFreq - self.MinFreq + 2)} 
+            self.I_V_CONsX, self.I_S_CONsX = 0,0
+        
+         
+
+        
+        ### ------------------------------------------------ Task logics ------------------------------------------------ ###
+        
+        def TaskLogic(SubData):
+
+            print('-------------  ',self.Name,'  -------------')
+
+            ### ------------------------------------------------ Sampling ------------------------------------------------ ###
+            # Updating NMiniBat; If there is a remainder in Ndata/NMiniBat, NMiniBat must be updated." 
+            self.NMiniBat = len(SubData[0]) 
+            self.SubCond = SubData[1]
+            print(np.squeeze(SubData[0])[:, None].shape)
+
+
+            # Sampling Samp_Z and Samp_Zj
+            # Please note that the tensor is maintained in a reduced number of dimensions for computational efficiency in practice.
+            ## Dimensionality Mapping in Our Paper: b: skipped, d: NMiniBat, r: NParts, m: NSubGen, t: SigDim; 
+            self.Xbdr_tmp = np.broadcast_to(np.squeeze(SubData[0])[:, None], (self.NMiniBat, self.NParts, self.SigDim))
+            # The values of X are perturbed by randomly sampled errors along dimensions b, d, r, and t, while remaining constant along dimension m.
+            self.Xbdr_tmp = np.round(np.clip(self.Xbdr_tmp + np.random.normal(0,2, self.Xbdr_tmp.shape), 0, 256))
+            self.Xbdr_Exp = np.broadcast_to(self.Xbdr_tmp[:,:,None], (self.NMiniBat, self.NParts, self.NSubGen, self.SigDim))
+            self.Xbdr = np.reshape(self.Xbdr_Exp, (-1, self.SigDim))
+
+            # The values of X are perturbed by randomly sampled errors along dimensions b, d, and j, while remaining constant along dimensions r and m.
+            self.Xbd = np.broadcast_to(self.Xbdr_Exp[:,0,0][:,None,None], (self.NMiniBat, self.NParts, self.NSubGen, self.SigDim)).reshape(-1, self.SigDim)
+            
+            # Selecting sub-Xbd from Xbd for I_V_ConsX
+            self.Xbd_Ext = self.Xbd.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            # Return shape of Xbd_Red1 : (NMiniBat*NSubGen, SigDim)
+            ## The values of X are perturbed by randomly sampled errors along dimensions b, d, and t, while remaining constant along dimension m.
+            self.Xbd_Red1 = self.Xbd_Ext[:, 0].reshape(self.NMiniBat*self.NSubGen, -1).copy()
+            # Return shape of Xbd_Red2 : (NMiniBat, SigDim)
+            ## The values of X are perturbed by randomly sampled errors along dimensions b, d, and j.
+            self.Xbd_Red2 = self.Xbd_Ext[:, 0, 0].copy()
+
+            
+            # Processing Conditional information 
+            ### Generating random indices for selecting true conditions
+            RandSelIDXbdm = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NSubGen)
+            RandSelIDXbdrm = np.random.randint(0, self.TrueCond.shape[0], self.NMiniBat * self.NParts* self.NSubGen)
+            
+            
+            ### Selecting the true conditions using the generated indices
+            # True conditions are randomly sampled at the dimensions b, d, m, and k, and constant across dimension r.
+            self.CONbdm = self.TrueCond[RandSelIDXbdm]
+            self.CONbdm = np.broadcast_to(self.CONbdm.reshape(self.NMiniBat, self.NSubGen, -1)[:,None], (self.NMiniBat, self.NParts, self.NSubGen, self.CondDim))
+            
+            # True conditions are randomly sampled across all dimensions b, d, r, m, and k.
+            self.CONbdrm = self.TrueCond[RandSelIDXbdrm]
+            
+            
+            # Sorting the arranged condition values in ascending order at the generation index.
+            self.CONbdm_Ext = self.CONbdm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            # Return shape of CONbdm_Sort : (NMiniBat*NSubGen, SigDim)
+            ## The conditions are sorted at the generation index after being randomly sampled across the dimensions b, d, m, and k.
+            self.CONbdm_Sort = np.sort(self.CONbdm_Ext , axis=2)[:,0].reshape(self.NMiniBat*self.NSubGen, self.CondDim)
+            # Return shape of CONbd_Sort : (NMiniBat, SigDim)
+            ## The conditions are sorted at the dimension d after being randomly sampled across the dimensions b, d and k.
+            self.CONbd_Sort = np.sort(self.CONbdm_Ext[:, 0, 0], axis=0).copy() 
+            
+
+            ### ------------------------------------------------ Signal reconstruction ------------------------------------------------ ###
+            '''
+            - To maximize the efficiency of GPU utilization, 
+              we performed a binding operation transforming tensors to (NMiniBat * NParts * NSubGen, SigDim) for Zs or (NMiniBat * NParts * NSubGen, CondDim) for CON. 
+              After the computation, we then reverted them back to their original dimensions.
+                       
+                                        ## Variable cases for the signal generation ##
+                    
+              # Cases                             # Super Signal                    # Sub-Signal                # Target metric
+              1) Xbdr + CONbdrm        ->         Sig_Xbdr_CONbdrm       ->                                    I() 
+              2) Xbd + CONbdrm         ->         Sig_Xbd_CONbdrm        ->         Sig_Xbd_CONbdm             I() 
+              3) Xbd + CONbdm_Sort     ->         Sig_Xbd_CONbdmSt       ->                                    I() 
+              4) Xbd + CONbd_Sort      ->         Sig_Xbd_CONbdSt        ->                                    I()  
+                                                  * St=Sort 
+             '''
+       
+            # Binding the samples together, generate signals through the model 
+            ListXs = [self.Xbdr, self.Xbd, self.Xbd_Red1, self.Xbd_Red2]
+            Set_Xs = np.concatenate(ListXs)   
+            Set_CONs = np.concatenate([self.CONbdrm, self.CONbdrm, self.CONbdm_Sort, self.CONbd_Sort]) 
+            Set_Data = [Set_Xs[:,:,None], Set_CONs]
+            
+            # Gneraing indices for Re-splitting predictions for each case
+            CaseLens = np.array([item.shape[0] for item in ListXs])
+            DataCaseIDX = [0] + list(np.cumsum(CaseLens))
+            
+            # Choosing GPU or CPU and generating signals
+            Set_Pred = CompResource(self.GenModel, Set_Data, BatchSize=self.GenBatchSize, NSplitBatch=self.NSplitBatch, GPU=self.GPU)
+            
+            if 'Wavenet' in self.Name:
+                Set_Pred = mu_law_decode(Set_Pred)
+            
+            # Re-splitting predictions for each case
+            self.Sig_Xbdr_CONbdrm, self.Sig_Xbd_CONbdrm, self.Sig_Xbd_CONbdmSt, self.Sig_Xbd_CONbdSt  = [Set_Pred[DataCaseIDX[i]:DataCaseIDX[i+1]] for i in range(len(DataCaseIDX)-1)] 
+            
+            self.Sig_Xbdr_CONbdrm = self.Sig_Xbdr_CONbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            self.Sig_Xbd_CONbdrm = self.Sig_Xbd_CONbdrm.reshape(self.NMiniBat, self.NParts, self.NSubGen, -1)
+            self.Sig_Xbd_CONbdmSt = self.Sig_Xbd_CONbdmSt.reshape(self.NMiniBat, self.NSubGen, -1)
+            self.Sig_Xbd_CONbdSt = self.Sig_Xbd_CONbdSt.reshape(self.NMiniBat, -1)
+            
+            self.Sig_Xbd_CONbdm = self.Sig_Xbdr_CONbdrm[:, 0]
+            self.Sig_Xbd_CONbdm = self.Sig_Xbd_CONbdrm[:, 0]
+
+
+            ### ------------------------------------------------ Calculating metrics for the evaluation ------------------------------------------------ ###
+            
+            '''                                        ## Sub-Metric list ##
+                ------------------------------------------------------------------------------------------------------------- 
+                # Sub-metrics   # Function             # Code                           # Function             # Code 
+                1) I_V_CONsX   q(v|Sig_Xbd_CONbdSt)   <QV_Xbd_CONbdSt>         vs     q(v|Sig_Xbd_CONbdm)   <QV_Xbd_CONbdm>
+                2) I_S_CONsX   q(s|Sig_Xbd_CONbdmSt)  <QV//QS_Xbd_CONbdmSt>    vs     q(s|Sig_Xbd_CONbdrm)  <QV//QS_Xbd_CONbdrm>
+                3) H()//KLD()  q(v|Sig_Xbdr_CONbdrm)  <QV_Xbdr_CONbdrm>        vs     q(v)                  <QV_Batch>       
+                
+                ## Metric list : I_V_CONsX, I_S_CONsX, H() or KLD()
+                
+             '''
+
+
+            ### ---------------------------- Cumulative Power Spectral Density (PSD) over each frequency -------------------------------- ###
+            # Return shape of MQV_Xbd_CONbdm : (NMiniBat, N_frequency)
+            self.MQV_Xbd_CONbdm = FFT_PSD(self.Sig_Xbd_CONbdm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(1)
+            # Return shape of MQV_Xbd_CONbdm : (NMiniBat, N_frequency)
+            self.MQV_Xbd_CONbdm = FFT_PSD(self.Sig_Xbd_CONbdm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).mean(1)
+            # Return shape of QV_Xbd_CONbdSt : (NMiniBat, N_frequency)
+            self.QV_Xbd_CONbdSt = FFT_PSD(self.Sig_Xbd_CONbdSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)[:,0]
+            
+            # Return shape of QV_Xbdr_CONbdrm : (NMiniBat, NParts, NSubGen, N_frequency)
+            self.QV_Xbdr_CONbdrm = FFT_PSD(self.Sig_Xbdr_CONbdrm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape of QV_Xbd_CONbdrm : (NMiniBat, NParts, NSubGen, N_frequency)
+            self.QV_Xbd_CONbdrm = FFT_PSD(self.Sig_Xbd_CONbdrm, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            # Return shape of QV_Xbd_CONbdmSt : (NMiniBat, NSubGen, N_frequency)
+            self.QV_Xbd_CONbdmSt = FFT_PSD(self.Sig_Xbd_CONbdmSt, 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq)
+            #print(self.MQV_Xbd_CONbdm.shape, self.MQV_Xbd_CONbdm.shape, self.QV_Xbd_CONbdSt.shape, self.QV_Xbdr_CONbdrm.shape, self.QV_Xbd_CONbdrm.shape, self.QV_Xbd_CONbdmSt.shape)
+            
+            
+            ### ---------------------------- Permutation density given PSD over each generation -------------------------------- ###
+            # Calculating PD-PSD over v and s.
+            ## Return shape of QSV_Xbdr_CONbdrm : (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QSV_Xbdr_CONbdrm = np.concatenate([ProbPermutation(self.QV_Xbdr_CONbdrm[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            ## Return shape of QSV_Xbd_CONCbdrm : (NMiniBat, NParts, N_frequency, N_permutation_cases)
+            self.QSV_Xbd_CONbdrm = np.concatenate([ProbPermutation(self.QV_Xbd_CONbdrm[:,i], WindowSize=WindowSize)[:,None] for i in range(self.NParts)], axis=1)
+            ## Return shape of QSV_Xbd_CONbdmSt : (NMiniBat, N_frequency, N_permutation_cases)
+            self.QSV_Xbd_CONbdmSt = ProbPermutation(self.QV_Xbd_CONbdmSt, WindowSize=WindowSize)
+            
+            # Marginalizing v to obtain PD-PSD(s).
+            ## Return shape of QS_Xbdr_CONbdrm : (NMiniBat, NParts, N_permutation_cases)
+            self.QS_Xbdr_CONbdrm = np.sum(self.QSV_Xbdr_CONbdrm, axis=2)
+            ## Return shape of QS_Xbd_CONbdrm : (NMiniBat, NParts, N_permutation_cases)
+            self.QS_Xbd_CONbdrm = np.sum(self.QSV_Xbd_CONbdrm, axis=2)
+            ## Return shape of QS_Xbd_CONbdmSt : (NMiniBat, N_permutation_cases)
+            self.QS_Xbd_CONbdmSt = np.sum(self.QSV_Xbd_CONbdmSt, axis=1)
+            #print(self.QSV_Xbdr_CONbdrm.shape,  self.QSV_Xbd_CONbdrm.shape, self.QSV_Xbd_CONbdmSt.shape, self.QS_Xbdr_CONbdrm.shape, self.QS_Xbd_CONbdrm.shape, self.QS_Xbd_CONbdmSt.shape)
+            
+            # Averaging PD-PSD(s) over the Dimension m: Effect of Monte Carlo Simulation
+            ## Return shape of MQS_Xbd_CONbdrm : (NMiniBat, N_permutation_cases)
+            self.MQS_Xbd_CONbdrm = np.mean(self.QS_Xbd_CONbdrm, axis=1)
+            ## Return shape of MQS_Xbdr_CONbdrm : (NMiniBat, N_permutation_cases)
+            self.MQS_Xbdr_CONbdrm = np.mean(self.QS_Xbdr_CONbdrm, axis=1)
+            #print(self.MQS_Xbd_CONbdrm.shape, self.MQS_Xbdr_CONbdrm.shape )
+
+           
+                
+            ### ---------------------------------------- Mutual information ---------------------------------------- ###
+            I_V_CONsX_ = MeanKLD(self.QV_Xbd_CONbdSt, self.MQV_Xbd_CONbdm ) # I(V;Con'|z')
+            I_S_CONsX_ = MeanKLD(self.QS_Xbd_CONbdmSt, self.MQS_Xbd_CONbdrm ) # I(S;Con'|z')
+           
+            print("I(V;Con'|z') :", I_V_CONsX_)
+            self.SubResDic['I_V_CONsX'].append(I_V_CONsX_)
+            self.I_V_CONsX += I_V_CONsX_
+            
+            print("I(S;Con'|z') :", I_S_CONsX_)
+            self.SubResDic['I_S_CONsX'].append(I_S_CONsX_)
+            self.I_S_CONsX += I_S_CONsX_
+                        
+            
+            ### --------------------------- Locating the candidate Z values that generate plausible signals ------------------------- ###
+            ## Return shape: (1, N_frequency, NMiniBat)
+            ### Since it is the true PSD, there are no M generations. 
+            self.QV_Batch = FFT_PSD(np.squeeze(SubData[0])[:, None], 'None', MinFreq=self.MinFreq, MaxFreq=self.MaxFreq).transpose((1,2,0))
+            
+            # Intermediate objects for Q(s) and H(')
+            ## Return shape: (NMiniBat, N_frequency, NGen)
+            self.QV_Xbdr_CONbdrm_T = self.QV_Xbdr_CONbdrm.reshape(self.NMiniBat, self.NGen, -1).transpose(0,2,1)
+            self.LocCandZsMaxFreq ( self.QV_Xbdr_CONbdrm_T, self.Xbdr,  self.CONbdrm)
+            
+            # Restructuring TrackerCand
+            ## item[0] contains frequency domains
+            ## item[1] contains tracked X values, 2nd data, and metrics
+            self.TrackerCand = {item[0]: {'TrackZs': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackZs']), 
+                                          'TrackSecData': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackSecData']), 
+                                          'TrackMetrics': np.concatenate(self.TrackerCand_Temp[item[0]]['TrackMetrics'])} 
+                                          for item in self.TrackerCand_Temp.items() if len(item[1]['TrackSecData']) > 0} 
+            
+            
+        # Conducting the task iteration
+        self.Iteration(TaskLogic)
+
+
+        # MI(V;CON,X)
+        self.I_V_CONsX /= (self.TotalIterSize)
+        self.AggResDic['I_V_CONsX'].append(self.I_V_CONsX)
+
+        # MI(VE;CON',X) 
+        self.I_S_CONsX /= (self.TotalIterSize)
+        self.AggResDic['I_S_CONsX'].append(self.I_S_CONsX)

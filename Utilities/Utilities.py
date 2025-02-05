@@ -60,7 +60,7 @@ def CompResource (PredModel, Data, BatchSize=1, GPU=True):  # GPU vs CPU
     return np.array(PredVal)
 '''
 
-def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, RootDirRes=None):
+def LoadModelConfigs(ConfigName, Training=True, Comp=True, TypeDesig = False, RootDirYaml=None, RootDirRes=None):
     
     # Whether the model performs signal compression (i.e., the main model) or not.
     CompSize = re.findall(r'\d+', ConfigName)[-1] if Comp else ''
@@ -82,6 +82,9 @@ def LoadModelConfigs(ConfigName, Training=True, Comp=True, RootDirYaml=None, Roo
         SubPath = 'II/'
     else:
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type' + CompSize(optional) , such as ConfigART800."
+
+    if TypeDesig:
+        LoadConfig += '_VAE' if 'VAE' in ConfigName else '_Other'
 
     YamlPath = RootDirYaml + LoadConfig+'.yml'
     ConfigSet = ReadYaml(YamlPath) # The YAML file
@@ -268,7 +271,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
     - `on_epoch_end(epoch, logs)`: Updates loss weights, logs losses, and saves the model if conditions are met.
     """
     
-    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , SavePath, verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True,  CheckPoint=False, Buffer=0, Resume=False):
+    def __init__(self, BetaList, LossScaling, MinLimit , MaxLimit , SavePath, verbose=1, ToSaveLoss=None, SaveWay=None, SaveLogOnly=True, 
+                 CheckPoint=False, Buffer=0, Resume=False, Patience=None):
             
         if type(ToSaveLoss) != list and ToSaveLoss is not None:
             ToSaveLoss = [ToSaveLoss]
@@ -284,7 +288,9 @@ class RelLossWeight(tf.keras.callbacks.Callback):
         self.SaveWay = SaveWay
         self.SavePath = SavePath
         self.Resume = Resume
-
+        self.Patience = Patience  # Early stopping patience parameter
+        self.Wait = 0  # Counter for patience tracking
+        
         # Extract model name from SavePath
         PathInfo = SavePath.split('/')
         self.ModelName = PathInfo[-1].split('.')[0]
@@ -368,6 +374,8 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                     file.write('\n'.join(self.Logs))
                 
                 self.CheckLoss = CurrentLoss
+                self.Wait = 0  # Reset patience counter
+
                 
             elif (epoch+self.StartEpoch) > 0:
                 print()
@@ -376,11 +384,14 @@ class RelLossWeight(tf.keras.callbacks.Callback):
                 
                 #self.Logs.append(str(epoch+self.StartEpoch)+': The model has not been saved since the loss did not decrease from '+ str(CurrentLoss)+ ' to ' + str(self.CheckLoss))
                 self.Logs.append(str(epoch+self.StartEpoch)+' not saved '+ str(rounded_losses))
-                
+                self.Wait += 1  # Increment patience counter
+
                 with open(self.LogsPath, "w") as file:
                     file.write('\n'.join(self.Logs))
                 
-                
+            if self.Patience is not None and self.Wait >= self.Patience:
+                print(f'\nEarly stopping triggered after {self.Patience} epochs of no improvement.\n')
+                self.model.stop_training = True 
                 
         WeigLosses = np.maximum(1e-7, np.array(list(Losses.values())))
         #print(WeigLosses)
