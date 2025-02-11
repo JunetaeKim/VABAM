@@ -7,25 +7,20 @@ import copy
 from argparse import ArgumentParser
 from itertools import product
 
-from Models.Caller import *
+from Models.Caller64 import *
 from Utilities.EvaluationMain import *
 from Utilities.Utilities import ReadYaml, SerializeObjects, DeserializeObjects, LoadModelConfigs, LoadParams
 
 
 # Refer to the execution code
-# python .\BatchMIEvaluation.py --Config EvalConfigART800 --GPUID 0
-# python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0
-# python .\BatchMIEvaluation.py --Config EvalConfigART800 --ConfigSpec FACFC_ART_50_800  --GPUID 0 --SpecNZs 40 50
+#python .\BatchMIEvaluation.py --Config EvalConfigMimic --GPUID 0
 
 
 
 #### -----------------------------------------------------   Defining model structure -----------------------------------------------------------------    
 def SetModel():
     # Calling Modesl
-    SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadPath)
-
-    # Intermediate parameters 
-    NFCs = SigRepModel.get_layer('FCs').output.shape[-1]
+    SigRepModel, ModelParts = ModelCall (ModelConfigSet, SigDim, DataSize, LoadWeight=True, ReturnModelPart=True, ReparaStd=Params['ReparaStd'], ModelSaveName=ModelLoadName)
 
 
     # Setting Model Specifications and Sub-models
@@ -103,7 +98,7 @@ if __name__ == "__main__":
     #### -----------------------------------------------------  Conducting batch evaluation --------------------------------------------------------------
                  
     SigTypePrev = None
-    for ConfigName in EvalConfigs:
+    for ConfigName in EvalConfigs['ModelList']:
         
         if ConfigName == 'Common_Info':
             continue
@@ -117,10 +112,10 @@ if __name__ == "__main__":
                 
         #### -----------------------------------------------------  Setting evaluation environment ----------------------------------------------------------
         # Loading the model configurations
-        ModelConfigSet, ModelLoadPath = LoadModelConfigs(ConfigName, Training=False)
-
+        ModelConfigSet, ModelLoadName = LoadModelConfigs(ConfigName)
+        
         # Loading parameters for the evaluation
-        Params = LoadParams(ModelConfigSet, EvalConfigs[ConfigName])
+        Params = LoadParams(ModelConfigSet, EvalConfigs['Parameters'])
         Params['Common_Info'] = EvalConfigs['Common_Info']
 
 
@@ -131,7 +126,7 @@ if __name__ == "__main__":
             print('SigType:', Params['SigType'])
             
             # Loading data
-            AnalData = np.load('./Data/ProcessedData/Test'+str(Params['SigType'])+'.npy')
+            AnalData = np.load('./Data/ProcessedData/'+str(Params['TestDataSource'])+'Val'+str(Params['SigType'])+'.npy').astype('float32')
             AnalData = np.random.permutation(AnalData)[:Params['EvalDataSize']]
 
         # Intermediate parameters 
@@ -161,6 +156,8 @@ if __name__ == "__main__":
        
             # Setting the model
             SampZModel, SampFCModel, GenModel = SetModel()
+
+            
             
             # Object save path
             ObjSavePath = './EvalResults/Instances/Obj_'+ConfigName+'_Nj'+str(NZs)+'_FC'+str(FC)+'.pkl'

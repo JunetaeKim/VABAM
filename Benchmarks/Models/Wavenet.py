@@ -206,8 +206,9 @@ class ConditionalWaveNet(Model):
             condition = self.condition_proj(condition)
             
         return condition
-        
-    def call(self, inputs, training=True):
+      
+
+    def call(self, inputs, post_eval=False):
         
         """
         Performs the forward pass of the ConditionalWaveNet model.
@@ -246,7 +247,8 @@ class ConditionalWaveNet(Model):
         out = self.final_conv2(out)
         out = self.output_conv(out)  # Raw logits
 
-        if not training:
+        
+        if post_eval:
             return tf.argmax(out, axis=-1)
         
         return out
@@ -257,46 +259,10 @@ class ConditionalWaveNet(Model):
           
         for i in range(0, len(inputs), batch_size):
             batch = inputs[i:i+batch_size]
-            results.append(self.call(batch, training=False))
+            results.append(self.call(batch, post_eval=True))
         
         return tf.concat(results, axis=0)
 
-        
+                
 
-def create_and_train_model(x_train, y_train, x_val, y_val, conditions_train, conditions_val, condition_dim=80, num_classes=None, epochs=2000, batch_size=1000):
-    """
-    Creates and trains a conditional WaveNet model with proper loss handling.
-
-    Args:
-        x_train (Tensor): Training input data.
-        y_train (Tensor): Training target data.
-        x_val (Tensor): Validation input data.
-        y_val (Tensor): Validation target data.
-        conditions_train (Tensor): Conditional training input data.
-        conditions_val (Tensor): Conditional validation input data.
-        condition_dim (int, optional): Dimensionality of the condition projection. Default is 80.
-        num_classes (int, optional): Number of classes for discrete conditions. If provided, an embedding layer is used.
-        epochs (int, optional): Number of epochs for training. Default is 2000.
-        batch_size (int, optional): Batch size for training. Default is 1000.
-
-    Returns:
-        model (ConditionalWaveNet): The trained conditional WaveNet model.
-        history (History): A record of training loss and metrics.
-    """
-    
-    # Create model
-    model = ConditionalWaveNet(condition_dim=condition_dim,  num_classes=num_classes)
-    
-    # Compile with sparse categorical crossentropy and proper from_logits setting
-    model.compile(optimizer=tf.keras.optimizers.Adam(), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
-    
-    # Checkpoint callback
-    checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath='./wavenet_best.h5', save_best_only=True, monitor='val_loss', mode='min', verbose=1)
-    
-    # Train model
-    history = model.fit([x_train, conditions_train], y_train, 
-                        validation_data=([x_val, conditions_val], y_val), 
-                        epochs=epochs, batch_size=batch_size, callbacks=[checkpoint_callback])
-    
-    return model, history
     

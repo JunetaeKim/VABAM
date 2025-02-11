@@ -2,6 +2,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from Benchmarks.Models.BaseVAES import *
 from Benchmarks.Models.Wavenet import *
+from Benchmarks.Models.DiffWave import *
 from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import Lossweight
 from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch
@@ -368,3 +369,18 @@ def Wavenet(SigDim, ConfigSpec, ConDim, SlidingSize = 50):
     WavenetModel.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
    
     return WavenetModel
+
+
+def DiffWave(ConfigSpec):
+    #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
+    # Instantiate the model.
+    DiffWaveModel = ConditionalDiffWave(ConfigSpec)
+
+    # Compile the model with an optimizer.
+    optimizer = tf.keras.optimizers.Adam(learning_rate=ConfigSpec['Lr'],
+                                        beta_1=ConfigSpec['Beta1'],
+                                        beta_2=ConfigSpec['Beta2'],
+                                        epsilon=ConfigSpec['Eps'] )
+    DiffWaveModel.compile(optimizer=optimizer)
+
+    return DiffWaveModel

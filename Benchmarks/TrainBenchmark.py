@@ -76,14 +76,19 @@ if __name__ == "__main__":
         except RuntimeError as e:
             print(e)        
     
-    
-    if 'ART' in ConfigName:
-        LoadConfig = 'Config' + 'ART'
-        SubPath = 'ART/'
-    elif 'II' in ConfigName:
-        LoadConfig = 'Config' + 'II'
-        SubPath = 'II/'
+        
+    # Iterate through possible prefixes ('ART' and 'II') to check if they exist in ConfigName
+    for prefix in ['ART', 'II']:
+        if prefix in ConfigName:
+            # Determine the suffix based on 'Other' or 'VAE' in ConfigName
+            suffix = '_VAE' if 'VAE' in ConfigName else '_Other'
+            
+            # Construct LoadConfig dynamically
+            LoadConfig = 'Config' + prefix + suffix   #f'Config{prefix}{suffix}'
+            SubPath = prefix + '/'
+            break  # Exit loop once a matching prefix is found
     else:
+        # Raise an assertion error if ConfigName does not contain a valid prefix
         assert False, "Please verify if the data type is properly included in the name of the configuration. The configuration name should be structured as 'Config' + 'data type', such as ConfigART."
 
     yaml_path = './Config/'+LoadConfig+'.yml'
@@ -138,29 +143,43 @@ if __name__ == "__main__":
         ModelParams['DataSize'] = TrInp.shape[0] 
         ModelParams['SigDim'] = TrInp.shape[1]
 
+    # Standardization for certain models.
+    if 'DiffWave' in ConfigName or 'VDMWave' in ConfigName:
+        SigMax = np.load('../Data/ProcessedData/'+str(DataSource)+'SigMax.pkl', allow_pickle=True)
+        SigMin = np.load('../Data/ProcessedData/'+str(DataSource)+'SigMin.pkl', allow_pickle=True)
+        
+        TrDeNorm = (TrInp * (SigMax[str(SigType)] - SigMin[str(SigType)]) + SigMin[str(SigType)]).copy()
+        ValDeNorm = (ValInp * (SigMax[str(SigType)] - SigMin[str(SigType)]) + SigMin[str(SigType)]).copy()
+        
+        MeanSig, SigmaSig = np.mean(TrDeNorm), np.std(TrDeNorm) 
+        TrInp = (TrDeNorm-MeanSig)/SigmaSig
+        ValInp = (ValDeNorm-MeanSig)/SigmaSig
     
     
     #### -----------------------------------------------------  Defining model structure -------------------------------------------------------------------------     
     # Calling Modesl
     BenchModel, TrInp, ValInp = ModelCall ({**CommonParams, **ModelParams}, ConfigName, TrInp, ValInp, Resume=Resume, Reparam=True, ModelSaveName=ModelSaveName) 
-
+    # Checkpoint callback
+    CheckPoint = tf.keras.callbacks.ModelCheckpoint(filepath=ModelSaveName, save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min', verbose=1)
+    # Early-stop callback
+    EarlyStop = EarlyStopping(monitor='val_loss', patience=200, restore_best_weights=True )
+    # Train model
 
     #### -----------------------------------------------------  Execute model training -------------------------------------------------------------------------     
     if 'VAE' in ConfigName:
         # Calling dynamic controller for losses (DCL)
         ## The relative size of the loss is reflected in the weight to minimize the loss.
-        RelLoss = DCLCall ({**CommonParams, **ModelParams}, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume)
+        RelLoss = DCLCall ({**CommonParams, **ModelParams}, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume, Patience=500)
         NEpochs -= (RelLoss.StartEpoch )    
         
         #### Model Training
         BenchModel.fit(TrInp, batch_size=BatSize, epochs=NEpochs, shuffle=True, validation_data =(ValInp, None) , callbacks=[RelLoss]) 
-        
-    else: 
-        # Checkpoint callback
-        CheckPoint = tf.keras.callbacks.ModelCheckpoint(filepath=ModelSaveName, save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min', verbose=1)
-        # Early-stop callback
-        EarlyStop = EarlyStopping(monitor='val_loss', patience=50, restore_best_weights=True )
-        # Train model
-        BenchModel.fit(TrInp, TrOut, validation_data=(ValInp, ValOut), epochs=ModelParams['NEpochs'], batch_size=ModelParams['BatSize'],  callbacks=[CheckPoint, EarlyStop])
+            
+    elif 'Wavenet' in ConfigName:
+        #### Model Training
+        BenchModel.fit(TrInp, TrOut, validation_data=(ValInp, ValOut), epochs=ModelParams['NEpochs'],
+                       batch_size=ModelParams['BatSize'], callbacks=[CheckPoint, EarlyStop])
 
-    
+    elif 'DiffWave' in ConfigName:
+        BenchModel.fit(x=TrInp[0], y=TrInp[1], batch_size=ModelParams['BatSize'], epochs=ModelParams['NEpochs'], 
+                       validation_data=(ValInp[0], ValInp[1]), callbacks=[CheckPoint, EarlyStop])

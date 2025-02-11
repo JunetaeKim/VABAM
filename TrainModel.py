@@ -106,7 +106,7 @@ if __name__ == "__main__":
    
     # Calling dynamic controller for losses (DCL)
     ## The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLoss = DCLCall (ModelConfigSet, ModelSavePath, ToSaveLoss=None, SaveWay='max', Resume=Resume)
+    RelLoss = DCLCall (ModelConfigSet, ModelSavePath, ToSaveLoss=None, SaveWay='max', Resume=Resume, Patience=300)
     NEpochs -= (RelLoss.StartEpoch )
     
     # Model Training
