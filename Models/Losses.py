@@ -98,8 +98,8 @@ def DefLosses (Models, DataSize, LossConfigSet):
     Z_Mu, Z_Log_Sigma, Zs = SigRepModel.get_layer('Z_Mu').output, SigRepModel.get_layer('Z_Log_Sigma').output, SigRepModel.get_layer('Zs').output
     LogProb_Prod_QZi = tf.maximum(LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None]), np.log(1/DataSize)) 
     LogProb_Prod_QZ = tf.reduce_sum(LogProb_Prod_QZi, axis=2, keepdims=False)
-    JointEntropy  = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_Prod_QZ ,   axis=1,   keepdims=False)
-    MarginalEntropies = tf.reduce_sum( - tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1),  axis=1)
+    JointEntropy = tf.reduce_logsumexp(-tf.math.log(DataSize*1.) + LogProb_Prod_QZ, axis=1, keepdims=False)
+    MarginalEntropies = tf.reduce_sum(-tf.math.log(DataSize*1.) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1), axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
     
     

@@ -6,13 +6,12 @@ from tensorflow.keras.layers import Input, GRU, Dense, Masking, Reshape, Flatten
 from tensorflow.keras import Model
 from Utilities.Utilities import ReName
 
-
 def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     ## Masking vector generation 1 vs 0
     NBatch = tf.shape(InpRegul)[0]
     
-    MaskIDX = tf.random.shuffle(tf.range(NBatch * InpRegul.shape[1] ))
-    CutIDX = tf.cast(  tf.cast(tf.shape(MaskIDX)[0], dtype=tf.float64) * (1-MaskingRate), dtype=tf.int32 )
+    MaskIDX = tf.random.shuffle(tf.range(NBatch * InpRegul.shape[1]))
+    CutIDX = tf.cast(tf.cast(tf.shape(MaskIDX)[0], dtype=tf.float64) * (1-MaskingRate), dtype=tf.int32)
     MaskIDX = tf.cast(MaskIDX < CutIDX, dtype=tf.float64)
     MaskVec = tf.reshape(MaskIDX, (NBatch, -1))[:,:,None]
     
@@ -24,7 +23,7 @@ def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     return MaskVec, NoisVec
 
 def GenLowFilter (LF, N, Decay=0.):
-    nVec = np.arange(N, dtype=np.float64)
+    nVec = tf.range(N, dtype=np.float64)
     Window = tf.signal.hamming_window(N) # Window shape = [N]
 
     # A low-pass filter
@@ -42,7 +41,7 @@ def GenLowFilter (LF, N, Decay=0.):
     return LPF[:,None]  
 
 def GenHighFilter (HF, N, Decay=0.):
-    nVec = np.arange(N, dtype=np.float64)
+    nVec = tf.range(N, dtype=np.float64)
     Window = tf.signal.hamming_window(N)
 
     # A high-pass filter

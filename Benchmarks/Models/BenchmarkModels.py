@@ -3,6 +3,7 @@ from tensorflow.keras import Model
 from Benchmarks.Models.BaseVAES import *
 from Benchmarks.Models.Wavenet import *
 from Benchmarks.Models.DiffWave import *
+from Benchmarks.Models.VDiffWave import *
 from Models.Discriminator import FacDiscriminator
 from Utilities.Utilities import Lossweight
 from Utilities.AncillaryFunctions import LogNormalDensity, SplitBatch
@@ -384,3 +385,14 @@ def DiffWave(ConfigSpec):
     DiffWaveModel.compile(optimizer=optimizer)
 
     return DiffWaveModel
+
+
+def VDiffWave(ConfigSpec):
+    #### -----------------------------------------------------   Model   -------------------------------------------------------------------------    
+    # Instantiate the model.
+    VDiffWaveModel = VDM(ConfigSpec)
+
+    # Compile the model with an optimizer.
+    VDiffWaveModel.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=2e-4))
+
+    return VDiffWaveModel

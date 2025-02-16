@@ -99,7 +99,7 @@ def DefLosses (Models, DataSize, LossConfigSet):
     LogProb_Prod_QZi = tf.maximum(LogNormalDensity(Zs[:, None], Z_Mu[None], Z_Log_Sigma[None]), np.log(1/DataSize)) 
     LogProb_Prod_QZ = tf.reduce_sum(LogProb_Prod_QZi, axis=2, keepdims=False)
     JointEntropy = tf.reduce_logsumexp(-tf.math.log(tf.cast(DataSize * 1., tf.float64)) + LogProb_Prod_QZ, axis=1, keepdims=False)
-    MarginalEntropies = tf.reduce_sum(- tf.math.log(tf.cast(DataSize * 1., tf.float64)) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1), axis=1)
+    MarginalEntropies = tf.reduce_sum(-tf.math.log(tf.cast(DataSize * 1., tf.float64)) + tf.reduce_logsumexp(LogProb_Prod_QZi, axis=1), axis=1)
     kl_Loss_TC = tf.reduce_mean( JointEntropy - MarginalEntropies)
     
     
@@ -131,6 +131,7 @@ def DefLosses (Models, DataSize, LossConfigSet):
         print('kl_Loss_DKZ selected')
 
 
+    
     ### Adding specific losses
     if 'SKZ' in SpecLosses :
         Capacity_Z = LossConfigSet['Capacity_Z']

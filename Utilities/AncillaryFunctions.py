@@ -167,7 +167,7 @@ def SamplingZj (Samp_Z, NMiniBat,  NParts, NSubGen, LatDim, NSelZ, ZjType='bd' )
     return Samp_Zj
 
 
-def SamplingFCs (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='Modelbdrm', FcLimit= 0.05):
+def SamplingFCs (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, GPU=True, SampFCType='Modelbdrm', FcLimit= [0, 1.]):
 
     # Check for valid SampFCType values
     assert SampFCType in ['Modelbdrm', 'Modelbdm'], "Please verify the value of 'SampFCType'. Only 'Modelbdrm', and 'Modelbdm' are valid."
@@ -185,7 +185,7 @@ def SamplingFCs (Data, SampModel, NMiniBat, NParts, NSubGen, BatchSize = 1000, G
         Samp_FC =  np.broadcast_to(UniqSamp_FC, (NMiniBat, NParts, NSubGen, UniqSamp_FC.shape[-1])).reshape(-1, UniqSamp_FC.shape[-1])
 
     # Return shape of Samp_FC: (NMiniBat*NParts*NSubGen, LatDim)
-    return Samp_FC * FcLimit
+    return FcLimit[0] + Samp_FC * (FcLimit[1] - FcLimit[0])
     
     
 

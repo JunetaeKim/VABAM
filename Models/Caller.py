@@ -102,7 +102,6 @@ def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', CheckP
     
     
     ### Dynamic controller for specific losses and betas
-    
     if 'SKZ' in SpecLosses :
         RelLossDic['val_kl_Loss_Z'] = 'Beta_Z'
         ScalingDic['val_kl_Loss_Z'] = SelConfigSet['WZ']

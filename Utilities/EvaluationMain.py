@@ -289,7 +289,7 @@ class Evaluator ():
     ''' ------------------------------------------------------ Main Functions ------------------------------------------------------'''
     
     ### -------------------------- Evaluating the performance of the model using both Z and FC inputs  -------------------------- ###
-    def Eval_ZFC (self, AnalSig, SampZModel, SampFCModel, GenModel,  FcLimit=0.05,  WindowSize=3,  SecDataType='FCIN',  Continue=True ):
+    def Eval_ZFC (self, AnalSig, SampZModel, SampFCModel, GenModel,  FcLimit= [0, 1.],  WindowSize=3,  SecDataType='FCIN',  Continue=True ):
         
         ## Required parameters
         self.AnalSig = AnalSig              # The data to be used for analysis.
@@ -552,7 +552,7 @@ class Evaluator ():
 
 
     ### -------------------------- Evaluating the performance of the model using both Z and Conditions -------------------------- ###
-    def Eval_ZCON (self, AnalData, SampZModel, GenModel, FcLimit=0.05,  WindowSize=3,  SecDataType=None,  Continue=True ):
+    def Eval_ZCON (self, AnalData, SampZModel, GenModel, FcLimit= [0, 1.],  WindowSize=3,  SecDataType=None,  Continue=True ):
         
         ## Required parameters
         self.SampZModel = SampZModel         # The model that samples Zs.

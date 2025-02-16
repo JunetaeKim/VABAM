@@ -10,8 +10,8 @@ def MaskingGen ( InpRegul, MaskingRate, MaskStd):
     ## Masking vector generation 1 vs 0
     NBatch = tf.shape(InpRegul)[0]
     
-    MaskIDX = tf.random.shuffle(tf.range(NBatch * InpRegul.shape[1] ))
-    CutIDX = tf.cast(  tf.cast(tf.shape(MaskIDX)[0], dtype=tf.float32) * (1-MaskingRate), dtype=tf.int32 )
+    MaskIDX = tf.random.shuffle(tf.range(NBatch * InpRegul.shape[1]))
+    CutIDX = tf.cast(tf.cast(tf.shape(MaskIDX)[0], dtype=tf.float32) * (1-MaskingRate), dtype=tf.int32)
     MaskIDX = tf.cast(MaskIDX < CutIDX, dtype=tf.float32)
     MaskVec = tf.reshape(MaskIDX, (NBatch, -1))[:,:,None]
     

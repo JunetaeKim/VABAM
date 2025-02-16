@@ -44,10 +44,39 @@ class DilatedConv1d(tf.keras.layers.Layer):
         return conv + self.bias
 
 # =============================================================================
+# Feature-wise Linear Modulation
+# =============================================================================
+class FiLM(tf.keras.layers.Layer):
+    """Feature-wise Linear Modulation (FiLM) layer for conditional signal modulation."""
+    def __init__(self, channels):
+        """
+        Args:
+            channels (int): Number of output channels to scale and shift.
+        """
+        super(FiLM, self).__init__()
+        self.gamma_layer = tf.keras.layers.Dense(channels, activation="linear")  # Scaling factor
+        self.beta_layer = tf.keras.layers.Dense(channels, activation="linear")   # Shift factor
+
+    def call(self, inputs, condition):
+        """
+        Apply FiLM modulation.
+        
+        Args:
+            inputs (Tensor): Input tensor of shape (B, T, C).
+            condition (Tensor): Conditioning tensor of shape (B, C).
+
+        Returns:
+            Tensor: Modulated tensor of shape (B, T, C).
+        """
+        gamma = self.gamma_layer(condition)[:, None, :]  # Shape: (B, 1, C)
+        beta = self.beta_layer(condition)[:, None, :]    # Shape: (B, 1, C)
+        return gamma * inputs + beta  
+
+# =============================================================================
 # WaveNet Block
 # =============================================================================
 class Block(tf.keras.Model):
-    """Modified WaveNet block for 2D condition input."""
+    """Modified WaveNet block for 2D condition input with FiLM."""
     def __init__(self, channels, kernel_size, dilation, last=False, **kwargs):
         """
         Args:
@@ -62,24 +91,25 @@ class Block(tf.keras.Model):
 
         # Projection for diffusion step embedding.
         self.proj_embed = tf.keras.layers.Dense(channels)
+
+        # FiLM Layer 
+        self.film = FiLM(channels)
+
         # Dilated convolution doubling the channels (for gated activation).
         self.conv = DilatedConv1d(channels, channels * 2, kernel_size, dilation)
-        
-        # Projection for conditions.
-        self.proj_cond = tf.keras.layers.Dense(channels * 2)
-        
+
         if not last:
             self.proj_res = tf.keras.layers.Conv1D(channels, kernel_size=1)
         self.proj_skip = tf.keras.layers.Conv1D(channels, kernel_size=1)
 
     def call(self, inputs, embedding, condition):
         """
-        Process the input through the WaveNet block.
+        Process the input through the WaveNet block with FiLM.
         
         Args:
             inputs: Tensor of shape [B, T, C], input signal.
             embedding: Tensor of shape [B, E], diffusion step embedding.
-            condition: Tensor of shape [B, M], input conditions.
+            condition: Tensor of shape [B, C], input conditions.
         
         Returns:
             residual: Tensor of shape [B, T, C] for the residual connection (or None if last block).
@@ -89,22 +119,20 @@ class Block(tf.keras.Model):
         emb = self.proj_embed(embedding)  # [B, C]
         x = inputs + emb[:, None]         # [B, T, C]
 
-        # Project the conditions and broadcast.
-        cond_proj = self.proj_cond(condition)       # [B, C*2]
-        cond_proj = cond_proj[:, None, :]     # [B, 1, C*2]
-        cond_proj_rep = tf.broadcast_to(cond_proj, [tf.shape(x)[0], tf.shape(x)[1], self.channels * 2])
-        
-        # Apply the dilated convolution and add conditions.
-        x = self.conv(x) + cond_proj_rep         # [B, T, C*2]
-        
+        # Apply FiLM 
+        x = self.film(x, condition)
+
+        # Apply the dilated convolution
+        x = self.conv(x)
+
         # Split into two halves and apply a gated activation.
         context = tf.math.tanh(x[..., :self.channels])
         gate = tf.math.sigmoid(x[..., self.channels:])
-        x = context * gate                  # [B, T, C]
+        x = context * gate  # [B, T, C]
 
         # Compute the residual connection (if not the last block).
         if not self.last:
-            residual = (self.proj_res(x) + inputs) / math.sqrt(2.0)
+            residual = (self.proj_res(x) + inputs) / tf.math.sqrt(2.0)
         else:
             residual = None
         skip = self.proj_skip(x)
@@ -114,68 +142,66 @@ class Block(tf.keras.Model):
 # WaveNet Model
 # =============================================================================
 class WaveNet(tf.keras.Model):
-    """Modified WaveNet model for 2D condition input."""
+    """Modified WaveNet model for 2D condition input with FiLM."""
     def __init__(self, config, **kwargs):
-        """
-        Args:
-            config: Configuration object with attributes such as:
-                channels, iter, embedding_proj, embedding_layers,
-                num_layers, num_cycles, dilation_rate, kernel_size,
-                embedding_size, embedding_factor, etc.
-        """
         super(WaveNet, self).__init__(**kwargs)
         self.config = config
-        
-        # Project the raw signal to hidden channels.
+
+        # Projection layer for input signal
         self.proj = tf.keras.layers.Conv1D(config['Channels'], kernel_size=1)
-        # Precompute sinusoidal embeddings for the diffusion steps.
+
+        # FiLM layers
+        self.film = FiLM(config['Channels'])
+
+        # Embedding layers
         self.embed = self._embedding(config['Iter'])
-        # A list of projection layers to refine the embedding.
         self.proj_embed = [tf.keras.layers.Dense(config['EmbeddingProj']) for _ in range(config['EmbeddingLayers'])]
-         
-        # Build WaveNet blocks with increasing dilation rates.
+
+        # WaveNet blocks
         self.blocks = []
         layers_per_cycle = config['NumLayers'] // config['NumCycles']
         for i in range(config['NumLayers']):
             dilation = config['DilationRate'] ** (i % layers_per_cycle)
             is_last = (i == config['NumLayers'] - 1)
             self.blocks.append(Block(config['Channels'], config['KernelSize'], dilation, last=is_last))
-        
-        # Output projection layers.
-        self.proj_out = [tf.keras.layers.Conv1D(config['Channels'], kernel_size=1, activation=tf.nn.relu),
-                        tf.keras.layers.Conv1D(1, kernel_size=1)]
+
+        # Output projection layers
+        self.proj_out = [
+            tf.keras.layers.Conv1D(config['Channels'], kernel_size=1, activation=tf.nn.relu),
+            tf.keras.layers.Conv1D(1, kernel_size=1)
+        ]
 
     def call(self, signal, timestep, condition):
         """
-        Forward pass through WaveNet.
+        Forward pass through WaveNet with FiLM applied.
         
         Args:
-            signal: Tensor of shape [B, T], input audio signal.
+            signal: Tensor of shape [B, T], input signal.
             timestep: Tensor of shape [B], diffusion timesteps.
             condition: Tensor of shape [B, M], input conditions.
-            - Note: Internally expanded to [B, 1, M].
-        
+
         Returns:
             Tensor of shape [B, T], predicted output signal.
         """
-        # Expand channel dimension and apply initial projection.
+        # Apply FiLM at the input stage
         x = tf.nn.relu(self.proj(tf.expand_dims(signal, axis=-1)))  # [B, T, C]
-        
+        x = self.film(x, condition)  # Apply FiLM modulation
+
         # Gather the embedding for the given timesteps.
         embed = tf.gather(self.embed, timestep - 1)  # [B, E]
         for proj in self.proj_embed:
             embed = tf.nn.swish(proj(embed))
-        
-        # Process through each WaveNet block and accumulate skip connections.
+
+        # Process through each WaveNet block
         skip_connections = []
         for block in self.blocks:
-            x, skip = block(x, embed, condition) # [B, T, C], [B, T, C]
+            x, skip = block(x, embed, condition)
             skip_connections.append(skip)
-        
-        # Sum the skip connections and scale.
-        out = tf.add_n(skip_connections) / math.sqrt(len(self.blocks))
-        
-        # Apply output projection layers.
+
+        # Sum the skip connections
+        out = tf.add_n(skip_connections) / tf.math.sqrt(float(len(self.blocks)))
+
+        # Apply output projection layers
         for proj in self.proj_out:
             out = proj(out)
         return tf.squeeze(out, axis=-1)
@@ -204,7 +230,7 @@ class WaveNet(tf.keras.Model):
 # =============================================================================
 class ConditionalDiffWave(tf.keras.Model):
     """
-    DiffWave: A diffusion model for audio synthesis.
+    DiffWave: A diffusion model for signal synthesis.
     """
     def __init__(self, config, **kwargs):
         """
@@ -226,12 +252,12 @@ class ConditionalDiffWave(tf.keras.Model):
         
         Returns:
             Tuple:
-              - signal: Tensor of shape [B, T], denoised audio signal.
+              - signal: Tensor of shape [B, T], denoised signal.
         """
         if noise is None:
             b = tf.shape(condition)[0]
             t = self.config['SigDim']
-            noise = tf.random.normal([b, t])
+            noise = tf.random.normal([b, t], mean=0.0, stddev=self.config['GaussSigma'])
 
         # Beta scheduler
         beta = np.linspace(self.config['BetaSchedule'][0], 
@@ -245,7 +271,7 @@ class ConditionalDiffWave(tf.keras.Model):
         for t_step in range(self.config['Iter'], 0, -1):
             eps = self.pred_noise(signal, tf.fill([tf.shape(signal)[0]], t_step), condition)
             mu, sigma = self.pred_signal(signal, eps, alpha[t_step - 1], alpha_bar[t_step - 1])
-            signal = mu + tf.random.normal(tf.shape(signal)) * sigma
+            signal = mu + tf.random.normal(tf.shape(signal), mean=0.0, stddev=self.config['GaussSigma']) * sigma
         return signal
 
     def diffusion(self, signal, alpha_bar, eps=None):
@@ -263,7 +289,7 @@ class ConditionalDiffWave(tf.keras.Model):
               - eps: Tensor of shape [B, T], the added noise.
         """
         if eps is None:
-            eps = tf.random.normal(tf.shape(signal))
+            eps = tf.random.normal(tf.shape(signal), mean=0.0, stddev=self.config['GaussSigma'])
         if isinstance(alpha_bar, tf.Tensor):
             alpha_bar = alpha_bar[:, None]
         return tf.sqrt(alpha_bar) * signal + tf.sqrt(1 - alpha_bar) * eps, eps
@@ -307,7 +333,7 @@ class ConditionalDiffWave(tf.keras.Model):
         Helper function to compute the loss for a given batch.
         
         Args:
-            signal: Tensor of shape [B, T], clean audio signal.
+            signal: Tensor of shape [B, T], clean signal.
             timesteps: Tensor of shape [B], diffusion timesteps.
             condition: Tensor of shape [B, M], input conditions.
                  - Note: Internally expanded to [B, 1, M'].
@@ -315,15 +341,30 @@ class ConditionalDiffWave(tf.keras.Model):
         Returns:
             loss: Scalar Tensor representing the computed loss.
         """
-
-         # Beta scheduler
+        
+        # For Computing PSD
+        def tf_fft_psd(data, min_freq=1, max_freq=51):
+            data = tf.cast(data, tf.complex64)
+            fft_res = tf.abs(tf.signal.fft(data))
+            half_len = tf.shape(fft_res)[-1] // 2
+            psd = tf.square(fft_res[..., :half_len]) / tf.cast(tf.shape(data)[-1], tf.float32)
+            psd = psd[..., min_freq:max_freq]
+            return psd / tf.reduce_sum(psd, axis=(-1),keepdims=True) 
+            
+        # Beta scheduler
         beta = np.linspace(self.config['BetaSchedule'][0], self.config['BetaSchedule'][1], self.config['Iter']) 
         alpha = 1.0 - beta
         alpha_bar = np.cumprod(alpha)
         noise_level = tf.gather(tf.constant(alpha_bar, dtype=tf.float32), timesteps - 1)
         noised, noise = self.diffusion(signal, noise_level)
         eps = self.pred_noise(noised, timesteps, condition)
-        loss = tf.reduce_mean((eps - noise)**2)
+
+        denoised_signal = noised - noise
+        psd_denoised = tf_fft_psd(denoised_signal) # Compute PSD of denoised_signal
+        
+        # Compute the total loss 
+        loss = tf.reduce_mean((eps - noise)**2) + tf.reduce_mean((psd_denoised - condition) ** 2)
+
         return loss
 
     def train_step(self, data):
@@ -332,7 +373,7 @@ class ConditionalDiffWave(tf.keras.Model):
         
         Args:
             data: A tuple (signal, condition) where:
-                  - signal: Tensor of shape [B, T], raw audio signal.
+                  - signal: Tensor of shape [B, T], raw signal.
                   - condition: Tensor of shape [B, M], input conditions.
                         - Note: Internally expanded to [B, 1, M'].
         
@@ -354,7 +395,7 @@ class ConditionalDiffWave(tf.keras.Model):
         
         Args:
             data: A tuple (signal, condition) where:
-                  - signal: Tensor of shape [B, T], raw audio signal.
+                  - signal: Tensor of shape [B, T], raw signal.
                   - condition: Tensor of shape [B, M], input conditions.
                         - Note: Internally expanded to [B, 1, M'].
         

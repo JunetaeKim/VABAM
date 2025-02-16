@@ -70,7 +70,7 @@ def ModelCall (SelConfigSet, SigDim, DataSize, Resume=False, LoadWeight=False, R
 
 
 # Dynamic controller for losses
-def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', CheckPoint=False, Resume=False, Buffer=0):
+def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', CheckPoint=False, Resume=False, Buffer=0, Patience=100):
     
     if ToSaveLoss is None:
         ToSaveLoss = ['val_FeatRecLoss', 'val_OrigRecLoss']
@@ -95,13 +95,19 @@ def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', CheckP
     
     
     ### Dynamic controller for common losses and betas; The relative size of the loss is reflected in the weight to minimize the loss.
-    RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat', 'val_kl_Loss_Z':'Beta_Z'}
-    ScalingDic = { 'val_OrigRecLoss':WRec, 'val_FeatRecLoss':WFeat, 'val_kl_Loss_Z':WZ}
-    MinLimit = {'Beta_Orig':MnWRec, 'Beta_Feat':MnWFeat, 'Beta_Z':MnWZ}
-    MaxLimit = {'Beta_Orig':MxWRec, 'Beta_Feat':MxWFeat, 'Beta_Z':MxWZ}
+    RelLossDic = { 'val_OrigRecLoss':'Beta_Orig', 'val_FeatRecLoss':'Beta_Feat'}
+    ScalingDic = { 'val_OrigRecLoss':WRec, 'val_FeatRecLoss':WFeat}
+    MinLimit = {'Beta_Orig':MnWRec, 'Beta_Feat':MnWFeat}
+    MaxLimit = {'Beta_Orig':MxWRec, 'Beta_Feat':MxWFeat}
     
     
     ### Dynamic controller for specific losses and betas
+    if 'SKZ' in SpecLosses :
+        RelLossDic['val_kl_Loss_Z'] = 'Beta_Z'
+        ScalingDic['val_kl_Loss_Z'] = SelConfigSet['WZ']
+        MinLimit['Beta_Z'] = SelConfigSet['MnWZ']
+        MaxLimit['Beta_Z'] = SelConfigSet['MxWZ']       
+            
     if 'FC' in SpecLosses :
         RelLossDic['val_kl_Loss_FC'] = 'Beta_Fc'
         ScalingDic['val_kl_Loss_FC'] = SelConfigSet['WFC']
@@ -133,6 +139,6 @@ def DCLCall (SelConfigSet, ModelSaveName, ToSaveLoss=None, SaveWay='max', CheckP
         
 
     RelLoss = RelLossWeight(BetaList=RelLossDic, LossScaling= ScalingDic, MinLimit= MinLimit, MaxLimit = MaxLimit, SavePath = ModelSaveName, CheckPoint=CheckPoint,
-                            ToSaveLoss=ToSaveLoss, SaveWay=SaveWay, Buffer=Buffer, Resume=Resume)
+                            ToSaveLoss=ToSaveLoss, SaveWay=SaveWay, Buffer=Buffer, Resume=Resume, Patience=Patience)
     
     return RelLoss

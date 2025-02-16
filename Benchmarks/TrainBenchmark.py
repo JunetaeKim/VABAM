@@ -144,16 +144,9 @@ if __name__ == "__main__":
         ModelParams['SigDim'] = TrInp.shape[1]
 
     # Standardization for certain models.
-    if 'DiffWave' in ConfigName or 'VDMWave' in ConfigName:
-        SigMax = np.load('../Data/ProcessedData/'+str(DataSource)+'SigMax.pkl', allow_pickle=True)
-        SigMin = np.load('../Data/ProcessedData/'+str(DataSource)+'SigMin.pkl', allow_pickle=True)
-        
-        TrDeNorm = (TrInp * (SigMax[str(SigType)] - SigMin[str(SigType)]) + SigMin[str(SigType)]).copy()
-        ValDeNorm = (ValInp * (SigMax[str(SigType)] - SigMin[str(SigType)]) + SigMin[str(SigType)]).copy()
-        
-        MeanSig, SigmaSig = np.mean(TrDeNorm), np.std(TrDeNorm) 
-        TrInp = (TrDeNorm-MeanSig)/SigmaSig
-        ValInp = (ValDeNorm-MeanSig)/SigmaSig
+    if 'DiffWave' in ConfigName or 'VDWave' in ConfigName:
+        TrInp = TrInp*2 -1.
+        ValInp = ValInp*2 -1.
     
     
     #### -----------------------------------------------------  Defining model structure -------------------------------------------------------------------------     
@@ -162,14 +155,14 @@ if __name__ == "__main__":
     # Checkpoint callback
     CheckPoint = tf.keras.callbacks.ModelCheckpoint(filepath=ModelSaveName, save_best_only=True, save_weights_only=True, monitor='val_loss', mode='min', verbose=1)
     # Early-stop callback
-    EarlyStop = EarlyStopping(monitor='val_loss', patience=200, restore_best_weights=True )
+    EarlyStop = EarlyStopping(monitor='val_loss', patience=300, restore_best_weights=True )
     # Train model
 
     #### -----------------------------------------------------  Execute model training -------------------------------------------------------------------------     
     if 'VAE' in ConfigName:
         # Calling dynamic controller for losses (DCL)
         ## The relative size of the loss is reflected in the weight to minimize the loss.
-        RelLoss = DCLCall ({**CommonParams, **ModelParams}, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume, Patience=500)
+        RelLoss = DCLCall ({**CommonParams, **ModelParams}, ConfigName, ModelSaveName, ToSaveLoss=None, SaveWay='max', Resume=Resume, Patience=300)
         NEpochs -= (RelLoss.StartEpoch )    
         
         #### Model Training
@@ -178,8 +171,8 @@ if __name__ == "__main__":
     elif 'Wavenet' in ConfigName:
         #### Model Training
         BenchModel.fit(TrInp, TrOut, validation_data=(ValInp, ValOut), epochs=ModelParams['NEpochs'],
-                       batch_size=ModelParams['BatSize'], callbacks=[CheckPoint, EarlyStop])
+                       batch_size=ModelParams['BatSize'], shuffle=True, callbacks=[CheckPoint, EarlyStop])
 
-    elif 'DiffWave' in ConfigName:
+    if 'DiffWave' in ConfigName or 'VDWave' in ConfigName:
         BenchModel.fit(x=TrInp[0], y=TrInp[1], batch_size=ModelParams['BatSize'], epochs=ModelParams['NEpochs'], 
-                       validation_data=(ValInp[0], ValInp[1]), callbacks=[CheckPoint, EarlyStop])
+                       validation_data=(ValInp[0], ValInp[1]), shuffle=True, callbacks=[CheckPoint, EarlyStop])

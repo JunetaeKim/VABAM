@@ -63,6 +63,17 @@ def ModelCall (ConfigSpec, ConfigName, TrData, ValData, Resume=False, LoadWeight
         BenchModel = DiffWave(ConfigSpec)
         _ = BenchModel.wavenet(TrInp[0][:1], tf.convert_to_tensor([1], dtype=tf.int32), TrInp[1][:1])
         _ = BenchModel(TrInp[1][:1])
+        
+    elif 'VDWave' in ConfigName:
+        Tr_Cond = FFT_PSD(TrData, 'None')[:, 0]
+        Val_Cond = FFT_PSD(ValData, 'None')[:, 0]   
+        TrInp, ValInp = [TrData, Tr_Cond], [ValData, Val_Cond]
+        ConfigSpec['SigDim'] = TrData.shape[-1]
+
+        # Call the model with some dummy input data to create the variables and allows weight loading
+        BenchModel = VDiffWave(ConfigSpec)
+        _ = BenchModel.wavenet(TrInp[0][:1, :, None], tf.convert_to_tensor([1], dtype=tf.int32), TrInp[1][:1])
+        _ = BenchModel([TrInp[0][:1], TrInp[1][:1]])
 
     else:
         assert False, "Please verify if the model name is right or not."    
